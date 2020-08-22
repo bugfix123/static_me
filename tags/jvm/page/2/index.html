@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>jvm :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://fixbug.me/tags/jvm/" rel="canonical"/>
+<link href="https://fixbug.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="website" property="og:type"/>
+<meta content="jvm :: DongZhi.ME" property="og:title"/>
+<meta content="" property="og:description"/>
+<meta content="https://fixbug.me/tags/jvm/" property="og:url"/>
+<meta content="jvm" property="og:site_name"/>
+<meta content="https://fixbug.me/img/favicon/orange.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<link href="/tags/jvm/index.xml" rel="alternate" title="DongZhi.ME" type="application/rss+xml"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="posts">
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-08/">JVM Learn 08 线程上下文类加载器和Service Loader</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-07
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          
+          双亲委托机制的局限性 当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/07/jvm-learn-08/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-09/">JVM Learn 09 类的字节码结构</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-07
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          
+          概念 字节码文件(.class)由JVM规范规定，主要包括魔数、JDK版本号(小版本和大版本)、常量池、类的访问标志、类的接口和父类信息、成员变量信息，方法信息等。 对于java中的数据类型，字节码中的对
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/07/jvm-learn-09/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-10/">JVM Learn 10 类的虚方法机制</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-07
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          
+          基本概念总结 符号引用在类的加载阶段或者第一次引用时转换成直接引用，这叫做静态解析。一些符号引用则在每次运行时转换成直接引用，这种转换是动态链接，java的多态正是在此时实现的。 方法调用的几个指令： in
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/07/jvm-learn-10/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-11/">JVM Learn 11 关于栈的指令操作的例子</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-07
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+<blockquote>
+<p>本例以一个简单的加减乘除的例子，来熟悉虚拟机的操作数栈的工作流程。</p>
+</blockquote>
+</div>
+<div>
+<a class="read-more button" href="/2020/07/07/jvm-learn-11/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-12/">JVM Learn 12 从字节码看动态代理</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-07
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          
+          动态代理是在运行时，通过反射机制实现动态代理，并且能够代理各种类型的对象。相对于静态代理，它的优势是不需要事先知道被代理的类型，可以与被代理的类解耦，同时可以大大减少代理类的数量。
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/07/jvm-learn-12/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-13/">JVM Learn 13 JVM的内存划分</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-07
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          
+          内存划分 java虚拟机的内存划分主要包括以下几个部分： 程序计数器：记录当前线程执行的下一条指令的地址，很小的空间 虚拟机栈(stack): 每个方法执行时候在栈里面创建一个栈帧，用于存储局部变量表，操作数
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/07/jvm-learn-13/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-14/">JVM Learn 14 java堆的转储与Jvisualvm</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-07
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+<blockquote>
+<p>本文记录一下java队的转储和JVisualVM的用法。</p>
+</blockquote>
+</div>
+<div>
+<a class="read-more button" href="/2020/07/07/jvm-learn-14/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-15/">JVM Learn 15 java栈的测试</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-07
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+<blockquote>
+<p>java的虚拟机栈中可能会存在java.lang.StackOverflowError这个错误，本例中通过方法的递归来模拟出该异常，进而研究其细节。</p>
+</blockquote>
+</div>
+<div>
+<a class="read-more button" href="/2020/07/07/jvm-learn-15/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/06/jvm-learn-01/">JVM Learn 01.类的加载之初体验</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-06
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          
+          在java中，类型（可以理解成class）的加载、连接和初始化都是在程序运行期间完成的。在运行期完成可以为程序开发人员提供了更大的灵活性。 加载：将已经存在的class文件加载到内存,查找并加载类的二进
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/06/jvm-learn-01/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/06/jvm-learn-02/">JVM Learn 02 常量的那点东西</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-06
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          常量在编译阶段会存入调用这个常量的方法所在类的常量池中，本质上调用类并没有直接引用定义常量的类，因此并不会出发定义常量类的初始化。如果该常量值时动态生成的，则不会放在常量池中，会导致定义常量的类主动使用并初始化。
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/06/jvm-learn-02/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/06/jvm-learn-03/">JVM Learn 03 理解类的初始化的一个简单例子</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-06
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          这是一个经典例子，很多面试题中出现过。首先引入正常的情况：
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/06/jvm-learn-03/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/06/jvm-learn-04/">JVM Learn 04 类加载器(一)</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-06
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<img alt="JVM Learn 04 类加载器(一)" class="post-cover" src="https://fixbug.me/post/images/2020/cover_classloader.jpg"/>
+<div class="post-content">
+          
+          java的类加载器(class loader)，用来将java的字节码文件(.class)读取到内存中，生成一个Java.lang.Class对象。通过Class类的newInstance()方法，可以生成一个被加载类的对象。
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/06/jvm-learn-04/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/06/jvm-learn-05/">JVM Learn 05 类加载器(二)</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-06
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          
+          父子类加载器的命名空间 类A中引用了类B，那么加载类B时，由类A的类加载器按照双亲委托机制尝试加载。子类加载器加载的类可以引用父类加载器加载的类，而父类加载器加载的类不能引用子类加载器加载的类。 测试案例
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/06/jvm-learn-05/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/06/jvm-learn-06/">JVM Learn 06 类加载器(三)</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-06
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          
+          继续前面两篇类加载器的内容，本篇补充总结类加载的一些关键问题。 Java的类加载器本身如何被加载？ Java的根类加载器(Bootstrap Class Loader)，由C++编写，它是内建在JVM方法区内的一块字
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/06/jvm-learn-06/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/06/jvm-learn-07/">JVM Learn 07 Launcher源码解析</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-06
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+<blockquote>
+<p>这次重新阅读了一下sun.misc.Launcher这个类的源码，这里总结一下。</p>
+</blockquote>
+</div>
+<div>
+<a class="read-more button" href="/2020/07/06/jvm-learn-07/">Read more →</a>
+</div>
+</div>
+<div class="pagination">
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="/tags/jvm/">
+<span class="button__icon">←</span>
+<span class="button__text">Newer posts</span>
+</a>
+</span>
+<span class="button next">
+<a href="/tags/jvm/page/3/">
+<span class="button__text">Older posts</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span>:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+</div>
+</div>
+</footer>
+<script src="https://fixbug.me/assets/main.js"></script>
+</div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>码农使用电脑的日常 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充 Github clone访问太慢 在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启s" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://fixbug.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/" rel="canonical"/>
+<link href="https://fixbug.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="码农使用电脑的日常 :: DongZhi.ME" property="og:title"/>
+<meta content="整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充 Github clone访问太慢 在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启s" property="og:description"/>
+<meta content="https://fixbug.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/" property="og:url"/>
+<meta content="码农使用电脑的日常" property="og:site_name"/>
+<meta content="https://fixbug.me/img/favicon/orange.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="技术" property="article:section"/>
+<meta content="2019-01-09 18:43:07 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://fixbug.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/">码农使用电脑的日常</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2019-01-09 
+      </span>
+</div>
+<div class="post-content"><div>
+<blockquote>
+<p>整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充</p>
+</blockquote>
+<!-- more -->
+<h1 id="github-clone访问太慢">Github clone访问太慢<a arialabel="Anchor" class="hanchor" href="#github-clone访问太慢">⌗</a> </h1>
+<p>在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启ss全局代理，不管用。测试发现，用socks5代理比较快。</p>
+<ul>
+<li>电脑环境：win7 64</li>
+<li>ss客户端版本: 4.1.3.1
+在cmd中输入以下指令：</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>git config --global http.proxy socks5://127.0.0.1:1080
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>git config --global https.proxy socks5://127.0.0.1:1080
+</code></pre></div><p>（端口号看你自己的配置，一般都是1080）
+如果要取消代理修改：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>git config --global --unset http.proxy
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>git config --global --unset https.proxy
+</code></pre></div><p>代理后git clone速度真的快了很多~我这边能到1MB/s以上。ps，我的ss是买的搬瓦工搭建了，比较稳定。</p>
+<h1 id="如何在浏览器js中引用node-js-">如何在浏览器js中引用node js ？<a arialabel="Anchor" class="hanchor" href="#如何在浏览器js中引用node-js-">⌗</a> </h1>
+<p><strong>首先</strong>，安装browserify，</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>npm install  browserify -g
+</code></pre></div><p><strong>然后</strong>，进入要打包的node project中，找到index.js文件</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#75715e"># test为自定义的模块名</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span> browserify -r ./index.js:<span style="color:#e6db74">'test'</span> &gt; bundle.js
+</code></pre></div><p><strong>最后</strong>，在html文件中引用test模块即可</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>&lt;<span style="color:#f92672">html</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">"utf-8"</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>    &lt;<span style="color:#f92672">head</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>        &lt;<span style="color:#f92672">tittle</span>&gt;js调用nodejs模块&lt;/<span style="color:#f92672">tittle</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>        &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">"text/javascript"</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">"bundle.js"</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>        &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">"text/javascript"</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>            <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">postStr</span>(){                
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>                <span style="color:#66d9ef">try</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>                    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">uniq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">'test'</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>                    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">nums</span> <span style="color:#f92672">=</span> [<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">5</span>];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>                    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">numsUniq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">uniq</span>(<span style="color:#a6e22e">nums</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>                    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">numsUniq</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>                    document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">"info"</span>).<span style="color:#a6e22e">innerHTML</span><span style="color:#f92672">=</span><span style="color:#a6e22e">numsUniq</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>                }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>                <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">err</span>){
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>                    <span style="color:#a6e22e">alert</span>(<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">message</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>                }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>        &lt;/<span style="color:#f92672">script</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>    &lt;/<span style="color:#f92672">head</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>    &lt;<span style="color:#f92672">body</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>        &lt;<span style="color:#f92672">form</span> <span style="color:#a6e22e">action</span><span style="color:#f92672">=</span><span style="color:#e6db74">""</span>&gt;                 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>            &lt;<span style="color:#f92672">p</span>&gt;&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">"info"</span>&gt;使用uniq函数后数组内容&lt;/<span style="color:#f92672">div</span>&gt; &lt;/<span style="color:#f92672">p</span>&gt;                    
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>            &lt;<span style="color:#f92672">p</span>&gt;&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">"button"</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">"btn_post"</span> <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">"postStr()"</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">"测试调用node函数"</span>/&gt;&lt;/<span style="color:#f92672">p</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>        &lt;/<span style="color:#f92672">form</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>    &lt;/<span style="color:#f92672">body</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>&lt;/<span style="color:#f92672">html</span>&gt;
+</code></pre></div><p>参考了这篇文章：</p>
+<ul>
+<li><a href="https://blog.csdn.net/w88193363/article/details/86238624">浏览器js调用nodejs模块，以uniq模块的调用为例</a></li>
+<li><a href="https://stackoverflow.com/questions/24329690/how-to-expose-require-to-the-browser-when-using-browserify-from-within-gulp">How to expose ‘require’ to the browser when using browserify from within gulp?</a></li>
+</ul>
+<h1 id="mp4视频添加srt字幕">mp4视频添加srt字幕<a arialabel="Anchor" class="hanchor" href="#mp4视频添加srt字幕">⌗</a> </h1>
+<p>有的时候你需要给视频加一个字幕(subtitle)，使用ffmpeg也可以做。一般我们见到的字幕以srt字幕为主，在ffmpeg里需要首先将srt字幕转化为ass字幕，然后就可以集成到视频中了(不是单独的字幕流，而是直接改写视频流)。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>ffmpeg -i my_subtitle.srt my_subtitle.ass
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>ffmpeg -i inputfile.mp4 -vf ass=my_subtitle.ass outputfile.mp4
+</code></pre></div><p>但是值得注意的是：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>my_subtitle.srt需要使用UTF8编码，老外不会注意到这一点，但是中文这是必须要考虑的；
+</code></pre></div><p>参考地址：<a href="https://github.com/tonydeng/fmj/blob/master/ffmpeg.md">FFMPEG 使用说明</a></p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://fixbug.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/">
+<span class="button__icon">←</span>
+<span class="button__text">Centos7下科学上网的方法</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://fixbug.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/">
+<span class="button__text">CentOS软件的常用安装命令汇总</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="background: rgb(183 168 154 / 26%);padding: 5px auto;margin: 10px auto;border: 1px dashed var(--accent);">
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.Pure.min.js"></script>
+<div id="vcomments"></div>
+<script>
+      new Valine({
+        el: '#comments' ,
+        appId: 'sJKN6mA2eSTxIq3YaOiCN3JX-MdYXbMMI',
+        appKey: 'aykSxGrm7HLN5BroU1gr3Ot3',
+        placeholder: 'go go it~',
+        visitor:  false ,
+        requiredFields: ['mail'],
+        emojiCDN: '//i0.hdslb.com/bfs/emote/',
+        emojiMaps: {
+          "tv_doge": "6ea59c827c414b4a2955fe79e0f6fd3dcd515e24.png",
+          "tv_亲亲": "a8111ad55953ef5e3be3327ef94eb4a39d535d06.png",
+          "tv_偷笑": "bb690d4107620f1c15cff29509db529a73aee261.png",
+          "tv_再见": "180129b8ea851044ce71caf55cc8ce44bd4a4fc8.png",
+          "tv_冷漠": "b9cbc755c2b3ee43be07ca13de84e5b699a3f101.png",
+          "tv_发怒": "34ba3cd204d5b05fec70ce08fa9fa0dd612409ff.png",
+          "tv_发财": "34db290afd2963723c6eb3c4560667db7253a21a.png",
+          "tv_可爱": "9e55fd9b500ac4b96613539f1ce2f9499e314ed9.png",
+          "tv_吐血": "09dd16a7aa59b77baa1155d47484409624470c77.png",
+          "tv_呆": "fe1179ebaa191569b0d31cecafe7a2cd1c951c9d.png",
+          "tv_呕吐": "9f996894a39e282ccf5e66856af49483f81870f3.png",
+          "tv_困": "241ee304e44c0af029adceb294399391e4737ef2.png",
+          "tv_坏笑": "1f0b87f731a671079842116e0991c91c2c88645a.png",
+          "tv_大佬": "093c1e2c490161aca397afc45573c877cdead616.png",
+          "tv_大哭": "23269aeb35f99daee28dda129676f6e9ea87934f.png",
+          "tv_委屈": "d04dba7b5465779e9755d2ab6f0a897b9b33bb77.png",
+          "tv_害羞": "a37683fb5642fa3ddfc7f4e5525fd13e42a2bdb1.png",
+          "tv_尴尬": "7cfa62dafc59798a3d3fb262d421eeeff166cfa4.png",
+          "tv_微笑": "70dc5c7b56f93eb61bddba11e28fb1d18fddcd4c.png",
+          "tv_思考": "90cf159733e558137ed20aa04d09964436f618a1.png",
+          "tv_惊吓": "0d15c7e2ee58e935adc6a7193ee042388adc22af.png",
+          "tv_打脸": "56ab10b624063e966bfcb76ea5dc4794d87dfd47.png",
+          "tv_抓狂": "fe31c08edad661d63762b04e17b8d5ae3c71a757.png",
+          "tv_抠鼻": "c666f55e88d471e51bbd9fab9bb308110824a6eb.png",
+          "tv_斜眼笑": "911f987aa8bc1bee12d52aafe62bc41ef4474e6c.png",
+          "tv_无奈": "ea8ed89ee9878f2fece2dda0ea8a5dbfe21b5751.png",
+          "tv_晕": "5443c22b4d07fb1907ccc610c8e6db254f2461b7.png",
+          "tv_流汗": "cead1c351ab8d79e9f369605beb90148db0fbed3.png",
+          "tv_流泪": "7e71cde7858f0cd50d74b0264aa26db612a8a167.png",
+          "tv_流鼻血": "c32d39db2737f89b904ca32700d140a9241b0767.png",
+          "tv_点赞": "f85c354995bd99e28fc76c869bfe42ba6438eff4.png",
+          "tv_生气": "26702dcafdab5e8225b43ffd23c94ac1ff932654.png",
+          "tv_生病": "8b0ec90e6b86771092a498c54f09fc94621c1900.png",
+          "tv_疑问": "0793d949b18d7be716078349c202c15ff166f314.png",
+          "tv_白眼": "c1d59f439e379ee50eef488bcb5e5378e5044ea4.png",
+          "tv_皱眉": "72ccad6679fea0d14cce648b4d818e09b8ffea2d.png",
+          "tv_目瞪口呆": "0b8cb81a68de5d5365212c99375e7ace3e7891b7.png",
+          "tv_睡着": "8b196675b53af58264f383c50ad0945048290b33.png",
+          "tv_笑哭": "1abc628f6d4f4caf9d0e7800878f4697abbc8273.png",
+          "tv_腼腆": "89712c0d4af73e67f89e35cbc518420380a7f6f4.png",
+          "tv_色": "61822c7e9aae5da76475e7892534545336b23a6f.png",
+          "tv_调侃": "4bc022533ef31544ca0d72c12c808cf4a1cce3e3.png",
+          "tv_调皮": "b9c41de8e82dd7a8515ae5e3cb63e898bf245186.png",
+          "tv_鄙视": "6e72339f346a692a495b123174b49e4e8e781303.png",
+          "tv_闭嘴": "c9e990da7f6e93975e25fd8b70e2e290aa4086ef.png",
+          "tv_难过": "87f46748d3f142ebc6586ff58860d0e2fc8263ba.png",
+          "tv_馋": "fc7e829b845c43c623c8b490ee3602b7f0e76a31.png",
+          "tv_鬼脸": "0ffbbddf8a94d124ca2f54b360bbc04feb6bbfea.png",
+          "tv_黑人问号": "45821a01f51bc867da9edbaa2e070410819a95b2.png",
+          "tv_鼓掌": "1d21793f96ef4e6f48b23e53e3b9e42da833a0f6.png"
+        } 
+      });
+      
+      
+      
+      
+      
+      
+      
+  </script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span>:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+</div>
+</div>
+</footer>
+<script src="https://fixbug.me/assets/main.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>同步异步和阻塞非阻塞的理解 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="同步、异步、阻塞和非阻塞这四个概念经常穿梭于IT教材和参考资料中，我也困惑久矣，晚上在知乎看到网友的一些讲解，写的非常好，于是特地记录总结一下。 我的理解 术语对比 同步和异步，描述的是请求方和响应方的通信" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://fixbug.me/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/" rel="canonical"/>
+<link href="https://fixbug.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="同步异步和阻塞非阻塞的理解 :: DongZhi.ME" property="og:title"/>
+<meta content="同步、异步、阻塞和非阻塞这四个概念经常穿梭于IT教材和参考资料中，我也困惑久矣，晚上在知乎看到网友的一些讲解，写的非常好，于是特地记录总结一下。 我的理解 术语对比 同步和异步，描述的是请求方和响应方的通信" property="og:description"/>
+<meta content="https://fixbug.me/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/" property="og:url"/>
+<meta content="同步异步和阻塞非阻塞的理解" property="og:site_name"/>
+<meta content="https://fixbug.me/img/favicon/orange.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="技术" property="article:section"/>
+<meta content="2018-12-16 20:58:22 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://fixbug.me/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/">同步异步和阻塞非阻塞的理解</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2018-12-16 
+      </span>
+</div>
+<div class="post-content"><div>
+<blockquote>
+<p>同步、异步、阻塞和非阻塞这四个概念经常穿梭于IT教材和参考资料中，我也困惑久矣，晚上在知乎看到网友的一些讲解，写的非常好，于是特地记录总结一下。</p>
+</blockquote>
+<!-- more -->
+<h2 id="我的理解">我的理解<a arialabel="Anchor" class="hanchor" href="#我的理解">⌗</a> </h2>
+<h3 id="术语对比">术语对比<a arialabel="Anchor" class="hanchor" href="#术语对比">⌗</a> </h3>
+<ul>
+<li>
+<p><strong>同步和异步</strong>，描述的是请求方和响应方的通信方式，同步侧重于请求方主动索取响应结果。异步的含义是，请求方发出请求后就完事了，至于响应结果的获取，它并不那么关心，响应结果是由响应方主动通知过来，或者通过回调的方式让请求方知晓响应结果。</p>
+</li>
+<li>
+<p><strong>阻塞和非阻塞</strong>，描述的是请求方的状态，请求发出之后，请求方在收到响应结果之前，可能全部的时间都在等待这个响应结果，则是阻塞，也可能还回去干别的事，这是非阻塞。</p>
+</li>
+<li>
+<p><strong>同步阻塞和同步非阻塞</strong>：请求方以同步的方式获取响应结果的这段时间里，可能什么事也不干，百分之百地处于轮询忙等状态，这是同步阻塞。也可能在这段里，请求方去作别的事，比方说看美女啦，但是他并没有忘记去查询响应结果，他隔一段时间地间歇性轮询响应结果，这是同步非阻塞。</p>
+</li>
+<li>
+<p><strong>异步阻塞和异步非阻塞</strong>：请求方以异步的方式获得响应结果，虽然获得响应结果是由响应方主动通知过来的，或者是通过回调请求方之前已经写好的例程。但是在获得响应结果之前的这段时间里，请求方可能发呆等待，也可能做别的事情去了，于是就有了异步阻塞和异步非阻塞。</p>
+</li>
+</ul>
+<h3 id="举个栗子">举个栗子<a arialabel="Anchor" class="hanchor" href="#举个栗子">⌗</a> </h3>
+<p>西门吹雪看了张柏芝的某著名电影后，对她莫名好感，历尽千辛万苦，联系上了张柏芝，握草，那还不抓紧机会表白啦。于是一天夜晚西门吹雪在张柏芝的宿舍楼下，向她表白了，表白的内容请参考《大话西游》，这里我们只关注表白的结果和相关行为：</p>
+<ol>
+<li>张柏芝说，请容我回去好好考虑一下吧，毕竟这是很慎重的事。张柏芝回去后，西门吹雪站在原地等待，打通张柏芝的电话后，一遍又一遍地问结果。这是同步阻塞。</li>
+<li>张柏芝说，请容我回去好好考虑一下吧，毕竟这是很慎重的事。张柏芝回去后，西门吹雪掏出小米手机开始玩QQ斗地主，当然每隔五分钟打张柏芝的电话一次问结果，不停地这样下去。这是同步非阻塞。</li>
+<li>张柏芝说，请容我回去好好考虑一下吧，毕竟这是很慎重的事，我想好了我打电话告诉你结果。西门吹雪待在原地，万分忐忑地发呆起来，过了一个小时后，张柏芝打来了电话，告知西门吹雪只能做普通朋友，哈哈。这是异步阻塞。</li>
+<li>张柏芝说，请容我回去好好考虑一下吧，毕竟这是很慎重的事，我想好了我打电话告诉你结果。于是西门吹雪掏出小米手机开始玩QQ斗地主，一小时后，张柏芝主动打来电话，告知不合适。这是异步非阻塞。</li>
+</ol>
+<h2 id="知乎上的讲解">知乎上的讲解<a arialabel="Anchor" class="hanchor" href="#知乎上的讲解">⌗</a> </h2>
+<p><strong>出处</strong>:怎样理解阻塞非阻塞与同步异步的区别？</p>
+<p>严肃网友：</p>
+<p>“阻塞”与”非阻塞”与”同步”与“异步”不能简单的从字面理解，提供一个从分布式系统角度的回答。</p>
+<ul>
+<li><strong>同步与异步</strong>   同步和异步关注的是消息通信机制 (synchronous communication/ asynchronous communication)所谓同步，就是在发出一个调用时，在没有得到结果之前，该调用就不返回。但是一旦调用返回，就得到返回值了。换句话说，就是由调用者主动等待这个调用的结果。而异步则是相反，调用在发出之后，这个调用就直接返回了，所以没有返回结果。换句话说，当一个异步过程调用发出后，调用者不会立刻得到结果。而是在调用发出后，被调用者通过状态、通知来通知调用者，或通过回调函数处理这个调用。典型的异步编程模型比如Node.js
+举个通俗的例子：你打电话问书店老板有没有《分布式系统》这本书，如果是同步通信机制，书店老板会说，你稍等，”我查一下”，然后开始查啊查，等查好了（可能是5秒，也可能是一天）告诉你结果（返回结果）。而异步通信机制，书店老板直接告诉你我查一下啊，查好了打电话给你，然后直接挂电话了（不返回结果）。然后查好了，他会主动打电话给你。在这里老板通过“回电”这种方式来回调。</li>
+<li><strong>阻塞与非阻塞</strong> 阻塞和非阻塞关注的是程序在等待调用结果（消息，返回值）时的状态.阻塞调用是指调用结果返回之前，当前线程会被挂起。调用线程只有在得到结果之后才会返回。非阻塞调用指在不能立刻得到结果之前，该调用不会阻塞当前线程。还是上面的例子，你打电话问书店老板有没有《分布式系统》这本书，你如果是阻塞式调用，你会一直把自己“挂起”，直到得到这本书有没有的结果，如果是非阻塞式调用，你不管老板有没有告诉你，你自己先一边去玩了， 当然你也要偶尔过几分钟check一下老板有没有返回结果。在这里阻塞与非阻塞与是否同步异步无关。跟老板通过什么方式回答你结果无关。如果是关心blocking IO/ asynchronous IO, 参考 Unix Network Programming View Book相关评论：</li>
+</ul>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://fixbug.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/">
+<span class="button__icon">←</span>
+<span class="button__text">CentOS软件的常用安装命令汇总</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="background: rgb(183 168 154 / 26%);padding: 5px auto;margin: 10px auto;border: 1px dashed var(--accent);">
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.Pure.min.js"></script>
+<div id="vcomments"></div>
+<script>
+      new Valine({
+        el: '#comments' ,
+        appId: 'sJKN6mA2eSTxIq3YaOiCN3JX-MdYXbMMI',
+        appKey: 'aykSxGrm7HLN5BroU1gr3Ot3',
+        placeholder: 'go go it~',
+        visitor:  false ,
+        requiredFields: ['mail'],
+        emojiCDN: '//i0.hdslb.com/bfs/emote/',
+        emojiMaps: {
+          "tv_doge": "6ea59c827c414b4a2955fe79e0f6fd3dcd515e24.png",
+          "tv_亲亲": "a8111ad55953ef5e3be3327ef94eb4a39d535d06.png",
+          "tv_偷笑": "bb690d4107620f1c15cff29509db529a73aee261.png",
+          "tv_再见": "180129b8ea851044ce71caf55cc8ce44bd4a4fc8.png",
+          "tv_冷漠": "b9cbc755c2b3ee43be07ca13de84e5b699a3f101.png",
+          "tv_发怒": "34ba3cd204d5b05fec70ce08fa9fa0dd612409ff.png",
+          "tv_发财": "34db290afd2963723c6eb3c4560667db7253a21a.png",
+          "tv_可爱": "9e55fd9b500ac4b96613539f1ce2f9499e314ed9.png",
+          "tv_吐血": "09dd16a7aa59b77baa1155d47484409624470c77.png",
+          "tv_呆": "fe1179ebaa191569b0d31cecafe7a2cd1c951c9d.png",
+          "tv_呕吐": "9f996894a39e282ccf5e66856af49483f81870f3.png",
+          "tv_困": "241ee304e44c0af029adceb294399391e4737ef2.png",
+          "tv_坏笑": "1f0b87f731a671079842116e0991c91c2c88645a.png",
+          "tv_大佬": "093c1e2c490161aca397afc45573c877cdead616.png",
+          "tv_大哭": "23269aeb35f99daee28dda129676f6e9ea87934f.png",
+          "tv_委屈": "d04dba7b5465779e9755d2ab6f0a897b9b33bb77.png",
+          "tv_害羞": "a37683fb5642fa3ddfc7f4e5525fd13e42a2bdb1.png",
+          "tv_尴尬": "7cfa62dafc59798a3d3fb262d421eeeff166cfa4.png",
+          "tv_微笑": "70dc5c7b56f93eb61bddba11e28fb1d18fddcd4c.png",
+          "tv_思考": "90cf159733e558137ed20aa04d09964436f618a1.png",
+          "tv_惊吓": "0d15c7e2ee58e935adc6a7193ee042388adc22af.png",
+          "tv_打脸": "56ab10b624063e966bfcb76ea5dc4794d87dfd47.png",
+          "tv_抓狂": "fe31c08edad661d63762b04e17b8d5ae3c71a757.png",
+          "tv_抠鼻": "c666f55e88d471e51bbd9fab9bb308110824a6eb.png",
+          "tv_斜眼笑": "911f987aa8bc1bee12d52aafe62bc41ef4474e6c.png",
+          "tv_无奈": "ea8ed89ee9878f2fece2dda0ea8a5dbfe21b5751.png",
+          "tv_晕": "5443c22b4d07fb1907ccc610c8e6db254f2461b7.png",
+          "tv_流汗": "cead1c351ab8d79e9f369605beb90148db0fbed3.png",
+          "tv_流泪": "7e71cde7858f0cd50d74b0264aa26db612a8a167.png",
+          "tv_流鼻血": "c32d39db2737f89b904ca32700d140a9241b0767.png",
+          "tv_点赞": "f85c354995bd99e28fc76c869bfe42ba6438eff4.png",
+          "tv_生气": "26702dcafdab5e8225b43ffd23c94ac1ff932654.png",
+          "tv_生病": "8b0ec90e6b86771092a498c54f09fc94621c1900.png",
+          "tv_疑问": "0793d949b18d7be716078349c202c15ff166f314.png",
+          "tv_白眼": "c1d59f439e379ee50eef488bcb5e5378e5044ea4.png",
+          "tv_皱眉": "72ccad6679fea0d14cce648b4d818e09b8ffea2d.png",
+          "tv_目瞪口呆": "0b8cb81a68de5d5365212c99375e7ace3e7891b7.png",
+          "tv_睡着": "8b196675b53af58264f383c50ad0945048290b33.png",
+          "tv_笑哭": "1abc628f6d4f4caf9d0e7800878f4697abbc8273.png",
+          "tv_腼腆": "89712c0d4af73e67f89e35cbc518420380a7f6f4.png",
+          "tv_色": "61822c7e9aae5da76475e7892534545336b23a6f.png",
+          "tv_调侃": "4bc022533ef31544ca0d72c12c808cf4a1cce3e3.png",
+          "tv_调皮": "b9c41de8e82dd7a8515ae5e3cb63e898bf245186.png",
+          "tv_鄙视": "6e72339f346a692a495b123174b49e4e8e781303.png",
+          "tv_闭嘴": "c9e990da7f6e93975e25fd8b70e2e290aa4086ef.png",
+          "tv_难过": "87f46748d3f142ebc6586ff58860d0e2fc8263ba.png",
+          "tv_馋": "fc7e829b845c43c623c8b490ee3602b7f0e76a31.png",
+          "tv_鬼脸": "0ffbbddf8a94d124ca2f54b360bbc04feb6bbfea.png",
+          "tv_黑人问号": "45821a01f51bc867da9edbaa2e070410819a95b2.png",
+          "tv_鼓掌": "1d21793f96ef4e6f48b23e53e3b9e42da833a0f6.png"
+        } 
+      });
+      
+      
+      
+      
+      
+      
+      
+  </script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span>:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+</div>
+</div>
+</footer>
+<script src="https://fixbug.me/assets/main.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>JVM Learn 19 JVM垃圾回收算法总结 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="本文转载自JVM进阶之GC（四）垃圾收集器 。总结的非常好，拿过来学习一下。 上篇讲了下垃圾回收算法，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://fixbug.me/2020/07/09/jvm-learn-19/" rel="canonical"/>
+<link href="https://fixbug.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="Joe John" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="JVM Learn 19 JVM垃圾回收算法总结 :: DongZhi.ME" property="og:title"/>
+<meta content="本文转载自JVM进阶之GC（四）垃圾收集器 。总结的非常好，拿过来学习一下。 上篇讲了下垃圾回收算法，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）" property="og:description"/>
+<meta content="https://fixbug.me/2020/07/09/jvm-learn-19/" property="og:url"/>
+<meta content="JVM Learn 19 JVM垃圾回收算法总结" property="og:site_name"/>
+<meta content="https://fixbug.me/" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-07-09 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/09/jvm-learn-19/">JVM Learn 19 JVM垃圾回收算法总结</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-07-09 
+      </span>
+<span class="post-author">::
+      Joe John
+    </span>
+</div>
+<div class="post-content"><div>
+<blockquote>
+<p>本文转载自<a href="https://blog.csdn.net/u011519624/article/details/79167607">JVM进阶之GC（四）垃圾收集器</a> 。总结的非常好，拿过来学习一下。</p>
+</blockquote>
+<p>上篇讲了下<a href="http://blog.csdn.net/u011519624/article/details/79156767">垃圾回收算法</a>，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）。</p>
+<h2 id="垃圾收集器">垃圾收集器<a arialabel="Anchor" class="hanchor" href="#垃圾收集器">⌗</a> </h2>
+<p>HotSpot虚拟机提供的收集器如下图：</p>
+<p><img alt="垃圾收集器" src="/post/images/2020/jvm_19_gc04.png"/></p>
+<p><strong>新生代的垃圾收集器有：Serial、ParNew、Parallel Scavenge</strong><br/>
+<strong>老年代的垃圾收集器有：CMS、Serial Old、Parallel Old</strong><br/>
+G1收集器因运用的还不是很广泛，不予讨论，有兴趣的可自行百度。<br/>
+收集器之间有连线，表示他们可以搭配使用。为什么需要搭配使用呢？而且收集器还这么多？应该说有什么样的需求就有什么样的产品，垃圾收集器也是按需设计的，没有最好的产品，只有最合适的。那么各个收集器的实现原理是怎样的，有什么特点呢？下面一一来讨论。</p>
+<h3 id="serial与serial-old-收集器">Serial与Serial Old 收集器<a arialabel="Anchor" class="hanchor" href="#serial与serial-old-收集器">⌗</a> </h3>
+<p>Serial，翻译成中文的意思是<strong>串行</strong>，顾名思义，这就是个单线程的收集器。仅仅使用一个线程去执行垃圾收集任务，而且收集任务期间，必须停掉其他的工作线程，直到垃圾收集完成。`垃圾回收时停掉其他的线程的现象，就称为<strong>Stop
+The World(STW)</strong>。打个比方，我清扫房间的时候，任何人都不能在家里活动，以免给我捣乱，不然清扫工作怎么也没法做完。STW就是这么个意思，至于暂停应用多久，得看具体垃圾的情况了。</p>
+<p>Serial收集器是收集新生代的收集器，而Serial Old收集器是收集老年代的，上图也看到了它们之间有连线可搭配使用，看如下它们搭配使用的运行图：<br/>
+<img alt="Serial与Serial Old搭配使用" src="/post/images/2020/jvm_19_gc05.png"/>
+①：新生代使用Serial收集器，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br/>
+②：老年代使用Serial Old收集器，采用标记整理算法，会发生STW。</p>
+<h3 id="parnew-收集器">ParNew 收集器<a arialabel="Anchor" class="hanchor" href="#parnew-收集器">⌗</a> </h3>
+<p>ParNew其实就是Serial的多线程版本，在新生代中使用多条线程进行垃圾回收。看如下逻辑图就一目了然了：
+<img alt="ParNew收集器" src="/post/images/2020/jvm_19_gc06.png"/>
+①：新生代使用ParNew收集器，可以看到有多条GC线程在进行垃圾回收，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br/>
+②：老年代使用Serial Old收集器，采用标记整理算法，会发生STW。</p>
+<h3 id="parallel-scavenge-收集器">Parallel Scavenge 收集器<a arialabel="Anchor" class="hanchor" href="#parallel-scavenge-收集器">⌗</a> </h3>
+<p>Parallel Scavenge 收集器也是新生代收集器，也是使用复制算法的多线程收集器。<br/>
+看上去和ParNew收集器差不多，但是Parallel Scavenge最大的特点是更关注<strong>吞吐量</strong>。<br/>
+吞吐量就是CPU用于运行用户代码的时间与CPU总消耗时间的比值：</p>
+<blockquote>
+<p>吞吐量 = 运行用户代码时间 / (运行用户代码时间) + 垃圾收集时间</p>
+</blockquote>
+<p>打个比方，虚拟机运行了100分钟，垃圾回收用了2分钟，那么吞吐量就是98%。<br/>
+按照公式来看，吞吐量越高的虚拟机，自然是垃圾收集时间也越短，理所当然的用户体验也要更好。<strong>Parallel Scavenge收集器会根据当前系统的运行情况，动态调整某些参数来提供最合适的停顿时间或最大的吞吐量</strong>，这就是GC的自适应调节策略，这也是其与ParNew收集器最明显的区别。</p>
+<h3 id="parallel-old-收集器">Parallel Old 收集器<a arialabel="Anchor" class="hanchor" href="#parallel-old-收集器">⌗</a> </h3>
+<p>Parallel Old 是 Parallel
+Scavenge收集器的老年代版本，运用多线程和标记整理算法收集。从最上面的搭配图也可以看到，Parallel Old 只能与Parallel
+Scavenge配对使用。这样的组合，在注重<strong>吞吐量和CPU资源</strong>的场合使用比较合适。如下是逻辑运行图：<br/>
+<img alt="Parallel Old收集器" src="/post/images/2020/jvm_19_gc07.png"/>
+①：新生代使用Parallel Scavenge收集器，可以看到有多条GC线程在进行垃圾回收，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br/>
+②：老年代使用Parallel Old收集器，使用多线程采用标记整理算法，会发生STW。</p>
+<h3 id="cms-收集器">CMS 收集器<a arialabel="Anchor" class="hanchor" href="#cms-收集器">⌗</a> </h3>
+<p>CMS收集器是一种<strong>以获取最短回收停顿时间为目标</strong>的收集器。在B/S架构模型的网站上，运用CMS收集器十分广泛，因为网站上更希望停顿越短越好，用户体验才能更好。</p>
+<p>CMS收集器是基于标记清除算法实现的，但是其运行过程相对来说更复杂了，整个过程分成下图4个步骤：<br/>
+<img alt="CMS收集过程" src="/post/images/2020/jvm_19_gc08.png"/></p>
+<ul>
+<li>
+<p>①：初始标记（initial mark）<br/>
+在图中可以看出这个步骤是单线程处理的，并且用户线程并未运行，是因为出现了STW。这个过程只是<strong>标记一下GC Roots能直接关联到的对象</strong>，速度很快。</p>
+</li>
+<li>
+<p>②：并发标记（concurrent mark）<br/>
+这个阶段就是进行GC Roots Tracing过程，可以看出GC线程与用户线程并发工作，所以并发标记过程并不影响用户线程的使用。</p>
+</li>
+<li>
+<p>③：重新标记（remark）<br/>
+重新标记阶段是为了修正并发标记期间，因用户线程继续运行导致标记产生变动的那一部分对象的标记。看起来有点绕，其实意思就是在并发标记时，用户线程也会产生需要标记的对象，这部分对象不能漏了标记，所以就需要重新标记过程。在图中可以看到，没有用户线程在运行，说明需要STW。</p>
+</li>
+<li>
+<p>④：并发清除（concurrent sweep）<br/>
+并发清除这个阶段看图也能类比了，有GC线程与用户线程并发运行，GC线程清理掉那些标记的对象，用户线程正常运行。</p>
+</li>
+</ul>
+<p>整体来看，CMS收集器的垃圾回收过程是与用户线程一起并发执行的。<br/>
+但是CMS收集器还是有一下三个缺点：</p>
+<ol>
+<li>因为是使用并发收集，虽然不会导致用户线程停顿，但是会占用一部分线程而导致应用程序变慢，总的吞吐量会降低。</li>
+<li>CMS收集器无法处理浮动垃圾，可能出现“Concurrent Mode Failure”失败而导致另一次Full GC的发生。因为在并发清理阶段，用户线程还在运行，自然就还有新的垃圾不断产生，这部分垃圾出现在标记过程之后，CMS也束手无策，只能等待下次GC时再清理，这一部分垃圾就叫“浮动垃圾”。</li>
+<li>CMS是基于标记清除算法实现的，前面的文章也提到过标记清除算法的缺点，就是会产生大量的空间碎片。空间碎片过多时，就会给大对象的空间分配带来麻烦。比如老年代有足够的空间，但是找不到连续的足够大的空间，而不得不触发一次Full GC。为了解决这个问题，CMS收集器提供了  <strong>-XX:+UseCMSFullGCsBeforeCompaction</strong>参数，用于设置执行了多少次不压缩的FGC后来一次碎片整理（默认是0，每次进入FGC时都进行碎片整理）。</li>
+</ol>
+<p>虽然CMS有几个缺点，但是进行合理的参数配置，在老年代的垃圾回收上还是有不俗的表现。目前的主流搭配使用是ParNew+CMS收集.</p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://fixbug.me/2020/07/09/jvm-learn-18/">
+<span class="button__icon">←</span>
+<span class="button__text">JVM Learn 18 JVM垃圾回收模型概述</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://fixbug.me/2020/07/09/jvm-learn-20/">
+<span class="button__text">JVM Learn 20 Java Garbage Collection Basics</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="background: rgb(183 168 154 / 26%);padding: 5px auto;margin: 10px auto;border: 1px dashed var(--accent);">
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.Pure.min.js"></script>
+<div id="vcomments"></div>
+<script>
+      new Valine({
+        el: '#comments' ,
+        appId: 'sJKN6mA2eSTxIq3YaOiCN3JX-MdYXbMMI',
+        appKey: 'aykSxGrm7HLN5BroU1gr3Ot3',
+        placeholder: 'go go it~',
+        visitor:  false ,
+        requiredFields: ['mail'],
+        emojiCDN: '//i0.hdslb.com/bfs/emote/',
+        emojiMaps: {
+          "tv_doge": "6ea59c827c414b4a2955fe79e0f6fd3dcd515e24.png",
+          "tv_亲亲": "a8111ad55953ef5e3be3327ef94eb4a39d535d06.png",
+          "tv_偷笑": "bb690d4107620f1c15cff29509db529a73aee261.png",
+          "tv_再见": "180129b8ea851044ce71caf55cc8ce44bd4a4fc8.png",
+          "tv_冷漠": "b9cbc755c2b3ee43be07ca13de84e5b699a3f101.png",
+          "tv_发怒": "34ba3cd204d5b05fec70ce08fa9fa0dd612409ff.png",
+          "tv_发财": "34db290afd2963723c6eb3c4560667db7253a21a.png",
+          "tv_可爱": "9e55fd9b500ac4b96613539f1ce2f9499e314ed9.png",
+          "tv_吐血": "09dd16a7aa59b77baa1155d47484409624470c77.png",
+          "tv_呆": "fe1179ebaa191569b0d31cecafe7a2cd1c951c9d.png",
+          "tv_呕吐": "9f996894a39e282ccf5e66856af49483f81870f3.png",
+          "tv_困": "241ee304e44c0af029adceb294399391e4737ef2.png",
+          "tv_坏笑": "1f0b87f731a671079842116e0991c91c2c88645a.png",
+          "tv_大佬": "093c1e2c490161aca397afc45573c877cdead616.png",
+          "tv_大哭": "23269aeb35f99daee28dda129676f6e9ea87934f.png",
+          "tv_委屈": "d04dba7b5465779e9755d2ab6f0a897b9b33bb77.png",
+          "tv_害羞": "a37683fb5642fa3ddfc7f4e5525fd13e42a2bdb1.png",
+          "tv_尴尬": "7cfa62dafc59798a3d3fb262d421eeeff166cfa4.png",
+          "tv_微笑": "70dc5c7b56f93eb61bddba11e28fb1d18fddcd4c.png",
+          "tv_思考": "90cf159733e558137ed20aa04d09964436f618a1.png",
+          "tv_惊吓": "0d15c7e2ee58e935adc6a7193ee042388adc22af.png",
+          "tv_打脸": "56ab10b624063e966bfcb76ea5dc4794d87dfd47.png",
+          "tv_抓狂": "fe31c08edad661d63762b04e17b8d5ae3c71a757.png",
+          "tv_抠鼻": "c666f55e88d471e51bbd9fab9bb308110824a6eb.png",
+          "tv_斜眼笑": "911f987aa8bc1bee12d52aafe62bc41ef4474e6c.png",
+          "tv_无奈": "ea8ed89ee9878f2fece2dda0ea8a5dbfe21b5751.png",
+          "tv_晕": "5443c22b4d07fb1907ccc610c8e6db254f2461b7.png",
+          "tv_流汗": "cead1c351ab8d79e9f369605beb90148db0fbed3.png",
+          "tv_流泪": "7e71cde7858f0cd50d74b0264aa26db612a8a167.png",
+          "tv_流鼻血": "c32d39db2737f89b904ca32700d140a9241b0767.png",
+          "tv_点赞": "f85c354995bd99e28fc76c869bfe42ba6438eff4.png",
+          "tv_生气": "26702dcafdab5e8225b43ffd23c94ac1ff932654.png",
+          "tv_生病": "8b0ec90e6b86771092a498c54f09fc94621c1900.png",
+          "tv_疑问": "0793d949b18d7be716078349c202c15ff166f314.png",
+          "tv_白眼": "c1d59f439e379ee50eef488bcb5e5378e5044ea4.png",
+          "tv_皱眉": "72ccad6679fea0d14cce648b4d818e09b8ffea2d.png",
+          "tv_目瞪口呆": "0b8cb81a68de5d5365212c99375e7ace3e7891b7.png",
+          "tv_睡着": "8b196675b53af58264f383c50ad0945048290b33.png",
+          "tv_笑哭": "1abc628f6d4f4caf9d0e7800878f4697abbc8273.png",
+          "tv_腼腆": "89712c0d4af73e67f89e35cbc518420380a7f6f4.png",
+          "tv_色": "61822c7e9aae5da76475e7892534545336b23a6f.png",
+          "tv_调侃": "4bc022533ef31544ca0d72c12c808cf4a1cce3e3.png",
+          "tv_调皮": "b9c41de8e82dd7a8515ae5e3cb63e898bf245186.png",
+          "tv_鄙视": "6e72339f346a692a495b123174b49e4e8e781303.png",
+          "tv_闭嘴": "c9e990da7f6e93975e25fd8b70e2e290aa4086ef.png",
+          "tv_难过": "87f46748d3f142ebc6586ff58860d0e2fc8263ba.png",
+          "tv_馋": "fc7e829b845c43c623c8b490ee3602b7f0e76a31.png",
+          "tv_鬼脸": "0ffbbddf8a94d124ca2f54b360bbc04feb6bbfea.png",
+          "tv_黑人问号": "45821a01f51bc867da9edbaa2e070410819a95b2.png",
+          "tv_鼓掌": "1d21793f96ef4e6f48b23e53e3b9e42da833a0f6.png"
+        } 
+      });
+      
+      
+      
+      
+      
+      
+      
+  </script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span>:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+</div>
+</div>
+</footer>
+<script src="https://fixbug.me/assets/main.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

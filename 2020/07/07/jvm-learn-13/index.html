@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>JVM Learn 13 JVM的内存划分 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="内存划分 java虚拟机的内存划分主要包括以下几个部分： 程序计数器：记录当前线程执行的下一条指令的地址，很小的空间 虚拟机栈(stack): 每个方法执行时候在栈里面创建一个栈帧，用于存储局部变量表，操作数" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://fixbug.me/2020/07/07/jvm-learn-13/" rel="canonical"/>
+<link href="https://fixbug.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="John Doe" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="JVM Learn 13 JVM的内存划分 :: DongZhi.ME" property="og:title"/>
+<meta content="内存划分 java虚拟机的内存划分主要包括以下几个部分： 程序计数器：记录当前线程执行的下一条指令的地址，很小的空间 虚拟机栈(stack): 每个方法执行时候在栈里面创建一个栈帧，用于存储局部变量表，操作数" property="og:description"/>
+<meta content="https://fixbug.me/2020/07/07/jvm-learn-13/" property="og:url"/>
+<meta content="JVM Learn 13 JVM的内存划分" property="og:site_name"/>
+<meta content="https://fixbug.me/" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-07-07 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-13/">JVM Learn 13 JVM的内存划分</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-07-07 
+      </span>
+<span class="post-author">::
+      John Doe
+    </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://fixbug.me/tags/jvm/">jvm</a> 
+    
+  </span>
+<div class="post-content"><div>
+<h1 id="内存划分">内存划分<a arialabel="Anchor" class="hanchor" href="#内存划分">⌗</a> </h1>
+<p>java虚拟机的内存划分主要包括以下几个部分：</p>
+<ol>
+<li>程序计数器：记录当前线程执行的下一条指令的地址，很小的空间</li>
+<li>虚拟机栈(stack): 每个方法执行时候在栈里面创建一个栈帧，用于存储局部变量表，操作数栈，动态链接等信息。通过入栈和出栈完成指令操作，当方法执行结束，栈帧销毁，对于的局部变量内存相应释放。</li>
+<li>本地方法栈：执行navive方法相关用到的内存，在Oracle Hotspot中，虚拟机栈和本地方法栈合二为一。</li>
+<li>堆(heap)：最大的一块内存，存放对象实例，对象的生命周期由JVM的垃圾收集器统一管理。由于现代垃圾收集器采用的分代回收算法，所以相应地划分为年轻代和老年代两块空间，年轻代包括Eden区和2快大小相等的Suvivor区</li>
+<li>方法区：JDK7以前的概念，它是一块紧挨着堆的连续内存空间，存放类的元信息、静态变量和运行时常量池。在JDK8中，取而代之的是元空间。</li>
+<li>运行时常量池：方法区的一部分
+<img alt="image" src="/post/images/2020/jvm_13_memory.png"/></li>
+</ol>
+<p>上图中，灰色的区域方法区和堆是线程共享的，其他部分是线程独享的。</p>
+<h1 id="new关键字创建对象">new关键字创建对象<a arialabel="Anchor" class="hanchor" href="#new关键字创建对象">⌗</a> </h1>
+<p>通过new创建对象经历3个步骤：</p>
+<ol>
+<li>在堆中创建这个对象实例</li>
+<li>为对象的成员变量赋初值</li>
+<li>返回该对象的引用</li>
+</ol>
+<p>解析new指令时，首先去运行时常量池定位new指令的参数代表的符号引用，并检查该符号引用是否已经被正确加载、解析和初始化了，如果没有，先会执行类的加载过程。如果加载OK了，根据class的信息可以确定要创建的实例所需要的内存空间大小，于是虚拟机就会为该实例分配内存空间。</p>
+<p>堆上分配内存通常有指针碰撞和空闲列表两种方式：</p>
+<ul>
+<li><strong>指针碰撞</strong>：假设Java堆是绝对规整的，所有用过的内存放在一边，空闲的内存放在另一边，中间放一个指针作为分界点的指示器。为对象分配内存时把那个指针向空闲空间那边挪动一段与对象大小相等的距离。</li>
+<li><strong>空闲列表</strong>：Java堆中的内存不是规整的，以使用的内存和空闲的内存相互交错，无法使用指针碰撞。这时虚拟机就必须维护一个列表，记录上哪些内存是可用的，在分配内存的时候从列表中找一块足够大的空间划分给对象实例，并更新列表上的记录。</li>
+</ul>
+<p>选择哪种分配方式由Java堆是否规整决定，而Java堆是否规整又由所采用的垃圾收集器是否带有压缩整理功能决定。</p>
+<h1 id="对象的内存布局和访问">对象的内存布局和访问<a arialabel="Anchor" class="hanchor" href="#对象的内存布局和访问">⌗</a> </h1>
+<p>对象的内存布局主要包括三块：</p>
+<ul>
+<li>对象头（Header）</li>
+<li>实例数据（Instance Data）</li>
+<li>对齐填充（Padding）</li>
+</ul>
+<p>对象的访问定位主要包括句柄和直接的指针访问：</p>
+<ul>
+<li>句柄：Java堆将会划分出一块内存作为句柄池，reference中存储的就是对象的句柄地址，而句柄中包含了对象实例数据和类型数据各自的具体地址信息。</li>
+<li>直接指针：reference中存储的就是对象地址。速度快，Hotspot采用的是这一种。</li>
+</ul>
+<h1 id="运行时常量池">运行时常量池<a arialabel="Anchor" class="hanchor" href="#运行时常量池">⌗</a> </h1>
+<p>运行时常量池是方法区中的一块内存区域，class字节码文件的常量池在类被加载后，进入运行时常量池中存放。每个类被加载后都有一个运行时常量池，字节码文件中的常量池是静态存储结构，而运行时常量池在运行期间会把符号引用解析为直接引用，具有动态性。</p>
+<h1 id="字符串常量池">字符串常量池<a arialabel="Anchor" class="hanchor" href="#字符串常量池">⌗</a> </h1>
+<p>字符串常量池是全局的，JVM 中独此一份。“使用常量池”对应的字节码是一个ldc指令，在给 String 类型的引用赋值的时候会先执行这个指令，看常量池中是否存在这个字符串对象的引用，若有就直接返回这个引用，若没有，就在堆里创建这个字符串对象并在字符串常量池中记录下这个引用（jdk1.7)。String 类的intern()方法还可在运行期间把字符串放到字符串常量池中。</p>
+<p>字符串常量池的位置和存放内容：</p>
+<ul>
+<li>在 jdk1.6（含）之前也是方法区的一部分，并且其中存放的是字符串的实例；</li>
+<li>在 jdk1.7（含）之后是在堆内存之中，存储的是字符串对象的引用，字符串实例是在堆中；</li>
+<li>jdk1.8 已移除永久代，字符串常量池是在本地内存当中，存储的也只是引用。</li>
+</ul>
+<h1 id="元空间metaspace">元空间(metaspace)<a arialabel="Anchor" class="hanchor" href="#元空间metaspace">⌗</a> </h1>
+<p>JDK8中，hotspot vm彻底取消了永久代，取而代之的是元空间(方法区是规范，永久代和元空间是实现，规范没有改变)。元空间属于本地内存(native memory)。相应地，运行时常量池也由永久代移到元空间中。因此，元空间中主要包含类的元信息，常量池和方法信息。</p>
+<p>为什么要用Metaspace替代方法区？</p>
+<p>原来的永久代实现中，使用连续的堆空间，通过-XX:MaxPermSize来设定永久代最大可分配空间，当JVM加载的类信息容量超过了这个值，会报OOM:PermGen错误。随着动态类加载的情况越来越多，这块内存变得不太可控，如果设置小了，系统运行过程中就容易出现内存溢出，设置大了又浪费内存。</p>
+<p>元空间的内存管理：</p>
+<ul>
+<li>在metaspace中，类和其元数据的生命周期与其对应的类加载器相同，只要类的类加载器是存活的，在Metaspace中的类元数据也是存活的，不能被回收。</li>
+<li>每个加载器有专门的存储空间</li>
+<li>只进行线性分配</li>
+<li>如果GC发现某个类加载器不再存活了，会把相关的空间整个回收掉</li>
+</ul>
+<p>默认情况下，元空间的大小仅受本地内存限制，但可以通过以下参数来指定元空间的大小：</p>
+<ul>
+<li><strong>-XX:MetaspaceSize</strong>:初始空间大小</li>
+<li><strong>-XX:MaxMetaspaceSize</strong>:最大空间大小,超过此值就会触发Full GC，此值默认没有限制，取决于系统内存大小，JVM动态改变此值</li>
+<li><strong>-XX:MinMetaspaceFreeRatio</strong> GC之后，最小的Metaspace剩余空间百分比，减少为分配空间所导致的垃圾收集</li>
+<li><strong>-XX:MaxMetaspaceFreeRatio</strong> GC之后，最大的Metaspace剩余空间百分比，减少为释放空间所导致的垃圾收集</li>
+</ul>
+<p>通过CGlib动态代理来模拟元空间溢出。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> test.metaspace<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">import</span> net.sf.cglib.proxy.Enhancer<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#f92672">import</span> net.sf.cglib.proxy.MethodInterceptor<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#f92672">import</span> net.sf.cglib.proxy.MethodProxy<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span style="color:#f92672">import</span> java.lang.reflect.Method<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestMetaSpace</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>            Enhancer enhancer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Enhancer<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>            enhancer<span style="color:#f92672">.</span><span style="color:#a6e22e">setSuperclass</span><span style="color:#f92672">(</span>TestMetaSpace<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>            enhancer<span style="color:#f92672">.</span><span style="color:#a6e22e">setUseCache</span><span style="color:#f92672">(</span><span style="color:#66d9ef">false</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>            enhancer<span style="color:#f92672">.</span><span style="color:#a6e22e">setCallback</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> MethodInterceptor<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>                <span style="color:#a6e22e">@Override</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>                <span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">intercept</span><span style="color:#f92672">(</span>Object arg0<span style="color:#f92672">,</span> Method arg1<span style="color:#f92672">,</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>                                        Object<span style="color:#f92672">[]</span> arg2<span style="color:#f92672">,</span> MethodProxy arg3<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Throwable <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>                    <span style="color:#66d9ef">return</span> arg3<span style="color:#f92672">.</span><span style="color:#a6e22e">invokeSuper</span><span style="color:#f92672">(</span>arg0<span style="color:#f92672">,</span> arg2<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>                <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>            <span style="color:#f92672">});</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>            enhancer<span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span style="color:#f92672">}</span>
+</code></pre></div><p>添加的cglib依赖为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span> <span style="color:#f92672">&lt;</span>dependency<span style="color:#f92672">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>          <span style="color:#f92672">&lt;</span>groupId<span style="color:#f92672">&gt;</span>cglib<span style="color:#f92672">&lt;/</span>groupId<span style="color:#f92672">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>          <span style="color:#f92672">&lt;</span>artifactId<span style="color:#f92672">&gt;</span>cglib<span style="color:#f92672">&lt;/</span>artifactId<span style="color:#f92672">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>          <span style="color:#f92672">&lt;</span>version<span style="color:#f92672">&gt;</span>3<span style="color:#f92672">.</span><span style="color:#a6e22e">2</span><span style="color:#f92672">.</span><span style="color:#a6e22e">10</span><span style="color:#f92672">&lt;/</span>version<span style="color:#f92672">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>      <span style="color:#f92672">&lt;/</span>dependency<span style="color:#f92672">&gt;</span>
+</code></pre></div><p>将元空间的最大大小设置为10m：<strong>-XX:MaxMetaspaceSize=10m</strong>，则运行程序很快出现元空间的OOM：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>Exception in thread "main" java.lang.OutOfMemoryError: Metaspace
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>	at net.sf.cglib.core.AbstractClassGenerator.generate(AbstractClassGenerator.java:348)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>	at net.sf.cglib.proxy.Enhancer.generate(Enhancer.java:492)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>	at net.sf.cglib.core.AbstractClassGenerator$ClassLoaderData.get(AbstractClassGenerator.java:117)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>	at net.sf.cglib.core.AbstractClassGenerator.create(AbstractClassGenerator.java:294)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>	at net.sf.cglib.proxy.Enhancer.createHelper(Enhancer.java:480)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>	at net.sf.cglib.proxy.Enhancer.create(Enhancer.java:305)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>	at test.metaspace.TestMetaSpace.main(TestMetaSpace.java:23)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>Process finished with exit code 1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>
+</code></pre></div><p>如果将元空间的最大大小设置为200M，通过Jvisualvm可以看到元空间的变化情况。
+<img alt="20200203120628" src="/post/images/2020/jvm_13_memory_devide.png"/></p>
+<h1 id="虚拟机参数">虚拟机参数<a arialabel="Anchor" class="hanchor" href="#虚拟机参数">⌗</a> </h1>
+<ul>
+<li>-Xms5m 堆的初始大小为5m</li>
+<li>-Xmx5m 堆的最大大小为5m</li>
+<li>-XX:+HeapDumpOnOutOfMemoryError 当发生OOM时生成堆的内存快照</li>
+<li></li>
+</ul>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-12/">
+<span class="button__icon">←</span>
+<span class="button__text">JVM Learn 12 从字节码看动态代理</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://fixbug.me/2020/07/07/jvm-learn-14/">
+<span class="button__text">JVM Learn 14 java堆的转储与Jvisualvm</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="background: rgb(183 168 154 / 26%);padding: 5px auto;margin: 10px auto;border: 1px dashed var(--accent);">
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.Pure.min.js"></script>
+<div id="vcomments"></div>
+<script>
+      new Valine({
+        el: '#comments' ,
+        appId: 'sJKN6mA2eSTxIq3YaOiCN3JX-MdYXbMMI',
+        appKey: 'aykSxGrm7HLN5BroU1gr3Ot3',
+        placeholder: 'go go it~',
+        visitor:  false ,
+        requiredFields: ['mail'],
+        emojiCDN: '//i0.hdslb.com/bfs/emote/',
+        emojiMaps: {
+          "tv_doge": "6ea59c827c414b4a2955fe79e0f6fd3dcd515e24.png",
+          "tv_亲亲": "a8111ad55953ef5e3be3327ef94eb4a39d535d06.png",
+          "tv_偷笑": "bb690d4107620f1c15cff29509db529a73aee261.png",
+          "tv_再见": "180129b8ea851044ce71caf55cc8ce44bd4a4fc8.png",
+          "tv_冷漠": "b9cbc755c2b3ee43be07ca13de84e5b699a3f101.png",
+          "tv_发怒": "34ba3cd204d5b05fec70ce08fa9fa0dd612409ff.png",
+          "tv_发财": "34db290afd2963723c6eb3c4560667db7253a21a.png",
+          "tv_可爱": "9e55fd9b500ac4b96613539f1ce2f9499e314ed9.png",
+          "tv_吐血": "09dd16a7aa59b77baa1155d47484409624470c77.png",
+          "tv_呆": "fe1179ebaa191569b0d31cecafe7a2cd1c951c9d.png",
+          "tv_呕吐": "9f996894a39e282ccf5e66856af49483f81870f3.png",
+          "tv_困": "241ee304e44c0af029adceb294399391e4737ef2.png",
+          "tv_坏笑": "1f0b87f731a671079842116e0991c91c2c88645a.png",
+          "tv_大佬": "093c1e2c490161aca397afc45573c877cdead616.png",
+          "tv_大哭": "23269aeb35f99daee28dda129676f6e9ea87934f.png",
+          "tv_委屈": "d04dba7b5465779e9755d2ab6f0a897b9b33bb77.png",
+          "tv_害羞": "a37683fb5642fa3ddfc7f4e5525fd13e42a2bdb1.png",
+          "tv_尴尬": "7cfa62dafc59798a3d3fb262d421eeeff166cfa4.png",
+          "tv_微笑": "70dc5c7b56f93eb61bddba11e28fb1d18fddcd4c.png",
+          "tv_思考": "90cf159733e558137ed20aa04d09964436f618a1.png",
+          "tv_惊吓": "0d15c7e2ee58e935adc6a7193ee042388adc22af.png",
+          "tv_打脸": "56ab10b624063e966bfcb76ea5dc4794d87dfd47.png",
+          "tv_抓狂": "fe31c08edad661d63762b04e17b8d5ae3c71a757.png",
+          "tv_抠鼻": "c666f55e88d471e51bbd9fab9bb308110824a6eb.png",
+          "tv_斜眼笑": "911f987aa8bc1bee12d52aafe62bc41ef4474e6c.png",
+          "tv_无奈": "ea8ed89ee9878f2fece2dda0ea8a5dbfe21b5751.png",
+          "tv_晕": "5443c22b4d07fb1907ccc610c8e6db254f2461b7.png",
+          "tv_流汗": "cead1c351ab8d79e9f369605beb90148db0fbed3.png",
+          "tv_流泪": "7e71cde7858f0cd50d74b0264aa26db612a8a167.png",
+          "tv_流鼻血": "c32d39db2737f89b904ca32700d140a9241b0767.png",
+          "tv_点赞": "f85c354995bd99e28fc76c869bfe42ba6438eff4.png",
+          "tv_生气": "26702dcafdab5e8225b43ffd23c94ac1ff932654.png",
+          "tv_生病": "8b0ec90e6b86771092a498c54f09fc94621c1900.png",
+          "tv_疑问": "0793d949b18d7be716078349c202c15ff166f314.png",
+          "tv_白眼": "c1d59f439e379ee50eef488bcb5e5378e5044ea4.png",
+          "tv_皱眉": "72ccad6679fea0d14cce648b4d818e09b8ffea2d.png",
+          "tv_目瞪口呆": "0b8cb81a68de5d5365212c99375e7ace3e7891b7.png",
+          "tv_睡着": "8b196675b53af58264f383c50ad0945048290b33.png",
+          "tv_笑哭": "1abc628f6d4f4caf9d0e7800878f4697abbc8273.png",
+          "tv_腼腆": "89712c0d4af73e67f89e35cbc518420380a7f6f4.png",
+          "tv_色": "61822c7e9aae5da76475e7892534545336b23a6f.png",
+          "tv_调侃": "4bc022533ef31544ca0d72c12c808cf4a1cce3e3.png",
+          "tv_调皮": "b9c41de8e82dd7a8515ae5e3cb63e898bf245186.png",
+          "tv_鄙视": "6e72339f346a692a495b123174b49e4e8e781303.png",
+          "tv_闭嘴": "c9e990da7f6e93975e25fd8b70e2e290aa4086ef.png",
+          "tv_难过": "87f46748d3f142ebc6586ff58860d0e2fc8263ba.png",
+          "tv_馋": "fc7e829b845c43c623c8b490ee3602b7f0e76a31.png",
+          "tv_鬼脸": "0ffbbddf8a94d124ca2f54b360bbc04feb6bbfea.png",
+          "tv_黑人问号": "45821a01f51bc867da9edbaa2e070410819a95b2.png",
+          "tv_鼓掌": "1d21793f96ef4e6f48b23e53e3b9e42da833a0f6.png"
+        } 
+      });
+      
+      
+      
+      
+      
+      
+      
+  </script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span>:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+</div>
+</div>
+</footer>
+<script src="https://fixbug.me/assets/main.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>
