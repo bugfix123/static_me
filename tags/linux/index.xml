@@ -2,39 +2,39 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>linux on DongZhi.ME</title>
-    <link>https://fixbug.me/tags/linux/</link>
+    <link>https://dongzhi.me/tags/linux/</link>
     <description>Recent content in linux on DongZhi.ME</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 11 Jul 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://fixbug.me/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://dongzhi.me/tags/linux/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>在CentOS7上如何下载Youtube视频?</title>
-      <link>https://fixbug.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/</link>
+      <link>https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/</link>
       <pubDate>Sat, 11 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://fixbug.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/</guid>
+      <guid>https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/</guid>
       <description>下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。 前提条件： 一台国外的vps。</description>
     </item>
     
     <item>
       <title>Centos7下科学上网的方法</title>
-      <link>https://fixbug.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/</link>
+      <link>https://dongzhi.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/</link>
       <pubDate>Fri, 11 Jan 2019 09:00:52 +0000</pubDate>
       
-      <guid>https://fixbug.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/</guid>
+      <guid>https://dongzhi.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/</guid>
       <description>本文就介绍一下如何在vps上搭建shadowsocks，让我们能够访问这些网站，以便于我们查阅资料，切勿用做其他不法用途。 常见VPS的服务商 活跃于大街小巷的搬瓦工，也是最适合新手使用的： https://bwh1.net/ （支持支付宝</description>
     </item>
     
     <item>
       <title>CentOS软件的常用安装命令汇总</title>
-      <link>https://fixbug.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/</link>
+      <link>https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/</link>
       <pubDate>Sun, 16 Dec 2018 23:41:20 +0000</pubDate>
       
-      <guid>https://fixbug.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/</guid>
+      <guid>https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/</guid>
       <description>记录一下CentOS上常用软件的安装命令。备以后查用，将持续更新。我经常使用的服务器是CentOS7的64位版，有时候也在vps上使CentOS6，如果该服务商没有提供7的话。 shadowsocks 使用root用户登录，</description>
     </item>
     
