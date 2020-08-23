@@ -23,7 +23,7 @@
 " property="og:description"/>
 <meta content="https://dongzhi.me/2020/07/09/jvm-learn-16/" property="og:url"/>
 <meta content="JVM Learn 16 一个线程死锁的例子及问题排查" property="og:site_name"/>
-<meta content="https://dongzhi.me/post/images/2020/thread_life_cycle.png" property="og:image"/>
+<meta content="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/thread_life_cycle.png" property="og:image"/>
 <meta content="2048" property="og:image:width"/>
 <meta content="1024" property="og:image:height"/>
 <meta content="2020-07-09 00:00:00 +0000 UTC" property="article:published_time"/>
@@ -72,7 +72,7 @@
       Joe John
     </span>
 </div>
-<img alt="JVM Learn 16 一个线程死锁的例子及问题排查" class="post-cover" src="https://dongzhi.me/post/images/2020/thread_life_cycle.png"/>
+<img alt="JVM Learn 16 一个线程死锁的例子及问题排查" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/thread_life_cycle.png"/>
 <div class="post-content"><div>
 <h2 id="死锁示例">死锁示例<a arialabel="Anchor" class="hanchor" href="#死锁示例">⌗</a> </h2>
 <p>这次记录一个线程死锁的例子。直接上代码：</p>
@@ -116,7 +116,7 @@
 <p>显然，first thread线程执行testA方法时，获取了A的Class对象锁，睡眠5秒后尝试获取B的Clas对象锁，而second thread执行testB方法时，获取了B的Class对象锁，所以线程first thread睡醒之后获取不到A的Class对象锁，处于Block状态，同样地，该线程睡醒之后也获取不到A的Class对象锁，这两个线程相互永远等待，处于dead block状态！</p>
 <h2 id="visualvm工具排查">VisualVM工具排查<a arialabel="Anchor" class="hanchor" href="#visualvm工具排查">⌗</a> </h2>
 <p>打开Java VisualVM工具，线程页签界面上鲜明地展示，当前应用存在死锁。
-<img alt="deak lock" src="/post/images/2020/dead_lock.png"/></p>
+<img alt="deak lock" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/dead_lock.png"/></p>
 <p>点击右上角<strong>线程Dump</strong>按钮，进去之后可以看到所有线程的执行状态快照，拖到页面的最后面，会打印出死锁线程的相关信息。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>Found one Java-level deadlock:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>=============================

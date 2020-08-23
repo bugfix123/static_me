@@ -97,9 +97,9 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>    <span style="color:#f92672">}</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#f92672">}</span>
 </code></pre></div><p>启动参数如下图：
-<img alt="qidongcanshu" src="/post/images/2020/jvm_14_qidongcanshu.png"/>
+<img alt="qidongcanshu" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_14_qidongcanshu.png"/>
 在命令行下执行：jvisualvm，打开这个工具，主界面如下：
-<img alt="" src="/post/images/2020/jvm_14_jvm_visual.png"/></p>
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_14_jvm_visual.png"/></p>
 <ul>
 <li>左上：CPU使用率，GC状态</li>
 <li>右上：堆的总大小，已使用的堆大小</li>
@@ -109,7 +109,7 @@
 <p>这个例子中，在一个死循环中新建对象，同时显示调用gc，运行了2个多小时，发现已使用堆的内存在稳步上升，说明有内存泄漏的趋势。</p>
 <p>经测试，如果启动参数-Xmx设置的不管是9m，还是10m，到最后分配的最大堆内存是10m。</p>
 <p>点击线程页签，界面如下：
-<img alt="20200202164251" src="/post/images/2020/jvm_14_visual_02.png"/>
+<img alt="20200202164251" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_14_visual_02.png"/>
 这里线程有5个状态：</p>
 <ul>
 <li>运行</li>

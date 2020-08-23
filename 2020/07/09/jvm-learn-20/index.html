@@ -23,7 +23,7 @@
 " property="og:description"/>
 <meta content="https://dongzhi.me/2020/07/09/jvm-learn-20/" property="og:url"/>
 <meta content="JVM Learn 20 Java Garbage Collection Basics" property="og:site_name"/>
-<meta content="https://dongzhi.me/post/images/2020/garbage_collectors.jpg" property="og:image"/>
+<meta content="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/garbage_collectors.jpg" property="og:image"/>
 <meta content="2048" property="og:image:width"/>
 <meta content="1024" property="og:image:height"/>
 <meta content="2020-07-09 00:00:00 +0000 UTC" property="article:published_time"/>
@@ -72,7 +72,7 @@
       Joe John
     </span>
 </div>
-<img alt="JVM Learn 20 Java Garbage Collection Basics" class="post-cover" src="https://dongzhi.me/post/images/2020/garbage_collectors.jpg"/>
+<img alt="JVM Learn 20 Java Garbage Collection Basics" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/garbage_collectors.jpg"/>
 <div class="post-content"><div>
 <blockquote>
 <p>本文原文地址<a href="https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html#RequiredSoftware/">：Java Garbage Collection Basics</a></p>
@@ -188,13 +188,13 @@ instructions targeted for the underlying system architecture. In addition,
 through the maturing evolution and continuous engineering of its runtime
 environment and multithreaded garbage collector, the HotSpot JVM yields high
 scalability on even the largest available computer systems.
-<img alt="Slide1" src="/post/images/2020/jvm_20_Slide1.png"/></p>
+<img alt="Slide1" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1.png"/></p>
 <p>The main components of the JVM include the classloader, the runtime data
 areas, and the execution engine.</p>
 <h4 id="key-hotspot-components">Key Hotspot Components<a arialabel="Anchor" class="hanchor" href="#key-hotspot-components">⌗</a> </h4>
 <p>The key components of the JVM that relate to performance are highlighted in
 the following image.
-<img alt="Slide2" src="/post/images/2020/jvm_20_Slide2.png"/></p>
+<img alt="Slide2" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide2.png"/></p>
 <p>There are three components of the JVM that are focused on when tuning
 performance. The <em>heap</em> is where your object data is stored. This area is then
 managed by the garbage collector selected at startup. Most tuning options
@@ -241,7 +241,7 @@ follows.</p>
 <h4 id="step-1-marking">Step 1: Marking<a arialabel="Anchor" class="hanchor" href="#step-1-marking">⌗</a> </h4>
 <p>The first step in the process is called marking. This is where the garbage
 collector identifies which pieces of memory are in use and which are not.
-<img alt="Slide3" src="/post/images/2020/jvm_20_Slide3.png"/>
+<img alt="Slide3" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide3.png"/>
 Referenced objects are shown in blue. Unreferenced objects are shown in gold.
 All objects are scanned in the marking phase to make this determination. This
 can be a very time consuming process if all objects in a system must be
@@ -249,14 +249,14 @@ scanned.</p>
 <h4 id="step-2-normal-deletion">Step 2: Normal Deletion<a arialabel="Anchor" class="hanchor" href="#step-2-normal-deletion">⌗</a> </h4>
 <p>Normal deletion removes unreferenced objects leaving referenced objects and
 pointers to free space.
-<img alt="Slide1b" src="/post/images/2020/jvm_20_Slide1b.png"/>
+<img alt="Slide1b" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1b.png"/>
 The memory allocator holds references to blocks of free space where new object
 can be allocated.</p>
 <h4 id="step-2a-deletion-with-compacting">Step 2a: Deletion with Compacting<a arialabel="Anchor" class="hanchor" href="#step-2a-deletion-with-compacting">⌗</a> </h4>
 <p>To further improve performance, in addition to deleting unreferenced objects,
 you can also compact the remaining referenced objects. By moving referenced
 object together, this makes new memory allocation much easier and faster.
-<img alt="Slide4" src="/post/images/2020/jvm_20_Slide4.png"/></p>
+<img alt="Slide4" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide4.png"/></p>
 <h4 id="why-generational-garbage-collection">Why Generational Garbage Collection?<a arialabel="Anchor" class="hanchor" href="#why-generational-garbage-collection">⌗</a> </h4>
 <p>As stated earlier, having to mark and compact all the objects in a JVM is
 inefficient. As more and more objects are allocated, the list of objects grows
@@ -265,7 +265,7 @@ empirical analysis of applications has shown that most objects are short
 lived.</p>
 <p>Here is an example of such data. The Y axis shows the number of bytes
 allocated and the X access shows the number of bytes allocated over time.
-<img alt="ObjectLifetime" src="/post/images/2020/jvm_20_ObjectLifetime.gif"/></p>
+<img alt="ObjectLifetime" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_ObjectLifetime.gif"/></p>
 <p>As you can see, fewer and fewer objects remain allocated over time. In fact
 most objects have a very short life as shown by the higher values on the left
 side of the graph.</p>
@@ -274,7 +274,7 @@ side of the graph.</p>
 enhance the performance of the JVM. Therefore, the heap is broken up into
 smaller parts or generations. The heap parts are: Young Generation, Old or
 Tenured Generation, and Permanent Generation
-<img alt="Slide5" src="/post/images/2020/jvm_20_Slide5.png"/>
+<img alt="Slide5" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide5.png"/>
 The <strong>Young Generation</strong> is where all new objects are allocated and aged. When
 the young generation fills up, this causes a <strong><em>minor garbage collection</em></strong>.
 Minor collections can be optimized assuming a high object mortality rate. A
