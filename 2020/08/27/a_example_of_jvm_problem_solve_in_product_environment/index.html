@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>记一次公司JVM堆溢出抽丝剥茧定位的过程 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="记一次公司JVM堆溢出抽丝剥茧定位的过程 :: DongZhi.ME" property="og:title"/>
+<meta content="背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为" property="og:description"/>
+<meta content="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" property="og:url"/>
+<meta content="记一次公司JVM堆溢出抽丝剥茧定位的过程" property="og:site_name"/>
+<meta content="https://dongzhi.me/post/images/2020/jvm_problem_01.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-08-27 20:09:50 +0800 +0800" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/">记一次公司JVM堆溢出抽丝剥茧定位的过程</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-08-27 
+      </span>
+</div>
+<img alt="记一次公司JVM堆溢出抽丝剥茧定位的过程" class="post-cover" src="https://dongzhi.me/post/images/2020/jvm_problem_01.png"/>
+<div class="post-content"><div>
+<h1 id="背景">背景<a arialabel="Anchor" class="hanchor" href="#背景">⌗</a> </h1>
+<p>公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。</p>
+<p>因为并发不高，所以线上一共部署了2个tomcat进行负载均衡。</p>
+<p>这个tomcat刚上生产线，运行挺平稳。大概过了大概 1 天后，运维同事反映2个tomcat 节点均挂了。无法接受新的请求了。CPU 飙升到 100%。</p>
+<h1 id="排查过程一">排查过程一<a arialabel="Anchor" class="hanchor" href="#排查过程一">⌗</a> </h1>
+<p>接手这个问题后。首先大致看了下当时的 JVM 监控。CPU 的确居高不下:
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png"/></p>
+<p>FULL GC从大概这个小时的22分开始，就开始频繁的进行FULL GC，一分钟最高能进行10次FULL GC:
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_02.png"/></p>
+<p>minor GC 每分钟竟然接近60次，相当于每秒钟都有minor GC。如图：
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_03.png"/></p>
+<p>同时，从老年代的使用情况也反应了这一点:
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_04.png"/></p>
+<p>接着，随机对线上应用分析了线程的 cpu 占用情况，用<code>top -H -p pid</code> 命令:
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_05.png"/></p>
+<p>可以看到前面 4 条线程，都占用了大量的 CPU 资源。随即进行了 jstack，把线程栈信息拉下来，用前面 4 条线程的 ID 转换 16 进制后进行搜索。发现并没有找到相应的线程。所以判断为不是应用线程导致的。</p>
+<h1 id="第一个结论">第一个结论<a arialabel="Anchor" class="hanchor" href="#第一个结论">⌗</a> </h1>
+<p>通过对当时JVM的的监控情况，可以发现。这个小时的22分之前，系统一直保持着一个比较稳定的运行状态，堆的使用率不高，但是22分之后，年轻代大量的minor gc后，老年代在几分钟之内被快速的填满。导致了FULL GC 。同时FULL GC不停的发生，导致了大量的STW，CPU被FULL GC线程占据，出现CPU飙高，应用线程由于STW再加上CPU过高，大量线程被阻塞。同时新的请求又不停的进来，最终 tomcat的线程池被占满，再也无法响应新的请求了。这个雪球终于还是滚大了。</p>
+<p>分析完了案发现场。要解决的问题变成了：<strong>是什么原因导致老年代被快速的填满？</strong>
+拉了下当时的 JVM 参数:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms2048m -Xmx4096m -Xmn2048m -Xss512k -XX:MetaspaceSize=512m -XX:MaxMetaspaceSize=512m -XX:+DisableExx plicitGC -XX:MaxTenuringThreshold=5 -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseCMSCompactAtFullCollection
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>-XX:+PrintGCDetails -Xloggc:/data/logs/gc.log
+</code></pre></div><p>总共4个G的堆，年轻代单独给了2个G，按照比率算，JVM 内存各个区的分配情况如下：
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_06.png"/></p>
+<p>所以开始怀疑是 JVM 参数设置的有问题导致的老年代被快速的占满。</p>
+<p>但是其实这参数已经是之前优化后的结果了，eden 区设置的挺大，大部分我们的方法产生的对象都是朝生夕死的对象，应该大部分都在年轻代会清理了。存活的对象才会进入survivor区。到达年龄或者触发了进入老年代的条件后才会进入老年代。基本上老年代里的对象大部分应该是一直存活的对象。比如static修饰的对象啊，一直被引用的 缓存啊，spring 容器中的 bean 等等。</p>
+<p>我看了下垃圾回收进入老年代的触发条件后，发现这个场景应该是属于大对象直接进老年代的这种，也就是说年轻代进行minor GC后，存活的对象足够大，不足以在survivor区域放下了，就直接进入老年代了。</p>
+<p>但是一次minor GC应该超过90%的对象都是无引用对象，只有少部分的对象才是存活的。而且这些个服务的并发一直不高，为什么一次minor GC后有那么大量的数据会存活呢。</p>
+<p>随即看了下当时的<code>jmap -histo</code>命令产生的文件:</p>
+<p><img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_07.png"/></p>
+<p>发现String这个这个对象的示例竟然有9000多w个，占用堆超过2G。这肯定有问题。但是tomcat里有8个应用，不可能通过分析代码来定位到。还是要从JVM入手来反推。</p>
+<h1 id="第二次结论">第二次结论<a arialabel="Anchor" class="hanchor" href="#第二次结论">⌗</a> </h1>
+<p>程序并发不高，但是在几分钟之内，在eden区产生了大量的对象，并且这些对象无法被minor GC回收 ，由于太大，触发了大对象直接进老年代机制，老年代会迅速填满，导致FULL GC，和后面CPU的飙升，从而导致 tomcat 的宕机。</p>
+<p>基本判断是，JVM参数应该没有问题，很可能问题出在应用本身不断产生无法被回收的对象上面。但是我暂时定位不到具体的代码位置。</p>
+<h1 id="排查过程二">排查过程二<a arialabel="Anchor" class="hanchor" href="#排查过程二">⌗</a> </h1>
+<p>第二天，又看了下当时的 JVM 监控，发现有这么一个监控数据当时漏看了:
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_08.png"/></p>
+<p>这是FULL GC之后老年代的使用率。可以看到,FULL GC之后老年代依然占据80%多的空间，FULL GC就根本清理不掉老年代的对象。这说明，老年代里的这些对象都是被程序引用着的，所以清理不掉。但是平稳的时候，老年代一直维持着大概300M的堆，从这个小时的 22 分开始，之后就狂飙到接近2G，这肯定不正常。更加印证了我前面一个观点：<strong>这是因为应用程序产生的无法回收的对象导致的</strong>。</p>
+<p>但是，当时我并没有dump下来jvm的堆，所以只能等再次重现问题。</p>
+<p>终于，在晚上 9 点多，这个问题又重现了，熟悉的配方，熟悉的味道。</p>
+<p>直接<code>jmap -dump</code>，经过漫长的等待，产生了4.2G的一个堆快照文件dump.hprof，经过压缩，得到一个466M的tar.gz文件</p>
+<p>然后download 到本地，解压。</p>
+<p>运行堆分析工具<code>JProfile</code>，装载这个dump.hprof 文件。然后查看堆当时的所有类占比大小的信息：</p>
+<p><img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_09.png"/></p>
+<p>发现导致堆溢出，就是这个String对象，和之前Jmap 得出的结果一样，超过了2个G，并且无法被回收。随即看大对象视图，发现这些个String对象都是被<strong>java.util.ArrayList</strong>引用着的，也就是有一个ArrayList里，引用了超过2G的对象：
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_10.png"/></p>
+<p>然后查看引用的关系图，往上溯源，源头终于显形：
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_11.png"/></p>
+<p>这个ArrayList是被一个线程栈引用着，而这个线程栈信息里面，可以直接定位到相应的服务和相应的类。具体服务是Media这个微服务。</p>
+<p>看来已经要逼近真相了！</p>
+<h1 id="第三次结论">第三次结论<a arialabel="Anchor" class="hanchor" href="#第三次结论">⌗</a> </h1>
+<p>本次大量频繁的FULL GC是因为应用程序产生了大量无法被回收的数据，最终进入老年代，最终把老年代撑满了导致的。具体的定位通过JVM的dump文件已经分析出，指向了Media这个服务的 ImageCombineUtils.getComputedLines 这个方法，是什么会产生尚不知道，需要具体分析代码。</p>
+<h1 id="最后">最后<a arialabel="Anchor" class="hanchor" href="#最后">⌗</a> </h1>
+<p>得知了具体的代码位置，直接进去看。经过小伙伴提醒，发现这个代码有一个问题:</p>
+<p>这段代码为一个拆词方法，具体代码就不贴了，里面有一个循环，每一次循环会往一个ArrayList里加一个String对象，在循环的某一个阶段，会重置循环计数器 i，在普通的参数下并没有问题。但是某些特定的条件下。就会不停的重置循环计数器 i，导致一个死循环。</p>
+<p>以下是模拟出来的结果，可以看到，才运行了一会，这个ArrayList就产生了322w个对象，且大部分Stirng对象都是空值。</p>
+<p><img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_12.png"/></p>
+<p>至此，水落石出。</p>
+<h1 id="最终结论">最终结论<a arialabel="Anchor" class="hanchor" href="#最终结论">⌗</a> </h1>
+<p>因为Media这个微服务的程序在某一些特殊场景下的一段程序导致了死循环，产生了一个超大的ArrayList。导致了年轻代的快速被填满，然后触发了大对象直接进老年代的机制，直接往老年代里面放。老年代被放满之后。触发FULL GC。但是这些ArrayList被<code>GC ROOT</code>根引用着，无法回收。导致回收不掉。老年代依旧满的，随机马上又触发FULL GC。同时因为老年代无法被回收，导致minor GC也没法清理，不停的进行minor GC。大量GC导致STW和CPU飙升，导致应用线程卡顿，阻塞，直至最后整个服务无法接受请求。</p>
+<blockquote>
+<p><strong>备注</strong>:本文转载自https://www.v2ex.com/t/701513</p>
+</blockquote>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button next">
+<a href="https://dongzhi.me/2020/08/21/kexueshangwang/">
+<span class="button__text">v2ray客户端配置简易说明</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="background: rgb(183 168 154 / 26%);padding: 5px auto;margin: 10px auto;border: 1px dashed var(--accent);">
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.Pure.min.js"></script>
+<div id="vcomments"></div>
+<script>
+      new Valine({
+        el: '#comments' ,
+        appId: 'sJKN6mA2eSTxIq3YaOiCN3JX-MdYXbMMI',
+        appKey: 'aykSxGrm7HLN5BroU1gr3Ot3',
+        placeholder: 'go go it~',
+        visitor:  false ,
+        requiredFields: ['mail'],
+        emojiCDN: '//i0.hdslb.com/bfs/emote/',
+        emojiMaps: {
+          "tv_doge": "6ea59c827c414b4a2955fe79e0f6fd3dcd515e24.png",
+          "tv_亲亲": "a8111ad55953ef5e3be3327ef94eb4a39d535d06.png",
+          "tv_偷笑": "bb690d4107620f1c15cff29509db529a73aee261.png",
+          "tv_再见": "180129b8ea851044ce71caf55cc8ce44bd4a4fc8.png",
+          "tv_冷漠": "b9cbc755c2b3ee43be07ca13de84e5b699a3f101.png",
+          "tv_发怒": "34ba3cd204d5b05fec70ce08fa9fa0dd612409ff.png",
+          "tv_发财": "34db290afd2963723c6eb3c4560667db7253a21a.png",
+          "tv_可爱": "9e55fd9b500ac4b96613539f1ce2f9499e314ed9.png",
+          "tv_吐血": "09dd16a7aa59b77baa1155d47484409624470c77.png",
+          "tv_呆": "fe1179ebaa191569b0d31cecafe7a2cd1c951c9d.png",
+          "tv_呕吐": "9f996894a39e282ccf5e66856af49483f81870f3.png",
+          "tv_困": "241ee304e44c0af029adceb294399391e4737ef2.png",
+          "tv_坏笑": "1f0b87f731a671079842116e0991c91c2c88645a.png",
+          "tv_大佬": "093c1e2c490161aca397afc45573c877cdead616.png",
+          "tv_大哭": "23269aeb35f99daee28dda129676f6e9ea87934f.png",
+          "tv_委屈": "d04dba7b5465779e9755d2ab6f0a897b9b33bb77.png",
+          "tv_害羞": "a37683fb5642fa3ddfc7f4e5525fd13e42a2bdb1.png",
+          "tv_尴尬": "7cfa62dafc59798a3d3fb262d421eeeff166cfa4.png",
+          "tv_微笑": "70dc5c7b56f93eb61bddba11e28fb1d18fddcd4c.png",
+          "tv_思考": "90cf159733e558137ed20aa04d09964436f618a1.png",
+          "tv_惊吓": "0d15c7e2ee58e935adc6a7193ee042388adc22af.png",
+          "tv_打脸": "56ab10b624063e966bfcb76ea5dc4794d87dfd47.png",
+          "tv_抓狂": "fe31c08edad661d63762b04e17b8d5ae3c71a757.png",
+          "tv_抠鼻": "c666f55e88d471e51bbd9fab9bb308110824a6eb.png",
+          "tv_斜眼笑": "911f987aa8bc1bee12d52aafe62bc41ef4474e6c.png",
+          "tv_无奈": "ea8ed89ee9878f2fece2dda0ea8a5dbfe21b5751.png",
+          "tv_晕": "5443c22b4d07fb1907ccc610c8e6db254f2461b7.png",
+          "tv_流汗": "cead1c351ab8d79e9f369605beb90148db0fbed3.png",
+          "tv_流泪": "7e71cde7858f0cd50d74b0264aa26db612a8a167.png",
+          "tv_流鼻血": "c32d39db2737f89b904ca32700d140a9241b0767.png",
+          "tv_点赞": "f85c354995bd99e28fc76c869bfe42ba6438eff4.png",
+          "tv_生气": "26702dcafdab5e8225b43ffd23c94ac1ff932654.png",
+          "tv_生病": "8b0ec90e6b86771092a498c54f09fc94621c1900.png",
+          "tv_疑问": "0793d949b18d7be716078349c202c15ff166f314.png",
+          "tv_白眼": "c1d59f439e379ee50eef488bcb5e5378e5044ea4.png",
+          "tv_皱眉": "72ccad6679fea0d14cce648b4d818e09b8ffea2d.png",
+          "tv_目瞪口呆": "0b8cb81a68de5d5365212c99375e7ace3e7891b7.png",
+          "tv_睡着": "8b196675b53af58264f383c50ad0945048290b33.png",
+          "tv_笑哭": "1abc628f6d4f4caf9d0e7800878f4697abbc8273.png",
+          "tv_腼腆": "89712c0d4af73e67f89e35cbc518420380a7f6f4.png",
+          "tv_色": "61822c7e9aae5da76475e7892534545336b23a6f.png",
+          "tv_调侃": "4bc022533ef31544ca0d72c12c808cf4a1cce3e3.png",
+          "tv_调皮": "b9c41de8e82dd7a8515ae5e3cb63e898bf245186.png",
+          "tv_鄙视": "6e72339f346a692a495b123174b49e4e8e781303.png",
+          "tv_闭嘴": "c9e990da7f6e93975e25fd8b70e2e290aa4086ef.png",
+          "tv_难过": "87f46748d3f142ebc6586ff58860d0e2fc8263ba.png",
+          "tv_馋": "fc7e829b845c43c623c8b490ee3602b7f0e76a31.png",
+          "tv_鬼脸": "0ffbbddf8a94d124ca2f54b360bbc04feb6bbfea.png",
+          "tv_黑人问号": "45821a01f51bc867da9edbaa2e070410819a95b2.png",
+          "tv_鼓掌": "1d21793f96ef4e6f48b23e53e3b9e42da833a0f6.png"
+        } 
+      });
+      
+      
+      
+      
+      
+      
+      
+  </script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span>:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

@@ -6,8 +6,15 @@
 <description>Recent content on DongZhi.ME</description>
 <generator>Hugo -- gohugo.io</generator>
 <language>en-us</language>
-<lastBuildDate>Fri, 21 Aug 2020 00:00:00 +0000</lastBuildDate>
+<lastBuildDate>Thu, 27 Aug 2020 20:09:50 +0800</lastBuildDate>
 <atom:link href="https://dongzhi.me/index.xml" rel="self" type="application/rss+xml"/>
+<item>
+<title>记一次公司JVM堆溢出抽丝剥茧定位的过程</title>
+<link>https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/</link>
+<pubDate>Thu, 27 Aug 2020 20:09:50 +0800</pubDate>
+<guid>https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/</guid>
+<description>背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为</description>
+</item>
 <item>
 <title>v2ray客户端配置简易说明</title>
 <link>https://dongzhi.me/2020/08/21/kexueshangwang/</link>
