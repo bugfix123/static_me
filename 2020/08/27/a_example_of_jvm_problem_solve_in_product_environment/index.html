@@ -91,9 +91,9 @@
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_05.png"/></p>
 <p>可以看到前面 4 条线程，都占用了大量的 CPU 资源。随即进行了 jstack，把线程栈信息拉下来，用前面 4 条线程的 ID 转换 16 进制后进行搜索。发现并没有找到相应的线程。所以判断为不是应用线程导致的。</p>
 <h1 id="第一个结论">第一个结论<a arialabel="Anchor" class="hanchor" href="#第一个结论">⌗</a> </h1>
-<p>通过对当时JVM的的监控情况，可以发现。这个小时的22分之前，系统一直保持着一个比较稳定的运行状态，堆的使用率不高，但是22分之后，年轻代大量的minor gc后，老年代在几分钟之内被快速的填满。导致了FULL GC 。同时FULL GC不停的发生，导致了大量的STW，CPU被FULL GC线程占据，出现CPU飙高，应用线程由于STW再加上CPU过高，大量线程被阻塞。同时新的请求又不停的进来，最终 tomcat的线程池被占满，再也无法响应新的请求了。这个雪球终于还是滚大了。</p>
+<p>通过对当时JVM的的监控情况，可以发现：这个小时的22分之前，系统一直保持着一个比较稳定的运行状态，堆的使用率不高，但是，在22分钟时年轻代大量的minor gc后，老年代在几分钟之内被快速的填满，导致了FULL GC。同时FULL GC不停的发生，导致了大量的STW，CPU被FULL GC线程占据，出现CPU飙高，应用线程由于STW再加上CPU过高，大量线程被阻塞。同时新的请求又不停的进来，最终tomcat的线程池被占满，再也无法响应新的请求了。这个雪球终于还是滚大了。</p>
 <p>分析完了案发现场。要解决的问题变成了：<strong>是什么原因导致老年代被快速的填满？</strong>
-拉了下当时的 JVM 参数:</p>
+拉了下当时的JVM 参数:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms2048m -Xmx4096m -Xmn2048m -Xss512k -XX:MetaspaceSize=512m -XX:MaxMetaspaceSize=512m -XX:+DisableExx plicitGC -XX:MaxTenuringThreshold=5 -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseCMSCompactAtFullCollection
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>-XX:+PrintGCDetails -Xloggc:/data/logs/gc.log
 </code></pre></div><p>总共4个G的堆，年轻代单独给了2个G，按照比率算，JVM 内存各个区的分配情况如下：
