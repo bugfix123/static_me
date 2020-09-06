@@ -1,276 +1,445 @@
-<!doctype html><html lang=en><head><title>JVM Learn 08 线程上下文类加载器和Service Loader :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="双亲委托机制的局限性 当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2020/07/07/jvm-learn-08/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content="John Doe"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="JVM Learn 08 线程上下文类加载器和Service Loader :: DongZhi.ME"><meta property="og:description" content="双亲委托机制的局限性 当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核"><meta property="og:url" content="https://dongzhi.me/2020/07/07/jvm-learn-08/"><meta property="og:site_name" content="JVM Learn 08 线程上下文类加载器和Service Loader"><meta property="og:image" content="https://dongzhi.me/"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:published_time" content="2020-07-07 00:00:00 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2020/07/07/jvm-learn-08/>JVM Learn 08 线程上下文类加载器和Service Loader</a></h1><div class=post-meta><span class=post-date>2020-07-07</span>
-<span class=post-author>::
-John Doe</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/jvm/>jvm</a>&nbsp;</span><div class=post-content><div><h2 id=双亲委托机制的局限性>双亲委托机制的局限性<a href=#双亲委托机制的局限性 class=hanchor arialabel=Anchor>&#8983;</a></h2><p>当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核心类库提供的，JAVA核心类库是由根类加载器来加载的，而这些接口的实现来着不同的jar包，由不同的厂商提供，根类加载不会去加载这些jar包中的类，这样传统的双亲委托机制就无法满足SPI的要求。而通过给当前线程设置线程上下文类加载器，在需要加载厂商实现类的地方，从当前线程获取上下文类加载器去加载，从而满足SPI。</p><p><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_08_service_loader.png alt></p><h2 id=线程上下文类加载器>线程上下文类加载器<a href=#线程上下文类加载器 class=hanchor arialabel=Anchor>&#8983;</a></h2><p>线程上下文类加载器(Thread Context Class Loader)，通过Thread.getContextClassLoader()和Thread.setContextClassLoader(ClassLoader cl)分别获取和设定。如果没有通过setContextClassLoader方法设置的话，线程将继承父线程的上下文类加载器。父类加载器加载的类可以使用Thread.currentThread().getContextClassLoader()设定的classloader加载的类。这一特性打破了双亲委托机制。</p><p><strong>根类加载器无法记载项目类路径下的类，但是可以通过当前线程的上下文类加载器来加载，相当于给类加载开了外挂。</strong></p><p>默认情况下，当前线程的上下文类加载器是系统类加载器。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TestThreadContextClassLoader</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span>Thread<span style=color:#f92672>.</span><span style=color:#a6e22e>currentThread</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getContextClassLoader</span><span style=color:#f92672>());</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span>Thread<span style=color:#f92672>.</span><span style=color:#a6e22e>class</span><span style=color:#f92672>.</span><span style=color:#a6e22e>getClassLoader</span><span style=color:#f92672>());</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>        
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span><span style=color:#f92672>}</span>
-</code></pre></div><p>执行后输出结果为：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>sun.misc.Launcher$AppClassLoader@18b4aac2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>null
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>Process finished with exit code 0
-</code></pre></div><p>线程上下文类加载器的使用模式一般为：获取-使用-还原。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>ClassLoader loader <span style=color:#f92672>=</span> Thread<span style=color:#f92672>.</span><span style=color:#a6e22e>currentThread</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getContextClassLoader</span><span style=color:#f92672>();</span><span style=color:#75715e>// 原来的类加载器
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span style=color:#75715e></span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span style=color:#66d9ef>try</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>    Thread<span style=color:#f92672>.</span><span style=color:#a6e22e>currentThread</span><span style=color:#f92672>().</span><span style=color:#a6e22e>setContextClassLoader</span><span style=color:#f92672>(</span>loader1<span style=color:#f92672>);</span><span style=color:#75715e>// 设置classloader，以便userMethod()使用
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span><span style=color:#75715e></span>    userMethod<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span><span style=color:#f92672>}</span> <span style=color:#66d9ef>finally</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span>    Thread<span style=color:#f92672>.</span><span style=color:#a6e22e>currentThread</span><span style=color:#f92672>().</span><span style=color:#a6e22e>setContextClassLoader</span><span style=color:#f92672>(</span>loader<span style=color:#f92672>);</span><span style=color:#75715e>//还原
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">8</span><span style=color:#75715e></span><span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">9</span>
-</code></pre></div><h2 id=探究service-loader>探究Service Loader<a href=#探究service-loader class=hanchor arialabel=Anchor>&#8983;</a></h2><p>以Mysql的驱动加载为例，探究一下java的Service Loader的使用。首先在依赖加入mysql-connector，</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>    <span style=color:#f92672>&lt;</span>dependency<span style=color:#f92672>&gt;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>      <span style=color:#f92672>&lt;</span>groupId<span style=color:#f92672>&gt;</span>mysql<span style=color:#f92672>&lt;/</span>groupId<span style=color:#f92672>&gt;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>      <span style=color:#f92672>&lt;</span>artifactId<span style=color:#f92672>&gt;</span>mysql<span style=color:#f92672>-</span>connector<span style=color:#f92672>-</span>java<span style=color:#f92672>&lt;/</span>artifactId<span style=color:#f92672>&gt;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>      <span style=color:#f92672>&lt;</span>version<span style=color:#f92672>&gt;</span>5<span style=color:#f92672>.</span><span style=color:#a6e22e>1</span><span style=color:#f92672>.</span><span style=color:#a6e22e>48</span><span style=color:#f92672>&lt;/</span>version<span style=color:#f92672>&gt;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>    <span style=color:#f92672>&lt;/</span>dependency<span style=color:#f92672>&gt;</span>
-</code></pre></div><p>然后使用Service loader加载驱动：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> io.dongzhi<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#f92672>import</span> java.sql.Driver<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span><span style=color:#f92672>import</span> java.util.Iterator<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span><span style=color:#f92672>import</span> java.util.ServiceLoader<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TestServiceLoader</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>        ServiceLoader<span style=color:#f92672>&lt;</span>Driver<span style=color:#f92672>&gt;</span> serviceLoader <span style=color:#f92672>=</span> ServiceLoader<span style=color:#f92672>.</span><span style=color:#a6e22e>load</span><span style=color:#f92672>(</span>Driver<span style=color:#f92672>.</span><span style=color:#a6e22e>class</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>        Iterator<span style=color:#f92672>&lt;</span>Driver<span style=color:#f92672>&gt;</span> it <span style=color:#f92672>=</span> serviceLoader<span style=color:#f92672>.</span><span style=color:#a6e22e>iterator</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>        <span style=color:#66d9ef>while</span> <span style=color:#f92672>(</span>it<span style=color:#f92672>.</span><span style=color:#a6e22e>hasNext</span><span style=color:#f92672>())</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>            Driver driver <span style=color:#f92672>=</span> it<span style=color:#f92672>.</span><span style=color:#a6e22e>next</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>            System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;driver class:&#34;</span> <span style=color:#f92672>+</span> driver <span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>            System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;driver class loader:&#34;</span> <span style=color:#f92672>+</span> driver<span style=color:#f92672>.</span><span style=color:#a6e22e>getClass</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getClassLoader</span><span style=color:#f92672>());</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>        <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span><span style=color:#f92672>}</span>
-</code></pre></div><p>打印结果为：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>driver class:com.mysql.jdbc.Driver@2b193f2d
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>driver class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>driver class:com.mysql.fabric.jdbc.FabricMySQLDriver@355da254
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>driver class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>Process finished with exit code 0
-</code></pre></div><p>也就是说成功加载了2个驱动：com.mysql.jdbc.Driver和com.mysql.fabric.jdbc.FabricMySQLDriver，它们的类加载器都是系统类加载器。</p><p>该案例的疑问是，代码中并没有出现和mysql driver相关的代码，ServiceLoader.load(Driver.class)引用的也是JDK自带的接口，为何能够成功打印出mysql的两个驱动实现类呢？翻阅Service Loader的java doc相关说明和源码得知，在mysql-connector-xx.jar中的<strong>META-INF/services/<strong>目录下有这样一个文件</strong>java.sql.Driver</strong>，其内容为：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>com.mysql.jdbc.Driver
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>com.mysql.fabric.jdbc.FabricMySQLDriver
-</code></pre></div><p><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_08_service_loader_driver.png alt=1578152254(1)>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>JVM Learn 08 线程上下文类加载器和Service Loader :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="双亲委托机制的局限性 当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/07/07/jvm-learn-08/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="John Doe" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="JVM Learn 08 线程上下文类加载器和Service Loader :: DongZhi.ME" property="og:title"/>
+<meta content="双亲委托机制的局限性 当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核" property="og:description"/>
+<meta content="https://dongzhi.me/2020/07/07/jvm-learn-08/" property="og:url"/>
+<meta content="JVM Learn 08 线程上下文类加载器和Service Loader" property="og:site_name"/>
+<meta content="https://dongzhi.me/" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-07-07 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-08/">JVM Learn 08 线程上下文类加载器和Service Loader</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-07-07 
+      </span>
+<span class="post-author">::
+      John Doe
+    </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
+    
+  </span>
+<div class="post-content"><div>
+<h2 id="双亲委托机制的局限性">双亲委托机制的局限性<a arialabel="Anchor" class="hanchor" href="#双亲委托机制的局限性">⌗</a> </h2>
+<p>当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核心类库提供的，JAVA核心类库是由根类加载器来加载的，而这些接口的实现来着不同的jar包，由不同的厂商提供，根类加载不会去加载这些jar包中的类，这样传统的双亲委托机制就无法满足SPI的要求。而通过给当前线程设置线程上下文类加载器，在需要加载厂商实现类的地方，从当前线程获取上下文类加载器去加载，从而满足SPI。</p>
+<p><img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_08_service_loader.png"/></p>
+<h2 id="线程上下文类加载器">线程上下文类加载器<a arialabel="Anchor" class="hanchor" href="#线程上下文类加载器">⌗</a> </h2>
+<p>线程上下文类加载器(Thread Context Class Loader)，通过Thread.getContextClassLoader()和Thread.setContextClassLoader(ClassLoader cl)分别获取和设定。如果没有通过setContextClassLoader方法设置的话，线程将继承父线程的上下文类加载器。父类加载器加载的类可以使用Thread.currentThread().getContextClassLoader()设定的classloader加载的类。这一特性打破了双亲委托机制。</p>
+<p><strong>根类加载器无法记载项目类路径下的类，但是可以通过当前线程的上下文类加载器来加载，相当于给类加载开了外挂。</strong></p>
+<p>默认情况下，当前线程的上下文类加载器是系统类加载器。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestThreadContextClassLoader</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getContextClassLoader</span><span style="color:#f92672">());</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClassLoader</span><span style="color:#f92672">());</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span style="color:#f92672">}</span>
+</code></pre></div><p>执行后输出结果为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>sun.misc.Launcher$AppClassLoader@18b4aac2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>null
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>Process finished with exit code 0
+</code></pre></div><p>线程上下文类加载器的使用模式一般为：获取-使用-还原。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>ClassLoader loader <span style="color:#f92672">=</span> Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getContextClassLoader</span><span style="color:#f92672">();</span><span style="color:#75715e">// 原来的类加载器
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span style="color:#75715e"></span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>    Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">setContextClassLoader</span><span style="color:#f92672">(</span>loader1<span style="color:#f92672">);</span><span style="color:#75715e">// 设置classloader，以便userMethod()使用
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span style="color:#75715e"></span>    userMethod<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span style="color:#f92672">}</span> <span style="color:#66d9ef">finally</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>    Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">setContextClassLoader</span><span style="color:#f92672">(</span>loader<span style="color:#f92672">);</span><span style="color:#75715e">//还原
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span>
+</code></pre></div><h2 id="探究service-loader">探究Service Loader<a arialabel="Anchor" class="hanchor" href="#探究service-loader">⌗</a> </h2>
+<p>以Mysql的驱动加载为例，探究一下java的Service Loader的使用。首先在依赖加入mysql-connector，</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>    <span style="color:#f92672">&lt;</span>dependency<span style="color:#f92672">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>      <span style="color:#f92672">&lt;</span>groupId<span style="color:#f92672">&gt;</span>mysql<span style="color:#f92672">&lt;/</span>groupId<span style="color:#f92672">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>      <span style="color:#f92672">&lt;</span>artifactId<span style="color:#f92672">&gt;</span>mysql<span style="color:#f92672">-</span>connector<span style="color:#f92672">-</span>java<span style="color:#f92672">&lt;/</span>artifactId<span style="color:#f92672">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>      <span style="color:#f92672">&lt;</span>version<span style="color:#f92672">&gt;</span>5<span style="color:#f92672">.</span><span style="color:#a6e22e">1</span><span style="color:#f92672">.</span><span style="color:#a6e22e">48</span><span style="color:#f92672">&lt;/</span>version<span style="color:#f92672">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>    <span style="color:#f92672">&lt;/</span>dependency<span style="color:#f92672">&gt;</span>
+</code></pre></div><p>然后使用Service loader加载驱动：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> io.dongzhi<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">import</span> java.sql.Driver<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#f92672">import</span> java.util.Iterator<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#f92672">import</span> java.util.ServiceLoader<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestServiceLoader</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        ServiceLoader<span style="color:#f92672">&lt;</span>Driver<span style="color:#f92672">&gt;</span> serviceLoader <span style="color:#f92672">=</span> ServiceLoader<span style="color:#f92672">.</span><span style="color:#a6e22e">load</span><span style="color:#f92672">(</span>Driver<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        Iterator<span style="color:#f92672">&lt;</span>Driver<span style="color:#f92672">&gt;</span> it <span style="color:#f92672">=</span> serviceLoader<span style="color:#f92672">.</span><span style="color:#a6e22e">iterator</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>it<span style="color:#f92672">.</span><span style="color:#a6e22e">hasNext</span><span style="color:#f92672">())</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>            Driver driver <span style="color:#f92672">=</span> it<span style="color:#f92672">.</span><span style="color:#a6e22e">next</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"driver class:"</span> <span style="color:#f92672">+</span> driver <span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"driver class loader:"</span> <span style="color:#f92672">+</span> driver<span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getClassLoader</span><span style="color:#f92672">());</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span style="color:#f92672">}</span>
+</code></pre></div><p>打印结果为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>driver class:com.mysql.jdbc.Driver@2b193f2d
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>driver class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>driver class:com.mysql.fabric.jdbc.FabricMySQLDriver@355da254
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>driver class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>Process finished with exit code 0
+</code></pre></div><p>也就是说成功加载了2个驱动：com.mysql.jdbc.Driver和com.mysql.fabric.jdbc.FabricMySQLDriver，它们的类加载器都是系统类加载器。</p>
+<p>该案例的疑问是，代码中并没有出现和mysql driver相关的代码，ServiceLoader.load(Driver.class)引用的也是JDK自带的接口，为何能够成功打印出mysql的两个驱动实现类呢？翻阅Service Loader的java doc相关说明和源码得知，在mysql-connector-xx.jar中的<strong>META-INF/services/<strong>目录下有这样一个文件</strong>java.sql.Driver</strong>，其内容为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>com.mysql.jdbc.Driver
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>com.mysql.fabric.jdbc.FabricMySQLDriver
+</code></pre></div><p><img alt="1578152254(1)" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_08_service_loader_driver.png"/>
 可以猜测，ServiceLoader.load(Driver.class)这行代码一定读取了该文件，并加载了这2个驱动实现类。
-下面接着简单看一下源码。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#f92672>&lt;</span>S<span style=color:#f92672>&gt;</span> ServiceLoader<span style=color:#f92672>&lt;</span>S<span style=color:#f92672>&gt;</span> <span style=color:#a6e22e>load</span><span style=color:#f92672>(</span>Class<span style=color:#f92672>&lt;</span>S<span style=color:#f92672>&gt;</span> service<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>        ClassLoader cl <span style=color:#f92672>=</span> Thread<span style=color:#f92672>.</span><span style=color:#a6e22e>currentThread</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getContextClassLoader</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>        <span style=color:#66d9ef>return</span> ServiceLoader<span style=color:#f92672>.</span><span style=color:#a6e22e>load</span><span style=color:#f92672>(</span>service<span style=color:#f92672>,</span> cl<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>    <span style=color:#f92672>}</span>
-</code></pre></div><p>由上面的讨论可知，由于java.util.ServiceLoader是java核心类，所以它的类加载器是BootstrapClassLoader，在上面的源码中获取了当前线程的上下文类加载器(默认为AppClassLoader)，为后续加载classpath下的两个驱动类做准备。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#f92672>&lt;</span>S<span style=color:#f92672>&gt;</span> ServiceLoader<span style=color:#f92672>&lt;</span>S<span style=color:#f92672>&gt;</span> <span style=color:#a6e22e>load</span><span style=color:#f92672>(</span>Class<span style=color:#f92672>&lt;</span>S<span style=color:#f92672>&gt;</span> service<span style=color:#f92672>,</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>                                            ClassLoader loader<span style=color:#f92672>)</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>    <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> ServiceLoader<span style=color:#f92672>&lt;&gt;(</span>service<span style=color:#f92672>,</span> loader<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>    
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span><span style=color:#f92672>...</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>reload</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>        providers<span style=color:#f92672>.</span><span style=color:#a6e22e>clear</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>        lookupIterator <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> LazyIterator<span style=color:#f92672>(</span>service<span style=color:#f92672>,</span> loader<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span><span style=color:#66d9ef>private</span> <span style=color:#a6e22e>ServiceLoader</span><span style=color:#f92672>(</span>Class<span style=color:#f92672>&lt;</span>S<span style=color:#f92672>&gt;</span> svc<span style=color:#f92672>,</span> ClassLoader cl<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>    service <span style=color:#f92672>=</span> Objects<span style=color:#f92672>.</span><span style=color:#a6e22e>requireNonNull</span><span style=color:#f92672>(</span>svc<span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;Service interface cannot be null&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>    loader <span style=color:#f92672>=</span> <span style=color:#f92672>(</span>cl <span style=color:#f92672>==</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>?</span> ClassLoader<span style=color:#f92672>.</span><span style=color:#a6e22e>getSystemClassLoader</span><span style=color:#f92672>()</span> <span style=color:#f92672>:</span> cl<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>    acc <span style=color:#f92672>=</span> <span style=color:#f92672>(</span>System<span style=color:#f92672>.</span><span style=color:#a6e22e>getSecurityManager</span><span style=color:#f92672>()</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>?</span> AccessController<span style=color:#f92672>.</span><span style=color:#a6e22e>getContext</span><span style=color:#f92672>()</span> <span style=color:#f92672>:</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>    reload<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span><span style=color:#f92672>}</span>
-</code></pre></div><p>loader方法实例了一个serviceLoader对象。在构造方法ServiceLoader(Class svc,ClassLoader cl)中做了两件事：clear provider和实例化一个延迟加载的迭代器LazyIterator。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span> // Cached providers, in instantiation order
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>    private LinkedHashMap&lt;String,S&gt; providers = new LinkedHashMap&lt;&gt;();
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>    // The current lazy-lookup iterator
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>    private LazyIterator lookupIterator;
-</code></pre></div><p>下面看延迟迭代器两个关键方法hasNextService()和nextService()</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>        <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>boolean</span> <span style=color:#a6e22e>hasNextService</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>            <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>nextName <span style=color:#f92672>!=</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>                <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>true</span><span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>            <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>            <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>configs <span style=color:#f92672>==</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>                <span style=color:#66d9ef>try</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>                    String fullName <span style=color:#f92672>=</span> PREFIX <span style=color:#f92672>+</span> service<span style=color:#f92672>.</span><span style=color:#a6e22e>getName</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>                    <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>loader <span style=color:#f92672>==</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>                        configs <span style=color:#f92672>=</span> ClassLoader<span style=color:#f92672>.</span><span style=color:#a6e22e>getSystemResources</span><span style=color:#f92672>(</span>fullName<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>                    <span style=color:#66d9ef>else</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>                        configs <span style=color:#f92672>=</span> loader<span style=color:#f92672>.</span><span style=color:#a6e22e>getResources</span><span style=color:#f92672>(</span>fullName<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>                <span style=color:#f92672>}</span> <span style=color:#66d9ef>catch</span> <span style=color:#f92672>(</span>IOException x<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>                    fail<span style=color:#f92672>(</span>service<span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;Error locating configuration files&#34;</span><span style=color:#f92672>,</span> x<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>                <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>            <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>            <span style=color:#66d9ef>while</span> <span style=color:#f92672>((</span>pending <span style=color:#f92672>==</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>||</span> <span style=color:#f92672>!</span>pending<span style=color:#f92672>.</span><span style=color:#a6e22e>hasNext</span><span style=color:#f92672>())</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>                <span style=color:#66d9ef>if</span> <span style=color:#f92672>(!</span>configs<span style=color:#f92672>.</span><span style=color:#a6e22e>hasMoreElements</span><span style=color:#f92672>())</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>                    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span><span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>                <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>                pending <span style=color:#f92672>=</span> parse<span style=color:#f92672>(</span>service<span style=color:#f92672>,</span> configs<span style=color:#f92672>.</span><span style=color:#a6e22e>nextElement</span><span style=color:#f92672>());</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>            <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>            nextName <span style=color:#f92672>=</span> pending<span style=color:#f92672>.</span><span style=color:#a6e22e>next</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>true</span><span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>        <span style=color:#f92672>}</span>
-</code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>        private S nextService() {
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>            if (!hasNextService())
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>                throw new NoSuchElementException();
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>            String cn = nextName;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>            nextName = null;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>            Class&lt;?&gt; c = null;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>            try {
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>                c = Class.forName(cn, false, loader);
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>            } catch (ClassNotFoundException x) {
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>                fail(service,
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>                     &#34;Provider &#34; + cn + &#34; not found&#34;);
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>            }
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>            if (!service.isAssignableFrom(c)) {
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>                fail(service,
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>                     &#34;Provider &#34; + cn  + &#34; not a subtype&#34;);
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>            }
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>            try {
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>                S p = service.cast(c.newInstance());
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>                providers.put(cn, p);
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>                return p;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>            } catch (Throwable x) {
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>                fail(service,
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>                     &#34;Provider &#34; + cn + &#34; could not be instantiated&#34;,
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>                     x);
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>            }
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>            throw new Error();          // This cannot happen
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>        }
-</code></pre></div><p>在hasNextService方法中，PREFIX = &ldquo;META-INF/services/"，service指的是接口名称java.sql.Driver，因此，fullName的值是META-INF/services/java.sql.Driver,这个文件由系统类加载器定位资源，解析出驱动类名称com.mysql.jdbc.Driver和com.mysql.fabric.jdbc.FabricMySQLDriver，nextName只得就是这两个类名词。</p><p>在nextService()方法中，nextName是驱动类名词，由Class.forName(cn, false, loader);加载并生成CLass对象，但不会对Class静态变量初始化。紧接着 S p = service.cast(c.newInstance())，实例化该驱动，将该实例缓存到providers中并返回对象引用。</p><p>至此，可知ServiceLoader的奥秘是，在META-INF/services目录下放置一个配置文件，文件命是服务接口的二进制名词，文件内容是服务具体实现类，每个实现类一行。java doc：</p><blockquote><p>A service provider is identified by placing a provider-configuration file in the resource directory META-INF/services. The file&rsquo;s name is the fully-qualified binary name of the service&rsquo;s type. The file contains a list of fully-qualified binary names of concrete provider classes, one per line. Space and tab characters surrounding each name, as well as blank lines, are ignored. The comment character is &lsquo;#&rsquo; ('\u0023&rsquo;, NUMBER SIGN); on each line all characters following the first comment character are ignored. The file must be encoded in UTF-8.</p></blockquote><p><strong>ServiceLoader类的Java Doc中给了一个小例子：</strong></p><p>Example Suppose we have a service type com.example.CodecSet which is intended to represent sets of encoder/decoder pairs for some protocol. In this case it is an abstract class with two abstract methods:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>   public abstract Encoder getEncoder(String encodingName);
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>   public abstract Decoder getDecoder(String encodingName);
+下面接着简单看一下源码。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#f92672">&lt;</span>S<span style="color:#f92672">&gt;</span> ServiceLoader<span style="color:#f92672">&lt;</span>S<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">load</span><span style="color:#f92672">(</span>Class<span style="color:#f92672">&lt;</span>S<span style="color:#f92672">&gt;</span> service<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        ClassLoader cl <span style="color:#f92672">=</span> Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getContextClassLoader</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        <span style="color:#66d9ef">return</span> ServiceLoader<span style="color:#f92672">.</span><span style="color:#a6e22e">load</span><span style="color:#f92672">(</span>service<span style="color:#f92672">,</span> cl<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>由上面的讨论可知，由于java.util.ServiceLoader是java核心类，所以它的类加载器是BootstrapClassLoader，在上面的源码中获取了当前线程的上下文类加载器(默认为AppClassLoader)，为后续加载classpath下的两个驱动类做准备。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#f92672">&lt;</span>S<span style="color:#f92672">&gt;</span> ServiceLoader<span style="color:#f92672">&lt;</span>S<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">load</span><span style="color:#f92672">(</span>Class<span style="color:#f92672">&lt;</span>S<span style="color:#f92672">&gt;</span> service<span style="color:#f92672">,</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>                                            ClassLoader loader<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>    <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> ServiceLoader<span style="color:#f92672">&lt;&gt;(</span>service<span style="color:#f92672">,</span> loader<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>    
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span style="color:#f92672">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">reload</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        providers<span style="color:#f92672">.</span><span style="color:#a6e22e">clear</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        lookupIterator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> LazyIterator<span style="color:#f92672">(</span>service<span style="color:#f92672">,</span> loader<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#66d9ef">private</span> <span style="color:#a6e22e">ServiceLoader</span><span style="color:#f92672">(</span>Class<span style="color:#f92672">&lt;</span>S<span style="color:#f92672">&gt;</span> svc<span style="color:#f92672">,</span> ClassLoader cl<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>    service <span style="color:#f92672">=</span> Objects<span style="color:#f92672">.</span><span style="color:#a6e22e">requireNonNull</span><span style="color:#f92672">(</span>svc<span style="color:#f92672">,</span> <span style="color:#e6db74">"Service interface cannot be null"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>    loader <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>cl <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">?</span> ClassLoader<span style="color:#f92672">.</span><span style="color:#a6e22e">getSystemClassLoader</span><span style="color:#f92672">()</span> <span style="color:#f92672">:</span> cl<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>    acc <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">getSecurityManager</span><span style="color:#f92672">()</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">?</span> AccessController<span style="color:#f92672">.</span><span style="color:#a6e22e">getContext</span><span style="color:#f92672">()</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>    reload<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span style="color:#f92672">}</span>
+</code></pre></div><p>loader方法实例了一个serviceLoader对象。在构造方法ServiceLoader(Class svc,ClassLoader cl)中做了两件事：clear provider和实例化一个延迟加载的迭代器LazyIterator。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span> // Cached providers, in instantiation order
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>    private LinkedHashMap&lt;String,S&gt; providers = new LinkedHashMap&lt;&gt;();
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>    // The current lazy-lookup iterator
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>    private LazyIterator lookupIterator;
+</code></pre></div><p>下面看延迟迭代器两个关键方法hasNextService()和nextService()</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">hasNextService</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>nextName <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span><span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>            <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>configs <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>                <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>                    String fullName <span style="color:#f92672">=</span> PREFIX <span style="color:#f92672">+</span> service<span style="color:#f92672">.</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>                    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>loader <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>                        configs <span style="color:#f92672">=</span> ClassLoader<span style="color:#f92672">.</span><span style="color:#a6e22e">getSystemResources</span><span style="color:#f92672">(</span>fullName<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>                    <span style="color:#66d9ef">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>                        configs <span style="color:#f92672">=</span> loader<span style="color:#f92672">.</span><span style="color:#a6e22e">getResources</span><span style="color:#f92672">(</span>fullName<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>                <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>IOException x<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>                    fail<span style="color:#f92672">(</span>service<span style="color:#f92672">,</span> <span style="color:#e6db74">"Error locating configuration files"</span><span style="color:#f92672">,</span> x<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>                <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>            <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>            <span style="color:#66d9ef">while</span> <span style="color:#f92672">((</span>pending <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">||</span> <span style="color:#f92672">!</span>pending<span style="color:#f92672">.</span><span style="color:#a6e22e">hasNext</span><span style="color:#f92672">())</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>                <span style="color:#66d9ef">if</span> <span style="color:#f92672">(!</span>configs<span style="color:#f92672">.</span><span style="color:#a6e22e">hasMoreElements</span><span style="color:#f92672">())</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>                    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span><span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>                <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>                pending <span style="color:#f92672">=</span> parse<span style="color:#f92672">(</span>service<span style="color:#f92672">,</span> configs<span style="color:#f92672">.</span><span style="color:#a6e22e">nextElement</span><span style="color:#f92672">());</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>            <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>            nextName <span style="color:#f92672">=</span> pending<span style="color:#f92672">.</span><span style="color:#a6e22e">next</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span><span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>        <span style="color:#f92672">}</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>        private S nextService() {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>            if (!hasNextService())
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>                throw new NoSuchElementException();
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>            String cn = nextName;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>            nextName = null;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>            Class&lt;?&gt; c = null;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>            try {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>                c = Class.forName(cn, false, loader);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>            } catch (ClassNotFoundException x) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>                fail(service,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>                     "Provider " + cn + " not found");
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>            if (!service.isAssignableFrom(c)) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>                fail(service,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>                     "Provider " + cn  + " not a subtype");
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>            try {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>                S p = service.cast(c.newInstance());
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>                providers.put(cn, p);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>                return p;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>            } catch (Throwable x) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>                fail(service,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>                     "Provider " + cn + " could not be instantiated",
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>                     x);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>            throw new Error();          // This cannot happen
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>        }
+</code></pre></div><p>在hasNextService方法中，PREFIX = “META-INF/services/"，service指的是接口名称java.sql.Driver，因此，fullName的值是META-INF/services/java.sql.Driver,这个文件由系统类加载器定位资源，解析出驱动类名称com.mysql.jdbc.Driver和com.mysql.fabric.jdbc.FabricMySQLDriver，nextName只得就是这两个类名词。</p>
+<p>在nextService()方法中，nextName是驱动类名词，由Class.forName(cn, false, loader);加载并生成CLass对象，但不会对Class静态变量初始化。紧接着 S p = service.cast(c.newInstance())，实例化该驱动，将该实例缓存到providers中并返回对象引用。</p>
+<p>至此，可知ServiceLoader的奥秘是，在META-INF/services目录下放置一个配置文件，文件命是服务接口的二进制名词，文件内容是服务具体实现类，每个实现类一行。java doc：</p>
+<blockquote>
+<p>A service provider is identified by placing a provider-configuration file in the resource directory META-INF/services. The file’s name is the fully-qualified binary name of the service’s type. The file contains a list of fully-qualified binary names of concrete provider classes, one per line. Space and tab characters surrounding each name, as well as blank lines, are ignored. The comment character is ‘#’ ('\u0023’, NUMBER SIGN); on each line all characters following the first comment character are ignored. The file must be encoded in UTF-8.</p>
+</blockquote>
+<p><strong>ServiceLoader类的Java Doc中给了一个小例子：</strong></p>
+<p>Example Suppose we have a service type com.example.CodecSet which is intended to represent sets of encoder/decoder pairs for some protocol. In this case it is an abstract class with two abstract methods:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>   public abstract Encoder getEncoder(String encodingName);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>   public abstract Decoder getDecoder(String encodingName);
 </code></pre></div><p>Each method returns an appropriate object or null if the provider does not support the given encoding. Typical providers support more than one encoding.
-If com.example.impl.StandardCodecs is an implementation of the CodecSet service then its jar file also contains a file named</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>   META-INF/services/com.example.CodecSet
+If com.example.impl.StandardCodecs is an implementation of the CodecSet service then its jar file also contains a file named</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>   META-INF/services/com.example.CodecSet
 </code></pre></div><p>This file contains the single line:
-com.example.impl.StandardCodecs # Standard codecs
-The CodecSet class creates and saves a single service instance at initialization:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>  private static ServiceLoader&lt;CodecSet&gt; codecSetLoader
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>      = ServiceLoader.load(CodecSet.class);
-</code></pre></div><p>To locate an encoder for a given encoding name it defines a static factory method which iterates through the known and available providers, returning only when it has located a suitable encoder or has run out of providers.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>   public static Encoder getEncoder(String encodingName) {
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>       for (CodecSet cp : codecSetLoader) {
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>           Encoder enc = cp.getEncoder(encodingName);
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>           if (enc != null)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>               return enc;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>       }
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span>       return null;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">8</span>   }
-</code></pre></div><p>A getDecoder method is defined similarly.</p><h2 id=jdbc的驱动加载机制>JDBC的驱动加载机制<a href=#jdbc的驱动加载机制 class=hanchor arialabel=Anchor>&#8983;</a></h2><p>JDBC在加载驱动时候通常有一下两盒代码：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>Class<span style=color:#f92672>.</span><span style=color:#a6e22e>forName</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;com.mysql.Driver&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>DriverManager<span style=color:#f92672>.</span><span style=color:#a6e22e>getConnection</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;&#34;</span><span style=color:#f92672>);</span>
-</code></pre></div><p>第一行将会触发这个代码块执行:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>    <span style=color:#66d9ef>static</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>        <span style=color:#66d9ef>try</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>            java<span style=color:#f92672>.</span><span style=color:#a6e22e>sql</span><span style=color:#f92672>.</span><span style=color:#a6e22e>DriverManager</span><span style=color:#f92672>.</span><span style=color:#a6e22e>registerDriver</span><span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> Driver<span style=color:#f92672>());</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>        <span style=color:#f92672>}</span> <span style=color:#66d9ef>catch</span> <span style=color:#f92672>(</span>SQLException E<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>            <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> RuntimeException<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Can&#39;t register driver!&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>        <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span>    <span style=color:#f92672>}</span>
-</code></pre></div><p>因此java.sql.DriverManager将会由根类加载器加载并初始化，该类的静态代码块将会执行：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>   <span style=color:#66d9ef>static</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>        loadInitialDrivers<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>        println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;JDBC DriverManager initialized&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>    <span style=color:#f92672>}</span>
-</code></pre></div><p>loadInitialDrivers()源码如下，主要通过ServiceLoader加载服务接口为java.sql.Driver的驱动实现类，默认情况下，系统参数"jdbc.drivers"的值为空。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span> <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>loadInitialDrivers</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>        String drivers<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>        <span style=color:#66d9ef>try</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>            drivers <span style=color:#f92672>=</span> AccessController<span style=color:#f92672>.</span><span style=color:#a6e22e>doPrivileged</span><span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> PrivilegedAction<span style=color:#f92672>&lt;</span>String<span style=color:#f92672>&gt;()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>                <span style=color:#66d9ef>public</span> String <span style=color:#a6e22e>run</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>                    <span style=color:#66d9ef>return</span> System<span style=color:#f92672>.</span><span style=color:#a6e22e>getProperty</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;jdbc.drivers&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>                <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>            <span style=color:#f92672>});</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>        <span style=color:#f92672>}</span> <span style=color:#66d9ef>catch</span> <span style=color:#f92672>(</span>Exception ex<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>            drivers <span style=color:#f92672>=</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>        <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>        AccessController<span style=color:#f92672>.</span><span style=color:#a6e22e>doPrivileged</span><span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> PrivilegedAction<span style=color:#f92672>&lt;</span>Void<span style=color:#f92672>&gt;()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>            <span style=color:#66d9ef>public</span> Void <span style=color:#a6e22e>run</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>                ServiceLoader<span style=color:#f92672>&lt;</span>Driver<span style=color:#f92672>&gt;</span> loadedDrivers <span style=color:#f92672>=</span> ServiceLoader<span style=color:#f92672>.</span><span style=color:#a6e22e>load</span><span style=color:#f92672>(</span>Driver<span style=color:#f92672>.</span><span style=color:#a6e22e>class</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>                Iterator<span style=color:#f92672>&lt;</span>Driver<span style=color:#f92672>&gt;</span> driversIterator <span style=color:#f92672>=</span> loadedDrivers<span style=color:#f92672>.</span><span style=color:#a6e22e>iterator</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>                <span style=color:#66d9ef>try</span><span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>                    <span style=color:#66d9ef>while</span><span style=color:#f92672>(</span>driversIterator<span style=color:#f92672>.</span><span style=color:#a6e22e>hasNext</span><span style=color:#f92672>())</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>                        driversIterator<span style=color:#f92672>.</span><span style=color:#a6e22e>next</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>                    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>                <span style=color:#f92672>}</span> <span style=color:#66d9ef>catch</span><span style=color:#f92672>(</span>Throwable t<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>                <span style=color:#75715e>// Do nothing
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span><span style=color:#75715e></span>                <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>                <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>            <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span>        <span style=color:#f92672>});</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">30</span>        println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;DriverManager.initialize: jdbc.drivers = &#34;</span> <span style=color:#f92672>+</span> drivers<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">31</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">32</span>        <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>drivers <span style=color:#f92672>==</span> <span style=color:#66d9ef>null</span> <span style=color:#f92672>||</span> drivers<span style=color:#f92672>.</span><span style=color:#a6e22e>equals</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;&#34;</span><span style=color:#f92672>))</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">33</span>            <span style=color:#66d9ef>return</span><span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">34</span>        <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">35</span>        String<span style=color:#f92672>[]</span> driversList <span style=color:#f92672>=</span> drivers<span style=color:#f92672>.</span><span style=color:#a6e22e>split</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;:&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">36</span>        println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;number of Drivers:&#34;</span> <span style=color:#f92672>+</span> driversList<span style=color:#f92672>.</span><span style=color:#a6e22e>length</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">37</span>        <span style=color:#66d9ef>for</span> <span style=color:#f92672>(</span>String aDriver <span style=color:#f92672>:</span> driversList<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">38</span>            <span style=color:#66d9ef>try</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">39</span>                println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;DriverManager.Initialize: loading &#34;</span> <span style=color:#f92672>+</span> aDriver<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">40</span>                Class<span style=color:#f92672>.</span><span style=color:#a6e22e>forName</span><span style=color:#f92672>(</span>aDriver<span style=color:#f92672>,</span> <span style=color:#66d9ef>true</span><span style=color:#f92672>,</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">41</span>                        ClassLoader<span style=color:#f92672>.</span><span style=color:#a6e22e>getSystemClassLoader</span><span style=color:#f92672>());</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">42</span>            <span style=color:#f92672>}</span> <span style=color:#66d9ef>catch</span> <span style=color:#f92672>(</span>Exception ex<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">43</span>                println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;DriverManager.Initialize: load failed: &#34;</span> <span style=color:#f92672>+</span> ex<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">44</span>            <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">45</span>        <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">46</span>    <span style=color:#f92672>}</span>
-</code></pre></div><p>驱动实现类被加载后，java.sql.DriverManager.registerDriver(new Driver())方法将把com.mysql.Driver实例注册到DriverManager中，然后getConnection()将会遍历驱动，获取连接。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>static</span> Connection <span style=color:#a6e22e>getConnection</span><span style=color:#f92672>(</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>        String url<span style=color:#f92672>,</span> java<span style=color:#f92672>.</span><span style=color:#a6e22e>util</span><span style=color:#f92672>.</span><span style=color:#a6e22e>Properties</span> info<span style=color:#f92672>,</span> Class<span style=color:#f92672>&lt;?&gt;</span> caller<span style=color:#f92672>)</span> <span style=color:#66d9ef>throws</span> SQLException <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>        <span style=color:#75715e>/*
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span><span style=color:#75715e>         * When callerCl is null, we should check the application&#39;s
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span><span style=color:#75715e>         * (which is invoking this class indirectly)
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span><span style=color:#75715e>         * classloader, so that the JDBC driver class outside rt.jar
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span><span style=color:#75715e>         * can be loaded from here.
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span><span style=color:#75715e>         */</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>        ClassLoader callerCL <span style=color:#f92672>=</span> caller <span style=color:#f92672>!=</span> <span style=color:#66d9ef>null</span> <span style=color:#f92672>?</span> caller<span style=color:#f92672>.</span><span style=color:#a6e22e>getClassLoader</span><span style=color:#f92672>()</span> <span style=color:#f92672>:</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>        <span style=color:#66d9ef>synchronized</span><span style=color:#f92672>(</span>DriverManager<span style=color:#f92672>.</span><span style=color:#a6e22e>class</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>            <span style=color:#75715e>// synchronize loading of the correct classloader.
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span><span style=color:#75715e></span>            <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>callerCL <span style=color:#f92672>==</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>                callerCL <span style=color:#f92672>=</span> Thread<span style=color:#f92672>.</span><span style=color:#a6e22e>currentThread</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getContextClassLoader</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>            <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>        <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>        <span style=color:#66d9ef>if</span><span style=color:#f92672>(</span>url <span style=color:#f92672>==</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>            <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> SQLException<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;The url cannot be null&#34;</span><span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;08001&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>        <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>        println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;DriverManager.getConnection(\&#34;&#34;</span> <span style=color:#f92672>+</span> url <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34;\&#34;)&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>        <span style=color:#75715e>// Walk through the loaded registeredDrivers attempting to make a connection.
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span><span style=color:#75715e></span>        <span style=color:#75715e>// Remember the first exception that gets raised so we can reraise it.
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span><span style=color:#75715e></span>        SQLException reason <span style=color:#f92672>=</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>        <span style=color:#66d9ef>for</span><span style=color:#f92672>(</span>DriverInfo aDriver <span style=color:#f92672>:</span> registeredDrivers<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span>            <span style=color:#75715e>// If the caller does not have permission to load the driver then
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span><span style=color:#75715e></span>            <span style=color:#75715e>// skip it.
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">30</span><span style=color:#75715e></span>            <span style=color:#66d9ef>if</span><span style=color:#f92672>(</span>isDriverAllowed<span style=color:#f92672>(</span>aDriver<span style=color:#f92672>.</span><span style=color:#a6e22e>driver</span><span style=color:#f92672>,</span> callerCL<span style=color:#f92672>))</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">31</span>                <span style=color:#66d9ef>try</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">32</span>                    println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;    trying &#34;</span> <span style=color:#f92672>+</span> aDriver<span style=color:#f92672>.</span><span style=color:#a6e22e>driver</span><span style=color:#f92672>.</span><span style=color:#a6e22e>getClass</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getName</span><span style=color:#f92672>());</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">33</span>                    Connection con <span style=color:#f92672>=</span> aDriver<span style=color:#f92672>.</span><span style=color:#a6e22e>driver</span><span style=color:#f92672>.</span><span style=color:#a6e22e>connect</span><span style=color:#f92672>(</span>url<span style=color:#f92672>,</span> info<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">34</span>                    <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>con <span style=color:#f92672>!=</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">35</span>                        <span style=color:#75715e>// Success!
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">36</span><span style=color:#75715e></span>                        println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;getConnection returning &#34;</span> <span style=color:#f92672>+</span> aDriver<span style=color:#f92672>.</span><span style=color:#a6e22e>driver</span><span style=color:#f92672>.</span><span style=color:#a6e22e>getClass</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getName</span><span style=color:#f92672>());</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">37</span>                        <span style=color:#66d9ef>return</span> <span style=color:#f92672>(</span>con<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">38</span>                    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">39</span>                <span style=color:#f92672>}</span> <span style=color:#66d9ef>catch</span> <span style=color:#f92672>(</span>SQLException ex<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">40</span>                    <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>reason <span style=color:#f92672>==</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">41</span>                        reason <span style=color:#f92672>=</span> ex<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">42</span>                    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">43</span>                <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">44</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">45</span>            <span style=color:#f92672>}</span> <span style=color:#66d9ef>else</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">46</span>                println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;    skipping: &#34;</span> <span style=color:#f92672>+</span> aDriver<span style=color:#f92672>.</span><span style=color:#a6e22e>getClass</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getName</span><span style=color:#f92672>());</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">47</span>            <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">48</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">49</span>        <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">50</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">51</span>        <span style=color:#75715e>// if we got here nobody could connect.
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">52</span><span style=color:#75715e></span>        <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>reason <span style=color:#f92672>!=</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span>    <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">53</span>            println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;getConnection failed: &#34;</span> <span style=color:#f92672>+</span> reason<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">54</span>            <span style=color:#66d9ef>throw</span> reason<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">55</span>        <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">56</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">57</span>        println<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;getConnection: no suitable driver found for &#34;</span><span style=color:#f92672>+</span> url<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">58</span>        <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> SQLException<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;No suitable driver found for &#34;</span><span style=color:#f92672>+</span> url<span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;08001&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">59</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">60</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">61</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">62</span><span style=color:#f92672>}</span>
-</code></pre></div><p>该方法传入的CLass参数是调用这个方法所在类的class，callerCL是调用类的类加载器。isDriverAllowed(aDriver.driver, callerCL)用于验证先前被加载的类和当前使用的驱动类是同一个。</p></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2020/07/09/jvm-learn-20/><span class=button__icon>←</span>
-<span class=button__text>JVM Learn 20 Java Garbage Collection Basics</span></a></span>
-<span class="button next"><a href=https://dongzhi.me/2020/07/07/jvm-learn-09/><span class=button__text>JVM Learn 09 类的字节码结构</span>
-<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
-<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
-<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
+com.example.impl.StandardCodecs    # Standard codecs
+The CodecSet class creates and saves a single service instance at initialization:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>  private static ServiceLoader&lt;CodecSet&gt; codecSetLoader
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>      = ServiceLoader.load(CodecSet.class);
+</code></pre></div><p>To locate an encoder for a given encoding name it defines a static factory method which iterates through the known and available providers, returning only when it has located a suitable encoder or has run out of providers.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>   public static Encoder getEncoder(String encodingName) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>       for (CodecSet cp : codecSetLoader) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>           Encoder enc = cp.getEncoder(encodingName);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>           if (enc != null)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>               return enc;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>       }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>       return null;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span>   }
+</code></pre></div><p>A getDecoder method is defined similarly.</p>
+<h2 id="jdbc的驱动加载机制">JDBC的驱动加载机制<a arialabel="Anchor" class="hanchor" href="#jdbc的驱动加载机制">⌗</a> </h2>
+<p>JDBC在加载驱动时候通常有一下两盒代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span><span style="color:#e6db74">"com.mysql.Driver"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>DriverManager<span style="color:#f92672">.</span><span style="color:#a6e22e">getConnection</span><span style="color:#f92672">(</span><span style="color:#e6db74">""</span><span style="color:#f92672">);</span>
+</code></pre></div><p>第一行将会触发这个代码块执行:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>    <span style="color:#66d9ef">static</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>            java<span style="color:#f92672">.</span><span style="color:#a6e22e">sql</span><span style="color:#f92672">.</span><span style="color:#a6e22e">DriverManager</span><span style="color:#f92672">.</span><span style="color:#a6e22e">registerDriver</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Driver<span style="color:#f92672">());</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException E<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException<span style="color:#f92672">(</span><span style="color:#e6db74">"Can't register driver!"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>因此java.sql.DriverManager将会由根类加载器加载并初始化，该类的静态代码块将会执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>   <span style="color:#66d9ef">static</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        loadInitialDrivers<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        println<span style="color:#f92672">(</span><span style="color:#e6db74">"JDBC DriverManager initialized"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>loadInitialDrivers()源码如下，主要通过ServiceLoader加载服务接口为java.sql.Driver的驱动实现类，默认情况下，系统参数"jdbc.drivers"的值为空。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span> <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">loadInitialDrivers</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>        String drivers<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>        <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>            drivers <span style="color:#f92672">=</span> AccessController<span style="color:#f92672">.</span><span style="color:#a6e22e">doPrivileged</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> PrivilegedAction<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>                <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>                    <span style="color:#66d9ef">return</span> System<span style="color:#f92672">.</span><span style="color:#a6e22e">getProperty</span><span style="color:#f92672">(</span><span style="color:#e6db74">"jdbc.drivers"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>                <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>            <span style="color:#f92672">});</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>Exception ex<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>            drivers <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>        AccessController<span style="color:#f92672">.</span><span style="color:#a6e22e">doPrivileged</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> PrivilegedAction<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>            <span style="color:#66d9ef">public</span> Void <span style="color:#a6e22e">run</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>                ServiceLoader<span style="color:#f92672">&lt;</span>Driver<span style="color:#f92672">&gt;</span> loadedDrivers <span style="color:#f92672">=</span> ServiceLoader<span style="color:#f92672">.</span><span style="color:#a6e22e">load</span><span style="color:#f92672">(</span>Driver<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>                Iterator<span style="color:#f92672">&lt;</span>Driver<span style="color:#f92672">&gt;</span> driversIterator <span style="color:#f92672">=</span> loadedDrivers<span style="color:#f92672">.</span><span style="color:#a6e22e">iterator</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>                <span style="color:#66d9ef">try</span><span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>                    <span style="color:#66d9ef">while</span><span style="color:#f92672">(</span>driversIterator<span style="color:#f92672">.</span><span style="color:#a6e22e">hasNext</span><span style="color:#f92672">())</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>                        driversIterator<span style="color:#f92672">.</span><span style="color:#a6e22e">next</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>                    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>                <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span><span style="color:#f92672">(</span>Throwable t<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>                <span style="color:#75715e">// Do nothing
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span style="color:#75715e"></span>                <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>            <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>        <span style="color:#f92672">});</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>        println<span style="color:#f92672">(</span><span style="color:#e6db74">"DriverManager.initialize: jdbc.drivers = "</span> <span style="color:#f92672">+</span> drivers<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>drivers <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">||</span> drivers<span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span><span style="color:#e6db74">""</span><span style="color:#f92672">))</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>            <span style="color:#66d9ef">return</span><span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>        String<span style="color:#f92672">[]</span> driversList <span style="color:#f92672">=</span> drivers<span style="color:#f92672">.</span><span style="color:#a6e22e">split</span><span style="color:#f92672">(</span><span style="color:#e6db74">":"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>        println<span style="color:#f92672">(</span><span style="color:#e6db74">"number of Drivers:"</span> <span style="color:#f92672">+</span> driversList<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>String aDriver <span style="color:#f92672">:</span> driversList<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>            <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>                println<span style="color:#f92672">(</span><span style="color:#e6db74">"DriverManager.Initialize: loading "</span> <span style="color:#f92672">+</span> aDriver<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>                Class<span style="color:#f92672">.</span><span style="color:#a6e22e">forName</span><span style="color:#f92672">(</span>aDriver<span style="color:#f92672">,</span> <span style="color:#66d9ef">true</span><span style="color:#f92672">,</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>                        ClassLoader<span style="color:#f92672">.</span><span style="color:#a6e22e">getSystemClassLoader</span><span style="color:#f92672">());</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span>            <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>Exception ex<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span>                println<span style="color:#f92672">(</span><span style="color:#e6db74">"DriverManager.Initialize: load failed: "</span> <span style="color:#f92672">+</span> ex<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span>            <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>驱动实现类被加载后，java.sql.DriverManager.registerDriver(new Driver())方法将把com.mysql.Driver实例注册到DriverManager中，然后getConnection()将会遍历驱动，获取连接。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>  <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> Connection <span style="color:#a6e22e">getConnection</span><span style="color:#f92672">(</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>        String url<span style="color:#f92672">,</span> java<span style="color:#f92672">.</span><span style="color:#a6e22e">util</span><span style="color:#f92672">.</span><span style="color:#a6e22e">Properties</span> info<span style="color:#f92672">,</span> Class<span style="color:#f92672">&lt;?&gt;</span> caller<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> SQLException <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>        <span style="color:#75715e">/*
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#75715e">         * When callerCl is null, we should check the application's
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#75715e">         * (which is invoking this class indirectly)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span style="color:#75715e">         * classloader, so that the JDBC driver class outside rt.jar
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span style="color:#75715e">         * can be loaded from here.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span style="color:#75715e">         */</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        ClassLoader callerCL <span style="color:#f92672">=</span> caller <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">?</span> caller<span style="color:#f92672">.</span><span style="color:#a6e22e">getClassLoader</span><span style="color:#f92672">()</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        <span style="color:#66d9ef">synchronized</span><span style="color:#f92672">(</span>DriverManager<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>            <span style="color:#75715e">// synchronize loading of the correct classloader.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>callerCL <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>                callerCL <span style="color:#f92672">=</span> Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">currentThread</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getContextClassLoader</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>            <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>url <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> SQLException<span style="color:#f92672">(</span><span style="color:#e6db74">"The url cannot be null"</span><span style="color:#f92672">,</span> <span style="color:#e6db74">"08001"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>        println<span style="color:#f92672">(</span><span style="color:#e6db74">"DriverManager.getConnection(\""</span> <span style="color:#f92672">+</span> url <span style="color:#f92672">+</span> <span style="color:#e6db74">"\")"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>        <span style="color:#75715e">// Walk through the loaded registeredDrivers attempting to make a connection.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span><span style="color:#75715e"></span>        <span style="color:#75715e">// Remember the first exception that gets raised so we can reraise it.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span style="color:#75715e"></span>        SQLException reason <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>        <span style="color:#66d9ef">for</span><span style="color:#f92672">(</span>DriverInfo aDriver <span style="color:#f92672">:</span> registeredDrivers<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>            <span style="color:#75715e">// If the caller does not have permission to load the driver then
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span><span style="color:#75715e"></span>            <span style="color:#75715e">// skip it.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>isDriverAllowed<span style="color:#f92672">(</span>aDriver<span style="color:#f92672">.</span><span style="color:#a6e22e">driver</span><span style="color:#f92672">,</span> callerCL<span style="color:#f92672">))</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>                <span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>                    println<span style="color:#f92672">(</span><span style="color:#e6db74">"    trying "</span> <span style="color:#f92672">+</span> aDriver<span style="color:#f92672">.</span><span style="color:#a6e22e">driver</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">());</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>                    Connection con <span style="color:#f92672">=</span> aDriver<span style="color:#f92672">.</span><span style="color:#a6e22e">driver</span><span style="color:#f92672">.</span><span style="color:#a6e22e">connect</span><span style="color:#f92672">(</span>url<span style="color:#f92672">,</span> info<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>                    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>con <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>                        <span style="color:#75715e">// Success!
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span><span style="color:#75715e"></span>                        println<span style="color:#f92672">(</span><span style="color:#e6db74">"getConnection returning "</span> <span style="color:#f92672">+</span> aDriver<span style="color:#f92672">.</span><span style="color:#a6e22e">driver</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">());</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>                        <span style="color:#66d9ef">return</span> <span style="color:#f92672">(</span>con<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>                    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>                <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>SQLException ex<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>                    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>reason <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>                        reason <span style="color:#f92672">=</span> ex<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span>                    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span>                <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span>            <span style="color:#f92672">}</span> <span style="color:#66d9ef">else</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span>                println<span style="color:#f92672">(</span><span style="color:#e6db74">"    skipping: "</span> <span style="color:#f92672">+</span> aDriver<span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">());</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47</span>            <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>        <span style="color:#75715e">// if we got here nobody could connect.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>reason <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span>    <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53</span>            println<span style="color:#f92672">(</span><span style="color:#e6db74">"getConnection failed: "</span> <span style="color:#f92672">+</span> reason<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54</span>            <span style="color:#66d9ef">throw</span> reason<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57</span>        println<span style="color:#f92672">(</span><span style="color:#e6db74">"getConnection: no suitable driver found for "</span><span style="color:#f92672">+</span> url<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58</span>        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> SQLException<span style="color:#f92672">(</span><span style="color:#e6db74">"No suitable driver found for "</span><span style="color:#f92672">+</span> url<span style="color:#f92672">,</span> <span style="color:#e6db74">"08001"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62</span><span style="color:#f92672">}</span>
+</code></pre></div><p>该方法传入的CLass参数是调用这个方法所在类的class，callerCL是调用类的类加载器。isDriverAllowed(aDriver.driver, callerCL)用于验证先前被加载的类和当前使用的驱动类是同一个。</p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://dongzhi.me/2020/07/09/jvm-learn-20/">
+<span class="button__icon">←</span>
+<span class="button__text">JVM Learn 20 Java Garbage Collection Basics</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-09/">
+<span class="button__text">JVM Learn 09 类的字节码结构</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<div id="hyvor-talk-view"></div>
+<script type="text/javascript">
+		var HYVOR_TALK_WEBSITE = 1505; 
+		var HYVOR_TALK_CONFIG = {
+        url: false,
+        id: false
+		};
+	  </script>
+<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

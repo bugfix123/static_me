@@ -1,50 +1,220 @@
-<!doctype html><html lang=en><head><title>CentOS软件的常用安装命令汇总 :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="记录一下CentOS上常用软件的安装命令。备以后查用，将持续更新。我经常使用的服务器是CentOS7的64位版，有时候也在vps上使CentOS6，如果该服务商没有提供7的话。 shadowsocks 使用root用户登录，"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="CentOS软件的常用安装命令汇总 :: DongZhi.ME"><meta property="og:description" content="记录一下CentOS上常用软件的安装命令。备以后查用，将持续更新。我经常使用的服务器是CentOS7的64位版，有时候也在vps上使CentOS6，如果该服务商没有提供7的话。 shadowsocks 使用root用户登录，"><meta property="og:url" content="https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/"><meta property="og:site_name" content="CentOS软件的常用安装命令汇总"><meta property="og:image" content="https://dongzhi.me/img/favicon/orange.png"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:section" content="技术"><meta property="article:published_time" content="2018-12-16 23:41:20 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/>CentOS软件的常用安装命令汇总</a></h1><div class=post-meta><span class=post-date>2018-12-16</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/linux/>linux</a>&nbsp;</span><div class=post-content><div><blockquote><p>记录一下CentOS上常用软件的安装命令。备以后查用，将持续更新。我经常使用的服务器是CentOS7的64位版，有时候也在vps上使CentOS6，如果该服务商没有提供7的话。</p></blockquote><h1 id=shadowsocks>shadowsocks<a href=#shadowsocks class=hanchor arialabel=Anchor>&#8983;</a></h1><p>使用root用户登录，运行以下命令：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>wget --no-check-certificate -O shadowsocks-all.sh https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks-all.sh
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>chmod +x shadowsocks-all.sh
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>./shadowsocks-all.sh 2&gt;&amp;<span style=color:#ae81ff>1</span> | tee shadowsocks-all.log
-</code></pre></div><p>安装完成后，脚本提示如下:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>Congratulations, your_shadowsocks_version install completed!
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>Your Server IP        :your_server_ip
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>Your Server Port      :your_server_port
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>Your Password         :your_password
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>Your Encryption Method:aes-256-cfb
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span>Welcome to visit:https://teddysun.com/486.html
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">8</span>Enjoy it!
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>CentOS软件的常用安装命令汇总 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="记录一下CentOS上常用软件的安装命令。备以后查用，将持续更新。我经常使用的服务器是CentOS7的64位版，有时候也在vps上使CentOS6，如果该服务商没有提供7的话。 shadowsocks 使用root用户登录，" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="CentOS软件的常用安装命令汇总 :: DongZhi.ME" property="og:title"/>
+<meta content="记录一下CentOS上常用软件的安装命令。备以后查用，将持续更新。我经常使用的服务器是CentOS7的64位版，有时候也在vps上使CentOS6，如果该服务商没有提供7的话。 shadowsocks 使用root用户登录，" property="og:description"/>
+<meta content="https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/" property="og:url"/>
+<meta content="CentOS软件的常用安装命令汇总" property="og:site_name"/>
+<meta content="https://dongzhi.me/img/favicon/orange.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="技术" property="article:section"/>
+<meta content="2018-12-16 23:41:20 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/">CentOS软件的常用安装命令汇总</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2018-12-16 
+      </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://dongzhi.me/tags/linux/">linux</a> 
+    
+  </span>
+<div class="post-content"><div>
+<blockquote>
+<p>记录一下CentOS上常用软件的安装命令。备以后查用，将持续更新。我经常使用的服务器是CentOS7的64位版，有时候也在vps上使CentOS6，如果该服务商没有提供7的话。</p>
+</blockquote>
+<!-- more -->
+<h1 id="shadowsocks">shadowsocks<a arialabel="Anchor" class="hanchor" href="#shadowsocks">⌗</a> </h1>
+<p>使用root用户登录，运行以下命令：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>wget --no-check-certificate -O shadowsocks-all.sh https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks-all.sh
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>chmod +x shadowsocks-all.sh
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>./shadowsocks-all.sh 2&gt;&amp;<span style="color:#ae81ff">1</span> | tee shadowsocks-all.log
+</code></pre></div><p>安装完成后，脚本提示如下:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>Congratulations, your_shadowsocks_version install completed!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>Your Server IP        :your_server_ip
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>Your Server Port      :your_server_port
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>Your Password         :your_password
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>Your Encryption Method:aes-256-cfb
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>Welcome to visit:https://teddysun.com/486.html
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span>Enjoy it!
 </code></pre></div><p>卸载方法
-若已安装多个版本，则卸载时也需多次运行（每次卸载一种）</p><p>使用root用户登录，运行以下命令：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>./shadowsocks-all.sh uninstall
+若已安装多个版本，则卸载时也需多次运行（每次卸载一种）</p>
+<p>使用root用户登录，运行以下命令：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>./shadowsocks-all.sh uninstall
 </code></pre></div><p>启动脚本
-启动脚本后面的参数含义，从左至右依次为：启动，停止，重启，查看状态。</p><p>Shadowsocks-Python 版：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>/etc/init.d/shadowsocks-python start | stop | restart | status
-</code></pre></div><p>ShadowsocksR 版：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>/etc/init.d/shadowsocks-r start | stop | restart | status
-</code></pre></div><p>Shadowsocks-Go 版：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>/etc/init.d/shadowsocks-go start | stop | restart | status
-</code></pre></div><p>Shadowsocks-libev 版：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span> /etc/init.d/shadowsocks-libev start | stop | restart | status
-</code></pre></div><p>各版本默认配置文件:</p><blockquote><p>Shadowsocks-Python 版：
-/etc/shadowsocks-python/config.json<br>ShadowsocksR 版：/etc/shadowsocks-r/config.json<br>Shadowsocks-Go 版：
-/etc/shadowsocks-go/config.json<br>Shadowsocks-libev 版：
-/etc/shadowsocks-libev/config.json</p></blockquote><p><strong>引用</strong>：<a href=https://teddysun.com/486.html>Shadowsocks 一键安装脚本（四合一）</a></p><h1 id=kcptun>kcptun<a href=#kcptun class=hanchor arialabel=Anchor>&#8983;</a></h1><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>wget https://raw.githubusercontent.com/kuoruan/kcptun_installer/master/kcptun.sh
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>chmod +x ./kcptun.sh
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>./kcptun.sh
-</code></pre></div><p><strong>引用</strong>：<a href=http://www.gblm.net/209.html>一步一步教你用Kcptun给Shadowsocks加速！看YouTube1080P一点都不卡！</a></p><h1 id=python3和pip3>python3和pip3<a href=#python3和pip3 class=hanchor arialabel=Anchor>&#8983;</a></h1><p>在安装了epel源的情况下，直接yum就可以安装python3.4</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>yum install python34 -y
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>python3 --version
-</code></pre></div><p>没有自带pip3，从官网安装</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>python3 get-pip.py
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>pip3 -V
-</code></pre></div><p>写个简单的代码</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span style=color:#75715e>#!/usr/bin/python3
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span style=color:#75715e></span><span style=color:#75715e># -*- coding: UTF-8 -*-</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>import sys
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>print<span style=color:#f92672>(</span>sys.version<span style=color:#f92672>)</span>
+启动脚本后面的参数含义，从左至右依次为：启动，停止，重启，查看状态。</p>
+<p>Shadowsocks-Python 版：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>/etc/init.d/shadowsocks-python start | stop | restart | status
+</code></pre></div><p>ShadowsocksR 版：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>/etc/init.d/shadowsocks-r start | stop | restart | status
+</code></pre></div><p>Shadowsocks-Go 版：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>/etc/init.d/shadowsocks-go start | stop | restart | status
+</code></pre></div><p>Shadowsocks-libev 版：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span> /etc/init.d/shadowsocks-libev start | stop | restart | status
+</code></pre></div><p>各版本默认配置文件:</p>
+<blockquote>
+<p>Shadowsocks-Python 版：
+/etc/shadowsocks-python/config.json<br/>
+ShadowsocksR 版：/etc/shadowsocks-r/config.json<br/>
+Shadowsocks-Go 版：
+/etc/shadowsocks-go/config.json<br/>
+Shadowsocks-libev 版：
+/etc/shadowsocks-libev/config.json</p>
+</blockquote>
+<p><strong>引用</strong>：<a href="https://teddysun.com/486.html">Shadowsocks 一键安装脚本（四合一）</a></p>
+<h1 id="kcptun">kcptun<a arialabel="Anchor" class="hanchor" href="#kcptun">⌗</a> </h1>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>wget https://raw.githubusercontent.com/kuoruan/kcptun_installer/master/kcptun.sh
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>chmod +x ./kcptun.sh
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>./kcptun.sh
+</code></pre></div><p><strong>引用</strong>：<a href="http://www.gblm.net/209.html">一步一步教你用Kcptun给Shadowsocks加速！看YouTube1080P一点都不卡！</a></p>
+<h1 id="python3和pip3">python3和pip3<a arialabel="Anchor" class="hanchor" href="#python3和pip3">⌗</a> </h1>
+<p>在安装了epel源的情况下，直接yum就可以安装python3.4</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>yum install python34 -y
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>python3 --version
+</code></pre></div><p>没有自带pip3，从官网安装</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>python3 get-pip.py
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>pip3 -V
+</code></pre></div><p>写个简单的代码</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#75715e">#!/usr/bin/python3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span style="color:#75715e"></span><span style="color:#75715e"># -*- coding: UTF-8 -*-</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>import sys
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>print<span style="color:#f92672">(</span>sys.version<span style="color:#f92672">)</span>
 </code></pre></div><p>这里还有Python2.7的安装教程：
-<a href=https://www.digitalocean.com/community/tutorials/how-to-set-up-python-2-7-6-and-3-3-3-on-centos-6-4>https://www.digitalocean.com/community/tutorials/how-to-set-up-python-2-7-6-and-3-3-3-on-centos-6-4</a></p><p>报错则用ep源：<a href=https://www.tecmint.com/how-to-enable-epel-repository-for-rhel-centos-6-5/>https://www.tecmint.com/how-to-enable-epel-repository-for-rhel-centos-6-5/</a></p><h1 id=axel>axel<a href=#axel class=hanchor arialabel=Anchor>&#8983;</a></h1><p>查找rpm包，然后安装</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>rpm -ivh ftp://fr2.rpmfind.net/linux/dag/redhat/el6/en/x86_64/dag/RPMS/axel-2.4-1.el6.rf.x86_64.rpm
-</code></pre></div><p><strong>引用</strong>：<a href=https://www.hugeserver.com/blog/tutorials/installing-axel-centos/>https://www.hugeserver.com/blog/tutorials/installing-axel-centos/</a></p><h1 id=you-get>you-get<a href=#you-get class=hanchor arialabel=Anchor>&#8983;</a></h1><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>$ pip3 install you-get
-</code></pre></div><p><strong>引用</strong>：<a href=https://you-get.org/>you-get</a></p><h1 id=添加sudo用户>添加sudo用户<a href=#添加sudo用户 class=hanchor arialabel=Anchor>&#8983;</a></h1><p>一种：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>**以用户名dongzhi为例子：**
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>adduser dongzhi
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>passwd dongzhi
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>gpasswd -a wheel dongzhi
-</code></pre></div><p>另一种：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>useradd dongzhi
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>passwd dongzhi
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>usermod -G wheel dongzhi
-</code></pre></div></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/><span class=button__icon>←</span>
-<span class=button__text>码农使用电脑的日常</span></a></span>
-<span class="button next"><a href=https://dongzhi.me/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/><span class=button__text>同步异步和阻塞非阻塞的理解</span>
-<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
-<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
-<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
+<a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-python-2-7-6-and-3-3-3-on-centos-6-4">https://www.digitalocean.com/community/tutorials/how-to-set-up-python-2-7-6-and-3-3-3-on-centos-6-4</a></p>
+<p>报错则用ep源：<a href="https://www.tecmint.com/how-to-enable-epel-repository-for-rhel-centos-6-5/">https://www.tecmint.com/how-to-enable-epel-repository-for-rhel-centos-6-5/</a></p>
+<h1 id="axel">axel<a arialabel="Anchor" class="hanchor" href="#axel">⌗</a> </h1>
+<p>查找rpm包，然后安装</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>rpm -ivh ftp://fr2.rpmfind.net/linux/dag/redhat/el6/en/x86_64/dag/RPMS/axel-2.4-1.el6.rf.x86_64.rpm
+</code></pre></div><p><strong>引用</strong>：<a href="https://www.hugeserver.com/blog/tutorials/installing-axel-centos/">https://www.hugeserver.com/blog/tutorials/installing-axel-centos/</a></p>
+<h1 id="you-get">you-get<a arialabel="Anchor" class="hanchor" href="#you-get">⌗</a> </h1>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ pip3 install you-get
+</code></pre></div><p><strong>引用</strong>：<a href="https://you-get.org/">you-get</a></p>
+<h1 id="添加sudo用户">添加sudo用户<a arialabel="Anchor" class="hanchor" href="#添加sudo用户">⌗</a> </h1>
+<p>一种：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>**以用户名dongzhi为例子：**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>adduser dongzhi
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>passwd dongzhi
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>gpasswd -a wheel dongzhi
+</code></pre></div><p>另一种：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>useradd dongzhi
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>passwd dongzhi
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>usermod -G wheel dongzhi
+</code></pre></div>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/">
+<span class="button__icon">←</span>
+<span class="button__text">码农使用电脑的日常</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://dongzhi.me/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/">
+<span class="button__text">同步异步和阻塞非阻塞的理解</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<div id="hyvor-talk-view"></div>
+<script type="text/javascript">
+		var HYVOR_TALK_WEBSITE = 1505; 
+		var HYVOR_TALK_CONFIG = {
+        url: false,
+        id: false
+		};
+	  </script>
+<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

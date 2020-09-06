@@ -1,15 +1,203 @@
-<!doctype html><html lang=en><head><title>JVM Learn 19 JVM垃圾回收算法总结 :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="本文转载自JVM进阶之GC（四）垃圾收集器 。总结的非常好，拿过来学习一下。 上篇讲了下垃圾回收算法，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2020/07/09/jvm-learn-19/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content="Joe John"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="JVM Learn 19 JVM垃圾回收算法总结 :: DongZhi.ME"><meta property="og:description" content="本文转载自JVM进阶之GC（四）垃圾收集器 。总结的非常好，拿过来学习一下。 上篇讲了下垃圾回收算法，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）"><meta property="og:url" content="https://dongzhi.me/2020/07/09/jvm-learn-19/"><meta property="og:site_name" content="JVM Learn 19 JVM垃圾回收算法总结"><meta property="og:image" content="https://dongzhi.me/"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:published_time" content="2020-07-09 00:00:00 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2020/07/09/jvm-learn-19/>JVM Learn 19 JVM垃圾回收算法总结</a></h1><div class=post-meta><span class=post-date>2020-07-09</span>
-<span class=post-author>::
-Joe John</span></div><div class=post-content><div><blockquote><p>本文转载自<a href=https://blog.csdn.net/u011519624/article/details/79167607>JVM进阶之GC（四）垃圾收集器</a> 。总结的非常好，拿过来学习一下。</p></blockquote><p>上篇讲了下<a href=http://blog.csdn.net/u011519624/article/details/79156767>垃圾回收算法</a>，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）。</p><h2 id=垃圾收集器>垃圾收集器<a href=#垃圾收集器 class=hanchor arialabel=Anchor>&#8983;</a></h2><p>HotSpot虚拟机提供的收集器如下图：</p><p><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc04.png alt=垃圾收集器></p><p><strong>新生代的垃圾收集器有：Serial、ParNew、Parallel Scavenge</strong><br><strong>老年代的垃圾收集器有：CMS、Serial Old、Parallel Old</strong><br>G1收集器因运用的还不是很广泛，不予讨论，有兴趣的可自行百度。<br>收集器之间有连线，表示他们可以搭配使用。为什么需要搭配使用呢？而且收集器还这么多？应该说有什么样的需求就有什么样的产品，垃圾收集器也是按需设计的，没有最好的产品，只有最合适的。那么各个收集器的实现原理是怎样的，有什么特点呢？下面一一来讨论。</p><h3 id=serial与serial-old-收集器>Serial与Serial Old 收集器<a href=#serial与serial-old-收集器 class=hanchor arialabel=Anchor>&#8983;</a></h3><p>Serial，翻译成中文的意思是<strong>串行</strong>，顾名思义，这就是个单线程的收集器。仅仅使用一个线程去执行垃圾收集任务，而且收集任务期间，必须停掉其他的工作线程，直到垃圾收集完成。`垃圾回收时停掉其他的线程的现象，就称为<strong>Stop
-The World(STW)</strong>。打个比方，我清扫房间的时候，任何人都不能在家里活动，以免给我捣乱，不然清扫工作怎么也没法做完。STW就是这么个意思，至于暂停应用多久，得看具体垃圾的情况了。</p><p>Serial收集器是收集新生代的收集器，而Serial Old收集器是收集老年代的，上图也看到了它们之间有连线可搭配使用，看如下它们搭配使用的运行图：<br><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc05.png alt="Serial与Serial Old搭配使用">
-①：新生代使用Serial收集器，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br>②：老年代使用Serial Old收集器，采用标记整理算法，会发生STW。</p><h3 id=parnew-收集器>ParNew 收集器<a href=#parnew-收集器 class=hanchor arialabel=Anchor>&#8983;</a></h3><p>ParNew其实就是Serial的多线程版本，在新生代中使用多条线程进行垃圾回收。看如下逻辑图就一目了然了：
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc06.png alt=ParNew收集器>
-①：新生代使用ParNew收集器，可以看到有多条GC线程在进行垃圾回收，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br>②：老年代使用Serial Old收集器，采用标记整理算法，会发生STW。</p><h3 id=parallel-scavenge-收集器>Parallel Scavenge 收集器<a href=#parallel-scavenge-收集器 class=hanchor arialabel=Anchor>&#8983;</a></h3><p>Parallel Scavenge 收集器也是新生代收集器，也是使用复制算法的多线程收集器。<br>看上去和ParNew收集器差不多，但是Parallel Scavenge最大的特点是更关注<strong>吞吐量</strong>。<br>吞吐量就是CPU用于运行用户代码的时间与CPU总消耗时间的比值：</p><blockquote><p>吞吐量 = 运行用户代码时间 / (运行用户代码时间) + 垃圾收集时间</p></blockquote><p>打个比方，虚拟机运行了100分钟，垃圾回收用了2分钟，那么吞吐量就是98%。<br>按照公式来看，吞吐量越高的虚拟机，自然是垃圾收集时间也越短，理所当然的用户体验也要更好。<strong>Parallel Scavenge收集器会根据当前系统的运行情况，动态调整某些参数来提供最合适的停顿时间或最大的吞吐量</strong>，这就是GC的自适应调节策略，这也是其与ParNew收集器最明显的区别。</p><h3 id=parallel-old-收集器>Parallel Old 收集器<a href=#parallel-old-收集器 class=hanchor arialabel=Anchor>&#8983;</a></h3><p>Parallel Old 是 Parallel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>JVM Learn 19 JVM垃圾回收算法总结 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="本文转载自JVM进阶之GC（四）垃圾收集器 。总结的非常好，拿过来学习一下。 上篇讲了下垃圾回收算法，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/07/09/jvm-learn-19/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="Joe John" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="JVM Learn 19 JVM垃圾回收算法总结 :: DongZhi.ME" property="og:title"/>
+<meta content="本文转载自JVM进阶之GC（四）垃圾收集器 。总结的非常好，拿过来学习一下。 上篇讲了下垃圾回收算法，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）" property="og:description"/>
+<meta content="https://dongzhi.me/2020/07/09/jvm-learn-19/" property="og:url"/>
+<meta content="JVM Learn 19 JVM垃圾回收算法总结" property="og:site_name"/>
+<meta content="https://dongzhi.me/" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-07-09 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/09/jvm-learn-19/">JVM Learn 19 JVM垃圾回收算法总结</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-07-09 
+      </span>
+<span class="post-author">::
+      Joe John
+    </span>
+</div>
+<div class="post-content"><div>
+<blockquote>
+<p>本文转载自<a href="https://blog.csdn.net/u011519624/article/details/79167607">JVM进阶之GC（四）垃圾收集器</a> 。总结的非常好，拿过来学习一下。</p>
+</blockquote>
+<p>上篇讲了下<a href="http://blog.csdn.net/u011519624/article/details/79156767">垃圾回收算法</a>，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）。</p>
+<h2 id="垃圾收集器">垃圾收集器<a arialabel="Anchor" class="hanchor" href="#垃圾收集器">⌗</a> </h2>
+<p>HotSpot虚拟机提供的收集器如下图：</p>
+<p><img alt="垃圾收集器" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc04.png"/></p>
+<p><strong>新生代的垃圾收集器有：Serial、ParNew、Parallel Scavenge</strong><br/>
+<strong>老年代的垃圾收集器有：CMS、Serial Old、Parallel Old</strong><br/>
+G1收集器因运用的还不是很广泛，不予讨论，有兴趣的可自行百度。<br/>
+收集器之间有连线，表示他们可以搭配使用。为什么需要搭配使用呢？而且收集器还这么多？应该说有什么样的需求就有什么样的产品，垃圾收集器也是按需设计的，没有最好的产品，只有最合适的。那么各个收集器的实现原理是怎样的，有什么特点呢？下面一一来讨论。</p>
+<h3 id="serial与serial-old-收集器">Serial与Serial Old 收集器<a arialabel="Anchor" class="hanchor" href="#serial与serial-old-收集器">⌗</a> </h3>
+<p>Serial，翻译成中文的意思是<strong>串行</strong>，顾名思义，这就是个单线程的收集器。仅仅使用一个线程去执行垃圾收集任务，而且收集任务期间，必须停掉其他的工作线程，直到垃圾收集完成。`垃圾回收时停掉其他的线程的现象，就称为<strong>Stop
+The World(STW)</strong>。打个比方，我清扫房间的时候，任何人都不能在家里活动，以免给我捣乱，不然清扫工作怎么也没法做完。STW就是这么个意思，至于暂停应用多久，得看具体垃圾的情况了。</p>
+<p>Serial收集器是收集新生代的收集器，而Serial Old收集器是收集老年代的，上图也看到了它们之间有连线可搭配使用，看如下它们搭配使用的运行图：<br/>
+<img alt="Serial与Serial Old搭配使用" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc05.png"/>
+①：新生代使用Serial收集器，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br/>
+②：老年代使用Serial Old收集器，采用标记整理算法，会发生STW。</p>
+<h3 id="parnew-收集器">ParNew 收集器<a arialabel="Anchor" class="hanchor" href="#parnew-收集器">⌗</a> </h3>
+<p>ParNew其实就是Serial的多线程版本，在新生代中使用多条线程进行垃圾回收。看如下逻辑图就一目了然了：
+<img alt="ParNew收集器" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc06.png"/>
+①：新生代使用ParNew收集器，可以看到有多条GC线程在进行垃圾回收，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br/>
+②：老年代使用Serial Old收集器，采用标记整理算法，会发生STW。</p>
+<h3 id="parallel-scavenge-收集器">Parallel Scavenge 收集器<a arialabel="Anchor" class="hanchor" href="#parallel-scavenge-收集器">⌗</a> </h3>
+<p>Parallel Scavenge 收集器也是新生代收集器，也是使用复制算法的多线程收集器。<br/>
+看上去和ParNew收集器差不多，但是Parallel Scavenge最大的特点是更关注<strong>吞吐量</strong>。<br/>
+吞吐量就是CPU用于运行用户代码的时间与CPU总消耗时间的比值：</p>
+<blockquote>
+<p>吞吐量 = 运行用户代码时间 / (运行用户代码时间) + 垃圾收集时间</p>
+</blockquote>
+<p>打个比方，虚拟机运行了100分钟，垃圾回收用了2分钟，那么吞吐量就是98%。<br/>
+按照公式来看，吞吐量越高的虚拟机，自然是垃圾收集时间也越短，理所当然的用户体验也要更好。<strong>Parallel Scavenge收集器会根据当前系统的运行情况，动态调整某些参数来提供最合适的停顿时间或最大的吞吐量</strong>，这就是GC的自适应调节策略，这也是其与ParNew收集器最明显的区别。</p>
+<h3 id="parallel-old-收集器">Parallel Old 收集器<a arialabel="Anchor" class="hanchor" href="#parallel-old-收集器">⌗</a> </h3>
+<p>Parallel Old 是 Parallel
 Scavenge收集器的老年代版本，运用多线程和标记整理算法收集。从最上面的搭配图也可以看到，Parallel Old 只能与Parallel
-Scavenge配对使用。这样的组合，在注重<strong>吞吐量和CPU资源</strong>的场合使用比较合适。如下是逻辑运行图：<br><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc07.png alt="Parallel Old收集器">
-①：新生代使用Parallel Scavenge收集器，可以看到有多条GC线程在进行垃圾回收，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br>②：老年代使用Parallel Old收集器，使用多线程采用标记整理算法，会发生STW。</p><h3 id=cms-收集器>CMS 收集器<a href=#cms-收集器 class=hanchor arialabel=Anchor>&#8983;</a></h3><p>CMS收集器是一种<strong>以获取最短回收停顿时间为目标</strong>的收集器。在B/S架构模型的网站上，运用CMS收集器十分广泛，因为网站上更希望停顿越短越好，用户体验才能更好。</p><p>CMS收集器是基于标记清除算法实现的，但是其运行过程相对来说更复杂了，整个过程分成下图4个步骤：<br><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc08.png alt=CMS收集过程></p><ul><li><p>①：初始标记（initial mark）<br>在图中可以看出这个步骤是单线程处理的，并且用户线程并未运行，是因为出现了STW。这个过程只是<strong>标记一下GC Roots能直接关联到的对象</strong>，速度很快。</p></li><li><p>②：并发标记（concurrent mark）<br>这个阶段就是进行GC Roots Tracing过程，可以看出GC线程与用户线程并发工作，所以并发标记过程并不影响用户线程的使用。</p></li><li><p>③：重新标记（remark）<br>重新标记阶段是为了修正并发标记期间，因用户线程继续运行导致标记产生变动的那一部分对象的标记。看起来有点绕，其实意思就是在并发标记时，用户线程也会产生需要标记的对象，这部分对象不能漏了标记，所以就需要重新标记过程。在图中可以看到，没有用户线程在运行，说明需要STW。</p></li><li><p>④：并发清除（concurrent sweep）<br>并发清除这个阶段看图也能类比了，有GC线程与用户线程并发运行，GC线程清理掉那些标记的对象，用户线程正常运行。</p></li></ul><p>整体来看，CMS收集器的垃圾回收过程是与用户线程一起并发执行的。<br>但是CMS收集器还是有一下三个缺点：</p><ol><li>因为是使用并发收集，虽然不会导致用户线程停顿，但是会占用一部分线程而导致应用程序变慢，总的吞吐量会降低。</li><li>CMS收集器无法处理浮动垃圾，可能出现“Concurrent Mode Failure”失败而导致另一次Full GC的发生。因为在并发清理阶段，用户线程还在运行，自然就还有新的垃圾不断产生，这部分垃圾出现在标记过程之后，CMS也束手无策，只能等待下次GC时再清理，这一部分垃圾就叫“浮动垃圾”。</li><li>CMS是基于标记清除算法实现的，前面的文章也提到过标记清除算法的缺点，就是会产生大量的空间碎片。空间碎片过多时，就会给大对象的空间分配带来麻烦。比如老年代有足够的空间，但是找不到连续的足够大的空间，而不得不触发一次Full GC。为了解决这个问题，CMS收集器提供了 <strong>-XX:+UseCMSFullGCsBeforeCompaction</strong>参数，用于设置执行了多少次不压缩的FGC后来一次碎片整理（默认是0，每次进入FGC时都进行碎片整理）。</li></ol><p>虽然CMS有几个缺点，但是进行合理的参数配置，在老年代的垃圾回收上还是有不俗的表现。目前的主流搭配使用是ParNew+CMS收集.</p></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2020/07/09/jvm-learn-18/><span class=button__icon>←</span>
-<span class=button__text>JVM Learn 18 JVM垃圾回收模型概述</span></a></span>
-<span class="button next"><a href=https://dongzhi.me/2020/07/09/jvm-learn-20/><span class=button__text>JVM Learn 20 Java Garbage Collection Basics</span>
-<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
-<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
-<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
+Scavenge配对使用。这样的组合，在注重<strong>吞吐量和CPU资源</strong>的场合使用比较合适。如下是逻辑运行图：<br/>
+<img alt="Parallel Old收集器" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc07.png"/>
+①：新生代使用Parallel Scavenge收集器，可以看到有多条GC线程在进行垃圾回收，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br/>
+②：老年代使用Parallel Old收集器，使用多线程采用标记整理算法，会发生STW。</p>
+<h3 id="cms-收集器">CMS 收集器<a arialabel="Anchor" class="hanchor" href="#cms-收集器">⌗</a> </h3>
+<p>CMS收集器是一种<strong>以获取最短回收停顿时间为目标</strong>的收集器。在B/S架构模型的网站上，运用CMS收集器十分广泛，因为网站上更希望停顿越短越好，用户体验才能更好。</p>
+<p>CMS收集器是基于标记清除算法实现的，但是其运行过程相对来说更复杂了，整个过程分成下图4个步骤：<br/>
+<img alt="CMS收集过程" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc08.png"/></p>
+<ul>
+<li>
+<p>①：初始标记（initial mark）<br/>
+在图中可以看出这个步骤是单线程处理的，并且用户线程并未运行，是因为出现了STW。这个过程只是<strong>标记一下GC Roots能直接关联到的对象</strong>，速度很快。</p>
+</li>
+<li>
+<p>②：并发标记（concurrent mark）<br/>
+这个阶段就是进行GC Roots Tracing过程，可以看出GC线程与用户线程并发工作，所以并发标记过程并不影响用户线程的使用。</p>
+</li>
+<li>
+<p>③：重新标记（remark）<br/>
+重新标记阶段是为了修正并发标记期间，因用户线程继续运行导致标记产生变动的那一部分对象的标记。看起来有点绕，其实意思就是在并发标记时，用户线程也会产生需要标记的对象，这部分对象不能漏了标记，所以就需要重新标记过程。在图中可以看到，没有用户线程在运行，说明需要STW。</p>
+</li>
+<li>
+<p>④：并发清除（concurrent sweep）<br/>
+并发清除这个阶段看图也能类比了，有GC线程与用户线程并发运行，GC线程清理掉那些标记的对象，用户线程正常运行。</p>
+</li>
+</ul>
+<p>整体来看，CMS收集器的垃圾回收过程是与用户线程一起并发执行的。<br/>
+但是CMS收集器还是有一下三个缺点：</p>
+<ol>
+<li>因为是使用并发收集，虽然不会导致用户线程停顿，但是会占用一部分线程而导致应用程序变慢，总的吞吐量会降低。</li>
+<li>CMS收集器无法处理浮动垃圾，可能出现“Concurrent Mode Failure”失败而导致另一次Full GC的发生。因为在并发清理阶段，用户线程还在运行，自然就还有新的垃圾不断产生，这部分垃圾出现在标记过程之后，CMS也束手无策，只能等待下次GC时再清理，这一部分垃圾就叫“浮动垃圾”。</li>
+<li>CMS是基于标记清除算法实现的，前面的文章也提到过标记清除算法的缺点，就是会产生大量的空间碎片。空间碎片过多时，就会给大对象的空间分配带来麻烦。比如老年代有足够的空间，但是找不到连续的足够大的空间，而不得不触发一次Full GC。为了解决这个问题，CMS收集器提供了  <strong>-XX:+UseCMSFullGCsBeforeCompaction</strong>参数，用于设置执行了多少次不压缩的FGC后来一次碎片整理（默认是0，每次进入FGC时都进行碎片整理）。</li>
+</ol>
+<p>虽然CMS有几个缺点，但是进行合理的参数配置，在老年代的垃圾回收上还是有不俗的表现。目前的主流搭配使用是ParNew+CMS收集.</p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://dongzhi.me/2020/07/09/jvm-learn-18/">
+<span class="button__icon">←</span>
+<span class="button__text">JVM Learn 18 JVM垃圾回收模型概述</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://dongzhi.me/2020/07/09/jvm-learn-20/">
+<span class="button__text">JVM Learn 20 Java Garbage Collection Basics</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<div id="hyvor-talk-view"></div>
+<script type="text/javascript">
+		var HYVOR_TALK_WEBSITE = 1505; 
+		var HYVOR_TALK_CONFIG = {
+        url: false,
+        id: false
+		};
+	  </script>
+<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>
