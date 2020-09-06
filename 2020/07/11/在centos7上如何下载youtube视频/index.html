@@ -1,218 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>在CentOS7上如何下载Youtube视频? :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
-<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。 前提条件： 一台国外的vps。" name="description"/>
-<meta content="" name="keywords"/>
-<meta content="noodp" name="robots"/>
-<link href="https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/" rel="canonical"/>
-<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
-<meta content="summary" name="twitter:card"/>
-<meta content="John Doe" name="twitter:creator"/>
-<meta content="en" property="og:locale"/>
-<meta content="article" property="og:type"/>
-<meta content="在CentOS7上如何下载Youtube视频? :: DongZhi.ME" property="og:title"/>
-<meta content="下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。 前提条件： 一台国外的vps。" property="og:description"/>
-<meta content="https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/" property="og:url"/>
-<meta content="在CentOS7上如何下载Youtube视频?" property="og:site_name"/>
-<meta content="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/youtube_download.jpg" property="og:image"/>
-<meta content="2048" property="og:image:width"/>
-<meta content="1024" property="og:image:height"/>
-<meta content="2020-07-11 00:00:00 +0000 UTC" property="article:published_time"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
-</head>
-<body class="">
-<div class="container center headings--one-size">
-<header class="header">
-<div class="header__inner">
-<div class="header__logo">
-<a href="/">
-<div class="logo">
-    DongZhi.ME
-  </div>
-</a>
-</div>
-<div class="menu-trigger">menu</div>
-</div>
-<nav class="menu">
-<ul class="menu__inner menu__inner--desktop">
-<li><a href="/">Home</a></li>
-<li><a href="/archives">Archives</a></li>
-<li><a href="/tags">Tags</a></li>
-<li><a href="/search">Search</a></li>
-<li><a href="/about">About</a></li>
-</ul>
-<ul class="menu__inner menu__inner--mobile">
-<li><a href="/">Home</a></li>
-<li><a href="/archives">Archives</a></li>
-<li><a href="/tags">Tags</a></li>
-<li><a href="/search">Search</a></li>
-<li><a href="/about">About</a></li>
-</ul>
-</nav>
-</header>
-<div class="content">
-<div class="post">
-<h1 class="post-title">
-<a href="https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/">在CentOS7上如何下载Youtube视频?</a></h1>
-<div class="post-meta">
-<span class="post-date">
-        2020-07-11 
-      </span>
-<span class="post-author">::
-      John Doe
-    </span>
-</div>
-<span class="post-tags">
-    
-    #<a href="https://dongzhi.me/tags/linux/">linux</a> 
-    
-  </span>
-<img alt="在CentOS7上如何下载Youtube视频?" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/youtube_download.jpg"/>
-<div class="post-content"><div>
-<blockquote>
-<p>下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。</p>
-</blockquote>
-<p>前提条件：</p>
-<ul>
-<li>一台国外的vps。我用的是搬瓦工，系统是CentOS7。</li>
-<li>科学上网，你懂得！</li>
-</ul>
-<h2 id="安装youtube-dl">安装youtube-dl<a arialabel="Anchor" class="hanchor" href="#安装youtube-dl">⌗</a> </h2>
-<p>youtube-dl是一个基于python的伟大工具，之所以说它伟大，不仅是因为它能下载youtub视频，它还能下载国外的如Dailymotion, Google Video, Photobucket, Facebook等一大批知名网站的视频，国内的优酷、腾讯、爱奇艺、网易云音乐、虾米音乐等主流的视频或歌曲。</p>
-<p>具体支持的网站列表: <a href="http://ytdl-org.github.io/youtube-dl/supportedsites.html">http://ytdl-org.github.io/youtube-dl/supportedsites.html</a></p>
-<p>在CentOS上用yum安装比较简单，遗憾地是自带的yum源仓库没有这个软件，所以可以先启用EPEL仓库，EPEL是什么鬼，不用管，简单说就是第三方的yum源，跟着敲命令就行。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span># yum search epel-release
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span># yum info epel-release
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span># yum install epel-release
-</code></pre></div><p>好了，可以安装youtube-dl了。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span># yum install youtube-dl
-</code></pre></div><h2 id="下载youtube视频">下载youtube视频<a arialabel="Anchor" class="hanchor" href="#下载youtube视频">⌗</a> </h2>
-<p>好了，可以愉快的下载视频了。假设下载地址是：https://www.youtube.com/watch?v=gWsOFw9QZN8&amp;frags=pl%2Cwn
-可以先输入如下命令查询视频格式：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span># youtube-dl --list-formats https://www.youtube.com/watch?v=gWsOFw9QZN8&amp;frags=pl%2Cwn
-</code></pre></div><p>输出结果：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>[root@JoeVPS ~]#  youtube-dl --list-formats https://www.youtube.com/watch?v=gWsOFw9QZN8&amp;frags=pl%2Cwn
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>[2] 1980
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>[root@JoeVPS ~]# [youtube] gWsOFw9QZN8: Downloading webpage
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>[info] Available formats for gWsOFw9QZN8:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>format code  extension  resolution note
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>249          webm       audio only tiny   59k , opus @ 50k (48000Hz), 3.74MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>250          webm       audio only tiny   77k , opus @ 70k (48000Hz), 4.77MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>140          m4a        audio only tiny  130k , m4a_dash container, mp4a.40.2@128k (44100Hz), 9.75MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>251          webm       audio only tiny  151k , opus @160k (48000Hz), 8.91MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>160          mp4        82x144     144p   40k , avc1.4d400b, 30fps, video only, 2.81MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>278          webm       82x144     144p   47k , webm container, vp9, 30fps, video only, 2.71MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>133          mp4        136x240    144p   83k , avc1.4d400c, 30fps, video only, 6.05MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>242          webm       136x240    144p   92k , vp9, 30fps, video only, 5.59MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>243          webm       202x360    240p  184k , vp9, 30fps, video only, 9.81MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>134          mp4        202x360    240p  204k , avc1.4d400d, 30fps, video only, 14.21MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>244          webm       270x480    240p  331k , vp9, 30fps, video only, 16.42MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>135          mp4        270x480    240p  371k , avc1.4d4015, 30fps, video only, 26.27MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>247          webm       406x720    360p  672k , vp9, 30fps, video only, 28.90MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>136          mp4        406x720    360p  739k , avc1.4d401e, 30fps, video only, 50.80MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>248          webm       608x1080   480p 1263k , vp9, 30fps, video only, 45.51MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>137          mp4        608x1080   480p 1428k , avc1.64001f, 30fps, video only, 92.27MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>271          webm       810x1440   720p 2933k , vp9, 30fps, video only, 114.82MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>313          webm       1080x1920  1080p 4259k , vp9, 30fps, video only, 173.92MiB
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>18           mp4        202x360    240p  401k , avc1.42001E, 30fps, mp4a.40.2@ 96k (44100Hz), 30.23MiB (best)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>[2]+  Done                    youtube-dl --list-formats https://www.youtube.com/watch?v=gWsOFw9QZN8
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>
-</code></pre></div><p>可以看到有很多分辨率的选项，注意上面4个是音频，下面的是视频，youtube的音频和视频是分开的。第一列是格式代码。</p>
-<p>比如要下载最后一行的240p的视频，输入：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>youtube-dl -f 18 https://www.youtube.com/watch?v=gWsOFw9QZN8
-</code></pre></div><p>其中，-f 18 表示格式码。</p>
-<p>老夫兴冲冲地输入如上命令下载了视频之后，结果没声音，无语!正确的做法是同时下载视频和音频，youtube会调用ffmpeg把下载的视频和音频合并，所以我们得安装ffmpeg。</p>
-<h3 id="安装ffmpeg">安装ffmpeg<a arialabel="Anchor" class="hanchor" href="#安装ffmpeg">⌗</a> </h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>yum install ffmpeg ffmpeg-devel -y
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>ffmpeg -h
-</code></pre></div><h3 id="终极总结">终极总结<a arialabel="Anchor" class="hanchor" href="#终极总结">⌗</a> </h3>
-<p>好了，终极下载命令：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>youtube-dl -f 313+250  --merge-output-format webm  https://www.youtube.com/watch?v=gWsOFw9QZN8&amp;frags=pl%2Cwn
-</code></pre></div><p>注意<strong>313</strong>是视频的格式码，<strong>250</strong>是音频的格式码，中间的<strong>加号</strong>是连接符，最后合并后的输出格式是webm。建议音频、视频和输出格式这三者要选择一致，否则合并视频会有问题。</p>
-<p>最后附上下载的视频：</p>
-<div class="shortcode_video">
-<video class="js-player" controls="" data-poster="" playsinline="">
-<source src="https://justokme.imfast.io/xiaojiejie2.webm" type="video/mp4"/>
-<source src="" type="video/webm"/>
-<source src="" type="video/ogg"/>
-</video>
-</div>
-<h3 id="参考地址">参考地址<a arialabel="Anchor" class="hanchor" href="#参考地址">⌗</a> </h3>
-<p><a href="www.youtube-dl.org/">youtube-dl官方网站</a></p>
-<p><a href="https://www.tecmint.com/install-youtube-dl-command-line-video-download-tool/">Install YouTube-DL – A Command Line Video Download Tool for Linux</a></p>
-<p><a href="https://bynss.com/2019/298101.html">怎样使用YouTube-DL从YouTube视频下载MP3曲目</a></p>
-</div></div>
-<div class="pagination">
-<div class="pagination__title">
-<span class="pagination__title-h">Read other posts</span>
-<hr/>
-</div>
-<div class="pagination__buttons">
-<span class="button previous">
-<a href="https://dongzhi.me/2020/07/18/do-you-believe-justice/">
-<span class="button__icon">←</span>
-<span class="button__text">你相信正义吗</span>
-</a>
-</span>
-<span class="button next">
-<a href="https://dongzhi.me/2020/07/09/jvm-learn-16/">
-<span class="button__text">JVM Learn 16 一个线程死锁的例子及问题排查</span>
-<span class="button__icon">→</span>
-</a>
-</span>
-</div>
-</div>
-<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
-<aside id="comments" style="
-/* background: rgb(183 168 154 / 26%);
-border: 1px dashed var(--accent); 
-padding: 5px auto;margin: 10px auto;*/
-">
-<div id="hyvor-talk-view"></div>
-<script type="text/javascript">
-		var HYVOR_TALK_WEBSITE = 1505; 
-		var HYVOR_TALK_CONFIG = {
-        url: false,
-        id: false
-		};
-	  </script>
-<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
-</aside>
-</div>
-</div>
-<footer class="footer">
-<div class="footer__inner">
-<div class="copyright">
-<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
-<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
-<span id="busuanzi_container_site_uv">
-                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
-          </span>
-</div>
-</div>
-</footer>
-<script src="https://dongzhi.me/assets/main.js"></script>
-<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
-<script>
-    const players = Plyr.setup('.js-player', {
-        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
-    });
-    </script>
-</div>
-</body>
-</html>
+<!doctype html><html lang=en><head><title>在CentOS7上如何下载Youtube视频? :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。 前提条件： 一台国外的vps。"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content="John Doe"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="在CentOS7上如何下载Youtube视频? :: DongZhi.ME"><meta property="og:description" content="下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。 前提条件： 一台国外的vps。"><meta property="og:url" content="https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/"><meta property="og:site_name" content="在CentOS7上如何下载Youtube视频?"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/youtube_download.jpg"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:published_time" content="2020-07-11 00:00:00 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/>在CentOS7上如何下载Youtube视频?</a></h1><div class=post-meta><span class=post-date>2020-07-11</span>
+<span class=post-author>::
+John Doe</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/linux/>linux</a>&nbsp;</span>
+<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/youtube_download.jpg class=post-cover alt=在CentOS7上如何下载Youtube视频?><div class=post-content><div><blockquote><p>下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。</p></blockquote><p>前提条件：</p><ul><li>一台国外的vps。我用的是搬瓦工，系统是CentOS7。</li><li>科学上网，你懂得！</li></ul><h2 id=安装youtube-dl>安装youtube-dl<a href=#安装youtube-dl class=hanchor arialabel=Anchor>&#8983;</a></h2><p>youtube-dl是一个基于python的伟大工具，之所以说它伟大，不仅是因为它能下载youtub视频，它还能下载国外的如Dailymotion, Google Video, Photobucket, Facebook等一大批知名网站的视频，国内的优酷、腾讯、爱奇艺、网易云音乐、虾米音乐等主流的视频或歌曲。</p><p>具体支持的网站列表: <a href=http://ytdl-org.github.io/youtube-dl/supportedsites.html>http://ytdl-org.github.io/youtube-dl/supportedsites.html</a></p><p>在CentOS上用yum安装比较简单，遗憾地是自带的yum源仓库没有这个软件，所以可以先启用EPEL仓库，EPEL是什么鬼，不用管，简单说就是第三方的yum源，跟着敲命令就行。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span># yum search epel-release
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span># yum info epel-release
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span># yum install epel-release
+</code></pre></div><p>好了，可以安装youtube-dl了。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span># yum install youtube-dl
+</code></pre></div><h2 id=下载youtube视频>下载youtube视频<a href=#下载youtube视频 class=hanchor arialabel=Anchor>&#8983;</a></h2><p>好了，可以愉快的下载视频了。假设下载地址是：https://www.youtube.com/watch?v=gWsOFw9QZN8&frags=pl%2Cwn
+可以先输入如下命令查询视频格式：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span># youtube-dl --list-formats https://www.youtube.com/watch?v=gWsOFw9QZN8&amp;frags=pl%2Cwn
+</code></pre></div><p>输出结果：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>[root@JoeVPS ~]#  youtube-dl --list-formats https://www.youtube.com/watch?v=gWsOFw9QZN8&amp;frags=pl%2Cwn
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>[2] 1980
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>[root@JoeVPS ~]# [youtube] gWsOFw9QZN8: Downloading webpage
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>[info] Available formats for gWsOFw9QZN8:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>format code  extension  resolution note
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>249          webm       audio only tiny   59k , opus @ 50k (48000Hz), 3.74MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>250          webm       audio only tiny   77k , opus @ 70k (48000Hz), 4.77MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>140          m4a        audio only tiny  130k , m4a_dash container, mp4a.40.2@128k (44100Hz), 9.75MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>251          webm       audio only tiny  151k , opus @160k (48000Hz), 8.91MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>160          mp4        82x144     144p   40k , avc1.4d400b, 30fps, video only, 2.81MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>278          webm       82x144     144p   47k , webm container, vp9, 30fps, video only, 2.71MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>133          mp4        136x240    144p   83k , avc1.4d400c, 30fps, video only, 6.05MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>242          webm       136x240    144p   92k , vp9, 30fps, video only, 5.59MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>243          webm       202x360    240p  184k , vp9, 30fps, video only, 9.81MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>134          mp4        202x360    240p  204k , avc1.4d400d, 30fps, video only, 14.21MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>244          webm       270x480    240p  331k , vp9, 30fps, video only, 16.42MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>135          mp4        270x480    240p  371k , avc1.4d4015, 30fps, video only, 26.27MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>247          webm       406x720    360p  672k , vp9, 30fps, video only, 28.90MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>136          mp4        406x720    360p  739k , avc1.4d401e, 30fps, video only, 50.80MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>248          webm       608x1080   480p 1263k , vp9, 30fps, video only, 45.51MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>137          mp4        608x1080   480p 1428k , avc1.64001f, 30fps, video only, 92.27MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>271          webm       810x1440   720p 2933k , vp9, 30fps, video only, 114.82MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>313          webm       1080x1920  1080p 4259k , vp9, 30fps, video only, 173.92MiB
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>18           mp4        202x360    240p  401k , avc1.42001E, 30fps, mp4a.40.2@ 96k (44100Hz), 30.23MiB (best)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>[2]+  Done                    youtube-dl --list-formats https://www.youtube.com/watch?v=gWsOFw9QZN8
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>
+</code></pre></div><p>可以看到有很多分辨率的选项，注意上面4个是音频，下面的是视频，youtube的音频和视频是分开的。第一列是格式代码。</p><p>比如要下载最后一行的240p的视频，输入：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>youtube-dl -f 18 https://www.youtube.com/watch?v=gWsOFw9QZN8
+</code></pre></div><p>其中，-f 18 表示格式码。</p><p>老夫兴冲冲地输入如上命令下载了视频之后，结果没声音，无语!正确的做法是同时下载视频和音频，youtube会调用ffmpeg把下载的视频和音频合并，所以我们得安装ffmpeg。</p><h3 id=安装ffmpeg>安装ffmpeg<a href=#安装ffmpeg class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>yum install ffmpeg ffmpeg-devel -y
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span>ffmpeg -h
+</code></pre></div><h3 id=终极总结>终极总结<a href=#终极总结 class=hanchor arialabel=Anchor>&#8983;</a></h3><p>好了，终极下载命令：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>youtube-dl -f 313+250  --merge-output-format webm  https://www.youtube.com/watch?v=gWsOFw9QZN8&amp;frags=pl%2Cwn
+</code></pre></div><p>注意<strong>313</strong>是视频的格式码，<strong>250</strong>是音频的格式码，中间的<strong>加号</strong>是连接符，最后合并后的输出格式是webm。建议音频、视频和输出格式这三者要选择一致，否则合并视频会有问题。</p><p>最后附上下载的视频：</p><div class=shortcode_video><video class=js-player playsinline controls data-poster>
+<source src=https://justokme.imfast.io/xiaojiejie2.webm type=video/mp4></source><source src type=video/webm></source><source src type=video/ogg></source></video></div><h3 id=参考地址>参考地址<a href=#参考地址 class=hanchor arialabel=Anchor>&#8983;</a></h3><p><a href=www.youtube-dl.org/>youtube-dl官方网站</a></p><p><a href=https://www.tecmint.com/install-youtube-dl-command-line-video-download-tool/>Install YouTube-DL – A Command Line Video Download Tool for Linux</a></p><p><a href=https://bynss.com/2019/298101.html>怎样使用YouTube-DL从YouTube视频下载MP3曲目</a></p></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2020/07/18/do-you-believe-justice/><span class=button__icon>←</span>
+<span class=button__text>你相信正义吗</span></a></span>
+<span class="button next"><a href=https://dongzhi.me/2020/07/09/jvm-learn-16/><span class=button__text>JVM Learn 16 一个线程死锁的例子及问题排查</span>
+<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
+<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
+<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
