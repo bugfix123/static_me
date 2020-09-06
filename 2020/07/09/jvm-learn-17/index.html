@@ -1,462 +1,261 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>JVM Learn 17 JVM内存排查相关命令用法 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
-<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="" name="description"/>
-<meta content="" name="keywords"/>
-<meta content="noodp" name="robots"/>
-<link href="https://dongzhi.me/2020/07/09/jvm-learn-17/" rel="canonical"/>
-<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
-<meta content="summary" name="twitter:card"/>
-<meta content="Joe John" name="twitter:creator"/>
-<meta content="en" property="og:locale"/>
-<meta content="article" property="og:type"/>
-<meta content="JVM Learn 17 JVM内存排查相关命令用法 :: DongZhi.ME" property="og:title"/>
-<meta content="" property="og:description"/>
-<meta content="https://dongzhi.me/2020/07/09/jvm-learn-17/" property="og:url"/>
-<meta content="JVM Learn 17 JVM内存排查相关命令用法" property="og:site_name"/>
-<meta content="https://dongzhi.me/" property="og:image"/>
-<meta content="2048" property="og:image:width"/>
-<meta content="1024" property="og:image:height"/>
-<meta content="2020-07-09 00:00:00 +0000 UTC" property="article:published_time"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
-</head>
-<body class="">
-<div class="container center headings--one-size">
-<header class="header">
-<div class="header__inner">
-<div class="header__logo">
-<a href="/">
-<div class="logo">
-    DongZhi.ME
-  </div>
-</a>
-</div>
-<div class="menu-trigger">menu</div>
-</div>
-<nav class="menu">
-<ul class="menu__inner menu__inner--desktop">
-<li><a href="/">Home</a></li>
-<li><a href="/archives">Archives</a></li>
-<li><a href="/tags">Tags</a></li>
-<li><a href="/search">Search</a></li>
-<li><a href="/about">About</a></li>
-</ul>
-<ul class="menu__inner menu__inner--mobile">
-<li><a href="/">Home</a></li>
-<li><a href="/archives">Archives</a></li>
-<li><a href="/tags">Tags</a></li>
-<li><a href="/search">Search</a></li>
-<li><a href="/about">About</a></li>
-</ul>
-</nav>
-</header>
-<div class="content">
-<div class="post">
-<h1 class="post-title">
-<a href="https://dongzhi.me/2020/07/09/jvm-learn-17/">JVM Learn 17 JVM内存排查相关命令用法</a></h1>
-<div class="post-meta">
-<span class="post-date">
-        2020-07-09 
-      </span>
-<span class="post-author">::
-      Joe John
-    </span>
-</div>
-<div class="post-content"><div>
-<h1 id="jmap">jmap<a arialabel="Anchor" class="hanchor" href="#jmap">⌗</a> </h1>
-<ol>
-<li>-heap 打印堆的概要信息
-命令：</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>jmap -heap 7664
-</code></pre></div><p><img alt="heap" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_17_heap.png"/>
-各部分说明如下：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jmap -heap 7664
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>Attaching to process ID 7664, please wait...
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>Debugger attached successfully.
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>Client compiler detected.
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>JVM version is 25.131-b11
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>using thread-local object allocation.
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>Mark Sweep Compact GC
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>Heap Configuration:     ##JVM堆的配置参数
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>   MinHeapFreeRatio         = 40
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>   MaxHeapFreeRatio         = 70
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>   MaxHeapSize              = 268435456 (256.0MB)   ##堆的最大大小
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>   NewSize                  = 5570560 (5.3125MB)    ##新生代大小
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>   MaxNewSize               = 89456640 (85.3125MB)  ##新生代最大大小
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>   OldSize                  = 11206656 (10.6875MB)  ##老年代大小
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>   NewRatio                 = 2                     ##新生代:老年代=1:2
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>   SurvivorRatio            = 8                     ##Eden:2s = 8:2
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>   MetaspaceSize            = 12582912 (12.0MB)    ##元空间的初始大小
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>   CompressedClassSpaceSize = 1073741824 (1024.0MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>   MaxMetaspaceSize         = 314572800 (300.0MB)  ##元空间的最大大小
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>   G1HeapRegionSize         = 0 (0.0MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>Heap Usage:  ##堆的实际使用情况
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>New Generation (Eden + 1 Survivor Space):  ##新生代的使用情况，约18M
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>   capacity = 17170432 (16.375MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>   used     = 15385488 (14.672744750976562MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>   free     = 1784944 (1.7022552490234375MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>   89.60454809756679% used
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>Eden Space:  ##伊甸区
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>   capacity = 15269888 (14.5625MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>   used     = 15269888 (14.5625MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>   free     = 0 (0.0MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>   100.0% used
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>From Space:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>   capacity = 1900544 (1.8125MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>   used     = 115600 (0.1102447509765625MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>   free     = 1784944 (1.7022552490234375MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>   6.082469019396552% used
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>To Space:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>   capacity = 1900544 (1.8125MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span>   used     = 6264 (0.00597381591796875MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span>   free     = 1894280 (1.8065261840820312MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span>   0.32958984375% used
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span>tenured generation:  ##老年代的使用情况，约36M
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span>   capacity = 38060032 (36.296875MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47</span>   used     = 35454608 (33.81214904785156MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48</span>   free     = 2605424 (2.4847259521484375MB)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span>   93.15443560320706% used
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>20829 interned Strings occupying 2643456 bytes.
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span>
-</code></pre></div><ol>
-<li>-dump转储heap</li>
-</ol>
-<p>命令：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>jmap  -dump:file=D:/a.phrof 7144
-</code></pre></div><h1 id="jstat">jstat<a arialabel="Anchor" class="hanchor" href="#jstat">⌗</a> </h1>
-<p>jstat命令可以查看堆内存各部分的使用量，以及加载类的数量。</p>
-<ol>
-<li>-gc 垃圾回收的大小</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jstat -gc 7044
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span> S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>1280.0 1280.0 116.9   0.0   10816.0   8653.0   26700.0    19417.7   52096.0 51394.9  0.0    0.0     2906    4.484   4      0.151    4.635
-</code></pre></div><p>各个字段的含义如下：</p>
-<ul>
-<li>S0C：第一个幸存区的大小</li>
-<li>S1C：第二个幸存区的大小</li>
-<li>S0U：第一个幸存区的使用大小</li>
-<li>S1U：第二个幸存区的使用大小</li>
-<li>EC：伊甸园区的大小</li>
-<li>EU：伊甸园区的使用大小</li>
-<li>OC：老年代大小</li>
-<li>OU：老年代使用大小</li>
-<li>MC：方法区大小</li>
-<li>MU：方法区使用大小</li>
-<li>CCSC:压缩类空间大小</li>
-<li>CCSU:压缩类空间使用大小</li>
-<li>YGC：年轻代垃圾回收次数</li>
-<li>YGCT：年轻代垃圾回收消耗时间</li>
-<li>FGC：老年代垃圾回收次数</li>
-<li>FGCT：老年代垃圾回收消耗时间</li>
-<li>GCT：垃圾回收消耗总时间</li>
-</ul>
-<h1 id="jcmd">jcmd<a arialabel="Anchor" class="hanchor" href="#jcmd">⌗</a> </h1>
-<p>JDK7后新增的命令，查看JVM内存的信息，很有用。</p>
-<ol>
-<li><strong>jcmd -l</strong>
-查看所有的java进程，同jps命令。</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd -l
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>5216
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>7044 test.metaspace.TestMetaSpace
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>740 org.jetbrains.idea.maven.server.RemoteMavenServer
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>872 sun.tools.jcmd.JCmd -l
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>4972 org.jetbrains.jps.cmdline.Launcher C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/jgoodies-forms.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/jps-builders-6.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/oromatcher.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/javac2.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/slf4j-api-1.7.10.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/annotations.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/util.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/httpclient-4.5.2.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/snappy-in-java-0.5.1.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/aether-dependency-resolver.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/jdom.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/resources_en.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/protobuf-java-2.5.0.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/
-</code></pre></div><ol start="2">
-<li><strong>jcmd PID help</strong>
-查看帮助信息</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 7044 help
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>7044:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>The following commands are available:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>JFR.stop
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>JFR.start
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>JFR.dump
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>JFR.check
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>VM.native_memory
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>VM.check_commercial_features
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>VM.unlock_commercial_features
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>ManagementAgent.stop
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>ManagementAgent.start_local
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>ManagementAgent.start
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>GC.rotate_log
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>Thread.print
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>GC.class_stats
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>GC.class_histogram
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>GC.heap_dump
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>GC.run_finalization
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>GC.run
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>VM.uptime
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>VM.flags
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>VM.system_properties
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>VM.command_line
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>VM.version
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>help
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>
-</code></pre></div><ol start="3">
-<li><strong>jcmd  PID  VM.uptime</strong> 运行时间</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 4236 VM.uptime
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>4236:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>17.314 s
-</code></pre></div><ol start="4">
-<li><strong>jcmd PID VM.flags</strong> 查看你JVM的启动参数</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 4236 VM.flags
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>4236:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>-XX:InitialHeapSize=16777216 -XX:MaxHeapSize=268435456 -XX:MaxMetaspaceSize=314572800 -XX:MaxNewSize=89456640 -XX:MinHeapDeltaBytes=131072 -XX:NewSize=5570560 -XX:OldSize=11206656 -XX:+UseFastUnorderedTimeStamps -XX:-UseLargePagesIndividualAllocation
-</code></pre></div><ol start="5">
-<li><strong>jcmd pid PerfCounter.print</strong> 查看性能统计</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 4236 PerfCounter.print
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>4236:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>java.ci.totalTime=2222906
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>java.cls.loadedClasses=33926
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>java.cls.sharedLoadedClasses=534
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>java.cls.sharedUnloadedClasses=0
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>java.cls.unloadedClasses=0
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>java.property.java.class.path="C:\Program Files\Java\jdk1.8.0_131\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\deploy.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\access-bridge.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\cldrdata.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\dnsns.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\jaccess.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\jfxrt.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\localedata.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\nashorn.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunec.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunjce_provider.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunmscapi.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunpkcs11.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\zipfs.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\javaws.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_131\j"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>java.property.java.endorsed.dirs="C:\Program Files\Java\jdk1.8.0_131\jre\lib\endorsed"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>java.property.java.ext.dirs="C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext;C:\WINDOWS\Sun\Java\lib\ext"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>java.property.java.home="C:\Program Files\Java\jdk1.8.0_131\jre"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>java.property.java.library.path="C:\Program Files\Java\jdk1.8.0_131\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Java\jdk1.8.0_131\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;;."
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>java.property.java.version="1.8.0_131"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>java.property.java.vm.info="mixed mode, sharing"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>java.property.java.vm.name="Java HotSpot(TM) Client VM"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>java.property.java.vm.specification.name="Java Virtual Machine Specification"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>java.property.java.vm.specification.vendor="Oracle Corporation"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>java.property.java.vm.specification.version="1.8"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>java.property.java.vm.vendor="Oracle Corporation"
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>java.property.java.vm.version="25.131-b11"
-</code></pre></div><ol start="6">
-<li><strong>jcmd PID GC.class_histogram</strong> 查看进程中类的统计信息</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 4236 GC.class_histogram
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>4236:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span> num     #instances         #bytes  class name
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>----------------------------------------------
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>   1:        196631       17303528  java.lang.reflect.Method
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>   2:         89900       12060616  [C
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>   3:         43517        6228224  java.lang.Class
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>   4:        341415        5462640  net.sf.cglib.core.Signature
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>   5:        170676        5461632  net.sf.cglib.proxy.MethodProxy
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>   6:        170676        5461632  net.sf.cglib.proxy.MethodProxy$CreateInfo
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>   7:          5128        4841296  [I
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>   8:         86027        4803360  [Ljava.lang.Object;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>   9:         89749        1435984  java.lang.String
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>  10:        171157        1369256  java.lang.Object
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>  11:         42785        1369120  java.lang.ref.SoftReference
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>  12:         42674        1365568  java.lang.ThreadLocal$ThreadLocalMap$Entry
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>  13:         42994        1031856  java.util.HashMap$Node
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>  14:         42675         682800  java.lang.ThreadLocal
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>  15:         28446         474960  [Ljava.lang.Class;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>  16:            34         266336  [Ljava.util.HashMap$Node;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>  17:             2         262240  [Ljava.lang.ThreadLocal$ThreadLocalMap$Entry;
-</code></pre></div><ol start="7">
-<li><strong>jcmd PID Thread.print</strong> 查看线程的堆栈信息</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 4236 Thread.print
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>4236:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>2020-02-03 17:03:02
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>Full thread dump Java HotSpot(TM) Client VM (25.131-b11 mixed mode, sharing):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>"Service Thread" #8 daemon prio=9 os_prio=0 tid=0x0213d400 nid=0x19cc runnable [0x00000000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>"C1 CompilerThread0" #7 daemon prio=9 os_prio=2 tid=0x02139000 nid=0x1b9c waiting on condition [0x00000000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>"Monitor Ctrl-Break" #6 daemon prio=5 os_prio=0 tid=0x14df9c00 nid=0x1d54 runnable [0x1500f000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>        at java.net.SocketInputStream.socketRead0(Native Method)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>        at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>        at java.net.SocketInputStream.read(SocketInputStream.java:171)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>        at java.net.SocketInputStream.read(SocketInputStream.java:141)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>        at sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:284)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>        at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:326)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>        at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>        - locked &lt;0x097afce0&gt; (a java.io.InputStreamReader)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>        at java.io.InputStreamReader.read(InputStreamReader.java:184)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>        at java.io.BufferedReader.fill(BufferedReader.java:161)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>        at java.io.BufferedReader.readLine(BufferedReader.java:324)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>        - locked &lt;0x097afce0&gt; (a java.io.InputStreamReader)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>        at java.io.BufferedReader.readLine(BufferedReader.java:389)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>        at com.intellij.rt.execution.application.AppMainV2$1.run(AppMainV2.java:64)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>"Attach Listener" #5 daemon prio=5 os_prio=2 tid=0x020df000 nid=0x8f8 waiting on condition [0x00000000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>"Signal Dispatcher" #4 daemon prio=9 os_prio=2 tid=0x020dd400 nid=0x1c04 runnable [0x00000000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>"Finalizer" #3 daemon prio=8 os_prio=1 tid=0x020c0c00 nid=0x7cc in Object.wait() [0x14cbf000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>   java.lang.Thread.State: WAITING (on object monitor)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>        at java.lang.Object.wait(Native Method)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>        - waiting on &lt;0x097b01b0&gt; (a java.lang.ref.ReferenceQueue$Lock)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:143)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>        - locked &lt;0x097b01b0&gt; (a java.lang.ref.ReferenceQueue$Lock)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:164)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span>        at java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:209)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span>"Reference Handler" #2 daemon prio=10 os_prio=2 tid=0x02067000 nid=0x728 in Object.wait() [0x041df000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span>   java.lang.Thread.State: WAITING (on object monitor)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span>        at java.lang.Object.wait(Native Method)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47</span>        - waiting on &lt;0x097b0350&gt; (a java.lang.ref.Reference$Lock)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48</span>        at java.lang.Object.wait(Object.java:502)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span>        at java.lang.ref.Reference.tryHandlePending(Reference.java:191)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span>        - locked &lt;0x097b0350&gt; (a java.lang.ref.Reference$Lock)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>        at java.lang.ref.Reference$ReferenceHandler.run(Reference.java:153)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53</span>"main" #1 prio=5 os_prio=0 tid=0x00adc800 nid=0x174c runnable [0x01a4f000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55</span>        at java.lang.String.equals(String.java:990)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56</span>        at java.util.HashMap.getNode(HashMap.java:571)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57</span>        at java.util.HashMap.containsKey(HashMap.java:595)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58</span>        at java.util.HashSet.contains(HashSet.java:203)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59</span>        at net.sf.cglib.core.AbstractClassGenerator$ClassLoaderData$1.evaluate(AbstractClassGenerator.java:78)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60</span>        at net.sf.cglib.core.DefaultNamingPolicy.getClassName(DefaultNamingPolicy.java:51)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61</span>        at net.sf.cglib.core.AbstractClassGenerator.generateClassName(AbstractClassGenerator.java:157)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62</span>        at net.sf.cglib.core.AbstractClassGenerator.generate(AbstractClassGenerator.java:320)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">63</span>        - locked &lt;0x097915f0&gt; (a sun.misc.Launcher$AppClassLoader)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">64</span>        at net.sf.cglib.proxy.Enhancer.generate(Enhancer.java:492)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">65</span>        at net.sf.cglib.core.AbstractClassGenerator$ClassLoaderData.get(AbstractClassGenerator.java:117)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">66</span>        at net.sf.cglib.core.AbstractClassGenerator.create(AbstractClassGenerator.java:294)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">67</span>        at net.sf.cglib.proxy.Enhancer.createHelper(Enhancer.java:480)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">68</span>        at net.sf.cglib.proxy.Enhancer.create(Enhancer.java:305)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">69</span>        at test.metaspace.TestMetaSpace.main(TestMetaSpace.java:23)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">70</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">71</span>"VM Thread" os_prio=2 tid=0x02062c00 nid=0x1eac runnable
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">72</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">73</span>"VM Periodic Task Thread" os_prio=2 tid=0x14e73000 nid=0x1198 waiting on condition
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">74</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">75</span>JNI global references: 124
-</code></pre></div><ol start="8">
-<li><strong>jcmd  PID GC.heap_dump  fileName</strong>  堆的转储</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 4236 GC.heap_dump  d:/aa.hprof
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>4236:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>Heap dump file created
-</code></pre></div><ol start="9">
-<li><strong>jcmd PID VM.system_properties</strong> 查看JVM的系统属性</li>
-<li><strong>jcmd PID  VM.version</strong> 查看JVM的版本信息</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 2472 VM.version
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>2472:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>Java HotSpot(TM) Client VM version 25.131-b11
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>JDK 8.0_131
-</code></pre></div><ol start="11">
-<li><strong>jcmd PID VM.command_line</strong> 查看JVM的命令行参数</li>
-</ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 2472 VM.command_line
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>2472:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>VM Arguments:
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>jvm_args: -XX:MaxMetaspaceSize=300m -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2017.3.7\lib\idea_rt.jar=53002:C:\Program Files\JetBrains\IntelliJ IDEA 2017.3.7\bin -Dfile.encoding=UTF-8
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>java_command: test.metaspace.TestMetaSpace
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>java_class_path (initial): C:\Program Files\Java\jdk1.8.0_131\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\deploy.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\access-bridge.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\cldrdata.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\dnsns.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\jaccess.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\jfxrt.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\localedata.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\nashorn.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunec.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunjce_provider.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunmscapi.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunpkcs11.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\zipfs.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\javaws.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jfxswt.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\management-agent.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\plugin.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\rt.jar;D:\develop\IdeaProjects\learning\test01\target\classes;D:\develop\maven_repo\io\netty\netty-all\4.1.0.Final\netty-all-4.1.0.Final.jar;D:\develop\maven_repo\cglib\cglib\3.2.10\cglib-3.2.10.jar;D:\develop\maven_repo\org\ow2\asm\asm\7.0\asm-7.0.jar;D:\develop\maven_repo\org\apache\ant\ant\1.10.3\ant-1.10.3.jar;D:\develop\maven_repo\org\apache\ant\ant-launcher\1.10.3\ant-launcher-1.10.3.jar;C:\Program Files\JetBrains\IntelliJ IDEA 2017.3.7\lib\idea_rt.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>Launcher Type: SUN_STANDARD
-</code></pre></div><h1 id="jstack">jstack<a arialabel="Anchor" class="hanchor" href="#jstack">⌗</a> </h1>
-<p>专门查看线程堆栈信息。命令：<strong>jstack PID</strong>
-同jscmd PID Thread.print</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jstack 2472
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>2020-02-03 17:19:21
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>Full thread dump Java HotSpot(TM) Client VM (25.131-b11 mixed mode):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>"Service Thread" #8 daemon prio=9 os_prio=0 tid=0x14d4b800 nid=0x18b0 runnable [0x00000000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>"C1 CompilerThread0" #7 daemon prio=9 os_prio=2 tid=0x14d4a800 nid=0x1de0 waiting on condition [0x00000000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>"Monitor Ctrl-Break" #6 daemon prio=5 os_prio=0 tid=0x14d4a000 nid=0x1d9c runnable [0x14faf000]
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>        at java.net.SocketInputStream.socketRead0(Native Method)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>        at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>        at java.net.SocketInputStream.read(SocketInputStream.java:171)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>        at java.net.SocketInputStream.read(SocketInputStream.java:141)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>        at sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:284)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>        at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:326)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>        at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>        - locked &lt;0x09da3e70&gt; (a java.io.InputStreamReader)
-</code></pre></div><h1 id="mbc-图形化jvm工具">MBC 图形化JVM工具<a arialabel="Anchor" class="hanchor" href="#mbc-图形化jvm工具">⌗</a> </h1>
-<p>JVM自带的一个内存分析工具，类似Jvisualvm</p>
-<h1 id="jhat">jhat<a arialabel="Anchor" class="hanchor" href="#jhat">⌗</a> </h1>
-<p>jhat 转储文件路径
-jhat用于解析转储文件hprof</p>
-<h1 id="oql">OQL<a arialabel="Anchor" class="hanchor" href="#oql">⌗</a> </h1>
-<p>对象查询语言</p>
-</div></div>
-<div class="pagination">
-<div class="pagination__title">
-<span class="pagination__title-h">Read other posts</span>
-<hr/>
-</div>
-<div class="pagination__buttons">
-<span class="button previous">
-<a href="https://dongzhi.me/2020/07/09/jvm-learn-16/">
-<span class="button__icon">←</span>
-<span class="button__text">JVM Learn 16 一个线程死锁的例子及问题排查</span>
-</a>
-</span>
-<span class="button next">
-<a href="https://dongzhi.me/2020/07/09/jvm-learn-18/">
-<span class="button__text">JVM Learn 18 JVM垃圾回收模型概述</span>
-<span class="button__icon">→</span>
-</a>
-</span>
-</div>
-</div>
-<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
-<aside id="comments" style="
-/* background: rgb(183 168 154 / 26%);
-border: 1px dashed var(--accent); 
-padding: 5px auto;margin: 10px auto;*/
-">
-<div id="hyvor-talk-view"></div>
-<script type="text/javascript">
-		var HYVOR_TALK_WEBSITE = 1505; 
-		var HYVOR_TALK_CONFIG = {
-        url: false,
-        id: false
-		};
-	  </script>
-<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
-</aside>
-</div>
-</div>
-<footer class="footer">
-<div class="footer__inner">
-<div class="copyright">
-<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
-<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
-<span id="busuanzi_container_site_uv">
-                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
-          </span>
-</div>
-</div>
-</footer>
-<script src="https://dongzhi.me/assets/main.js"></script>
-<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
-<script>
-    const players = Plyr.setup('.js-player', {
-        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
-    });
-    </script>
-</div>
-</body>
-</html>
+<!doctype html><html lang=en><head><title>JVM Learn 17 JVM内存排查相关命令用法 :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2020/07/09/jvm-learn-17/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content="Joe John"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="JVM Learn 17 JVM内存排查相关命令用法 :: DongZhi.ME"><meta property="og:description" content><meta property="og:url" content="https://dongzhi.me/2020/07/09/jvm-learn-17/"><meta property="og:site_name" content="JVM Learn 17 JVM内存排查相关命令用法"><meta property="og:image" content="https://dongzhi.me/"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:published_time" content="2020-07-09 00:00:00 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2020/07/09/jvm-learn-17/>JVM Learn 17 JVM内存排查相关命令用法</a></h1><div class=post-meta><span class=post-date>2020-07-09</span>
+<span class=post-author>::
+Joe John</span></div><div class=post-content><div><h1 id=jmap>jmap<a href=#jmap class=hanchor arialabel=Anchor>&#8983;</a></h1><ol><li>-heap 打印堆的概要信息
+命令：</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>jmap -heap 7664
+</code></pre></div><p><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_17_heap.png alt=heap>
+各部分说明如下：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jmap -heap 7664
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>Attaching to process ID 7664, please wait...
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>Debugger attached successfully.
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>Client compiler detected.
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>JVM version is 25.131-b11
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>using thread-local object allocation.
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>Mark Sweep Compact GC
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>Heap Configuration:     ##JVM堆的配置参数
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>   MinHeapFreeRatio         = 40
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>   MaxHeapFreeRatio         = 70
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>   MaxHeapSize              = 268435456 (256.0MB)   ##堆的最大大小
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>   NewSize                  = 5570560 (5.3125MB)    ##新生代大小
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>   MaxNewSize               = 89456640 (85.3125MB)  ##新生代最大大小
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>   OldSize                  = 11206656 (10.6875MB)  ##老年代大小
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>   NewRatio                 = 2                     ##新生代:老年代=1:2
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>   SurvivorRatio            = 8                     ##Eden:2s = 8:2
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>   MetaspaceSize            = 12582912 (12.0MB)    ##元空间的初始大小
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>   CompressedClassSpaceSize = 1073741824 (1024.0MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>   MaxMetaspaceSize         = 314572800 (300.0MB)  ##元空间的最大大小
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>   G1HeapRegionSize         = 0 (0.0MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>Heap Usage:  ##堆的实际使用情况
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>New Generation (Eden + 1 Survivor Space):  ##新生代的使用情况，约18M
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>   capacity = 17170432 (16.375MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>   used     = 15385488 (14.672744750976562MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span>   free     = 1784944 (1.7022552490234375MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span>   89.60454809756679% used
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">30</span>Eden Space:  ##伊甸区
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">31</span>   capacity = 15269888 (14.5625MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">32</span>   used     = 15269888 (14.5625MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">33</span>   free     = 0 (0.0MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">34</span>   100.0% used
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">35</span>From Space:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">36</span>   capacity = 1900544 (1.8125MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">37</span>   used     = 115600 (0.1102447509765625MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">38</span>   free     = 1784944 (1.7022552490234375MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">39</span>   6.082469019396552% used
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">40</span>To Space:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">41</span>   capacity = 1900544 (1.8125MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">42</span>   used     = 6264 (0.00597381591796875MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">43</span>   free     = 1894280 (1.8065261840820312MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">44</span>   0.32958984375% used
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">45</span>tenured generation:  ##老年代的使用情况，约36M
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">46</span>   capacity = 38060032 (36.296875MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">47</span>   used     = 35454608 (33.81214904785156MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">48</span>   free     = 2605424 (2.4847259521484375MB)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">49</span>   93.15443560320706% used
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">50</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">51</span>20829 interned Strings occupying 2643456 bytes.
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">52</span>
+</code></pre></div><ol><li>-dump转储heap</li></ol><p>命令：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>jmap  -dump:file=D:/a.phrof 7144
+</code></pre></div><h1 id=jstat>jstat<a href=#jstat class=hanchor arialabel=Anchor>&#8983;</a></h1><p>jstat命令可以查看堆内存各部分的使用量，以及加载类的数量。</p><ol><li>-gc 垃圾回收的大小</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jstat -gc 7044
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span> S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>1280.0 1280.0 116.9   0.0   10816.0   8653.0   26700.0    19417.7   52096.0 51394.9  0.0    0.0     2906    4.484   4      0.151    4.635
+</code></pre></div><p>各个字段的含义如下：</p><ul><li>S0C：第一个幸存区的大小</li><li>S1C：第二个幸存区的大小</li><li>S0U：第一个幸存区的使用大小</li><li>S1U：第二个幸存区的使用大小</li><li>EC：伊甸园区的大小</li><li>EU：伊甸园区的使用大小</li><li>OC：老年代大小</li><li>OU：老年代使用大小</li><li>MC：方法区大小</li><li>MU：方法区使用大小</li><li>CCSC:压缩类空间大小</li><li>CCSU:压缩类空间使用大小</li><li>YGC：年轻代垃圾回收次数</li><li>YGCT：年轻代垃圾回收消耗时间</li><li>FGC：老年代垃圾回收次数</li><li>FGCT：老年代垃圾回收消耗时间</li><li>GCT：垃圾回收消耗总时间</li></ul><h1 id=jcmd>jcmd<a href=#jcmd class=hanchor arialabel=Anchor>&#8983;</a></h1><p>JDK7后新增的命令，查看JVM内存的信息，很有用。</p><ol><li><strong>jcmd -l</strong>
+查看所有的java进程，同jps命令。</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd -l
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>5216
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>7044 test.metaspace.TestMetaSpace
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>740 org.jetbrains.idea.maven.server.RemoteMavenServer
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>872 sun.tools.jcmd.JCmd -l
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>4972 org.jetbrains.jps.cmdline.Launcher C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/jgoodies-forms.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/jps-builders-6.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/oromatcher.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/javac2.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/slf4j-api-1.7.10.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/annotations.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/util.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/httpclient-4.5.2.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/snappy-in-java-0.5.1.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/aether-dependency-resolver.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/jdom.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/resources_en.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/protobuf-java-2.5.0.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/
+</code></pre></div><ol start=2><li><strong>jcmd PID help</strong>
+查看帮助信息</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 7044 help
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>7044:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>The following commands are available:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>JFR.stop
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>JFR.start
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>JFR.dump
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>JFR.check
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>VM.native_memory
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>VM.check_commercial_features
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>VM.unlock_commercial_features
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>ManagementAgent.stop
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>ManagementAgent.start_local
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>ManagementAgent.start
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>GC.rotate_log
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>Thread.print
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>GC.class_stats
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>GC.class_histogram
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>GC.heap_dump
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>GC.run_finalization
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>GC.run
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>VM.uptime
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>VM.flags
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>VM.system_properties
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>VM.command_line
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>VM.version
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>help
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>
+</code></pre></div><ol start=3><li><strong>jcmd PID VM.uptime</strong> 运行时间</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 4236 VM.uptime
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>4236:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>17.314 s
+</code></pre></div><ol start=4><li><strong>jcmd PID VM.flags</strong> 查看你JVM的启动参数</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 4236 VM.flags
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>4236:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>-XX:InitialHeapSize=16777216 -XX:MaxHeapSize=268435456 -XX:MaxMetaspaceSize=314572800 -XX:MaxNewSize=89456640 -XX:MinHeapDeltaBytes=131072 -XX:NewSize=5570560 -XX:OldSize=11206656 -XX:+UseFastUnorderedTimeStamps -XX:-UseLargePagesIndividualAllocation
+</code></pre></div><ol start=5><li><strong>jcmd pid PerfCounter.print</strong> 查看性能统计</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 4236 PerfCounter.print
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>4236:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>java.ci.totalTime=2222906
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>java.cls.loadedClasses=33926
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>java.cls.sharedLoadedClasses=534
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>java.cls.sharedUnloadedClasses=0
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>java.cls.unloadedClasses=0
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>java.property.java.class.path=&#34;C:\Program Files\Java\jdk1.8.0_131\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\deploy.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\access-bridge.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\cldrdata.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\dnsns.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\jaccess.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\jfxrt.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\localedata.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\nashorn.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunec.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunjce_provider.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunmscapi.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunpkcs11.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\zipfs.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\javaws.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_131\j&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>java.property.java.endorsed.dirs=&#34;C:\Program Files\Java\jdk1.8.0_131\jre\lib\endorsed&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>java.property.java.ext.dirs=&#34;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext;C:\WINDOWS\Sun\Java\lib\ext&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>java.property.java.home=&#34;C:\Program Files\Java\jdk1.8.0_131\jre&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>java.property.java.library.path=&#34;C:\Program Files\Java\jdk1.8.0_131\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Java\jdk1.8.0_131\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;;.&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>java.property.java.version=&#34;1.8.0_131&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>java.property.java.vm.info=&#34;mixed mode, sharing&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>java.property.java.vm.name=&#34;Java HotSpot(TM) Client VM&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>java.property.java.vm.specification.name=&#34;Java Virtual Machine Specification&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>java.property.java.vm.specification.vendor=&#34;Oracle Corporation&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>java.property.java.vm.specification.version=&#34;1.8&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>java.property.java.vm.vendor=&#34;Oracle Corporation&#34;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>java.property.java.vm.version=&#34;25.131-b11&#34;
+</code></pre></div><ol start=6><li><strong>jcmd PID GC.class_histogram</strong> 查看进程中类的统计信息</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 4236 GC.class_histogram
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>4236:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span> num     #instances         #bytes  class name
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>----------------------------------------------
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>   1:        196631       17303528  java.lang.reflect.Method
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>   2:         89900       12060616  [C
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>   3:         43517        6228224  java.lang.Class
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>   4:        341415        5462640  net.sf.cglib.core.Signature
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>   5:        170676        5461632  net.sf.cglib.proxy.MethodProxy
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>   6:        170676        5461632  net.sf.cglib.proxy.MethodProxy$CreateInfo
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>   7:          5128        4841296  [I
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>   8:         86027        4803360  [Ljava.lang.Object;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>   9:         89749        1435984  java.lang.String
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>  10:        171157        1369256  java.lang.Object
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>  11:         42785        1369120  java.lang.ref.SoftReference
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>  12:         42674        1365568  java.lang.ThreadLocal$ThreadLocalMap$Entry
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>  13:         42994        1031856  java.util.HashMap$Node
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>  14:         42675         682800  java.lang.ThreadLocal
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>  15:         28446         474960  [Ljava.lang.Class;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>  16:            34         266336  [Ljava.util.HashMap$Node;
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>  17:             2         262240  [Ljava.lang.ThreadLocal$ThreadLocalMap$Entry;
+</code></pre></div><ol start=7><li><strong>jcmd PID Thread.print</strong> 查看线程的堆栈信息</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 4236 Thread.print
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>4236:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>2020-02-03 17:03:02
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>Full thread dump Java HotSpot(TM) Client VM (25.131-b11 mixed mode, sharing):
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>&#34;Service Thread&#34; #8 daemon prio=9 os_prio=0 tid=0x0213d400 nid=0x19cc runnable [0x00000000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>&#34;C1 CompilerThread0&#34; #7 daemon prio=9 os_prio=2 tid=0x02139000 nid=0x1b9c waiting on condition [0x00000000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>&#34;Monitor Ctrl-Break&#34; #6 daemon prio=5 os_prio=0 tid=0x14df9c00 nid=0x1d54 runnable [0x1500f000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>        at java.net.SocketInputStream.socketRead0(Native Method)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>        at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>        at java.net.SocketInputStream.read(SocketInputStream.java:171)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>        at java.net.SocketInputStream.read(SocketInputStream.java:141)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>        at sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:284)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>        at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:326)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>        at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>        - locked &lt;0x097afce0&gt; (a java.io.InputStreamReader)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>        at java.io.InputStreamReader.read(InputStreamReader.java:184)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>        at java.io.BufferedReader.fill(BufferedReader.java:161)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>        at java.io.BufferedReader.readLine(BufferedReader.java:324)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>        - locked &lt;0x097afce0&gt; (a java.io.InputStreamReader)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>        at java.io.BufferedReader.readLine(BufferedReader.java:389)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>        at com.intellij.rt.execution.application.AppMainV2$1.run(AppMainV2.java:64)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span>&#34;Attach Listener&#34; #5 daemon prio=5 os_prio=2 tid=0x020df000 nid=0x8f8 waiting on condition [0x00000000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">30</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">31</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">32</span>&#34;Signal Dispatcher&#34; #4 daemon prio=9 os_prio=2 tid=0x020dd400 nid=0x1c04 runnable [0x00000000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">33</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">34</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">35</span>&#34;Finalizer&#34; #3 daemon prio=8 os_prio=1 tid=0x020c0c00 nid=0x7cc in Object.wait() [0x14cbf000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">36</span>   java.lang.Thread.State: WAITING (on object monitor)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">37</span>        at java.lang.Object.wait(Native Method)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">38</span>        - waiting on &lt;0x097b01b0&gt; (a java.lang.ref.ReferenceQueue$Lock)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">39</span>        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:143)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">40</span>        - locked &lt;0x097b01b0&gt; (a java.lang.ref.ReferenceQueue$Lock)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">41</span>        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:164)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">42</span>        at java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:209)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">43</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">44</span>&#34;Reference Handler&#34; #2 daemon prio=10 os_prio=2 tid=0x02067000 nid=0x728 in Object.wait() [0x041df000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">45</span>   java.lang.Thread.State: WAITING (on object monitor)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">46</span>        at java.lang.Object.wait(Native Method)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">47</span>        - waiting on &lt;0x097b0350&gt; (a java.lang.ref.Reference$Lock)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">48</span>        at java.lang.Object.wait(Object.java:502)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">49</span>        at java.lang.ref.Reference.tryHandlePending(Reference.java:191)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">50</span>        - locked &lt;0x097b0350&gt; (a java.lang.ref.Reference$Lock)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">51</span>        at java.lang.ref.Reference$ReferenceHandler.run(Reference.java:153)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">52</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">53</span>&#34;main&#34; #1 prio=5 os_prio=0 tid=0x00adc800 nid=0x174c runnable [0x01a4f000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">54</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">55</span>        at java.lang.String.equals(String.java:990)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">56</span>        at java.util.HashMap.getNode(HashMap.java:571)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">57</span>        at java.util.HashMap.containsKey(HashMap.java:595)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">58</span>        at java.util.HashSet.contains(HashSet.java:203)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">59</span>        at net.sf.cglib.core.AbstractClassGenerator$ClassLoaderData$1.evaluate(AbstractClassGenerator.java:78)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">60</span>        at net.sf.cglib.core.DefaultNamingPolicy.getClassName(DefaultNamingPolicy.java:51)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">61</span>        at net.sf.cglib.core.AbstractClassGenerator.generateClassName(AbstractClassGenerator.java:157)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">62</span>        at net.sf.cglib.core.AbstractClassGenerator.generate(AbstractClassGenerator.java:320)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">63</span>        - locked &lt;0x097915f0&gt; (a sun.misc.Launcher$AppClassLoader)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">64</span>        at net.sf.cglib.proxy.Enhancer.generate(Enhancer.java:492)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">65</span>        at net.sf.cglib.core.AbstractClassGenerator$ClassLoaderData.get(AbstractClassGenerator.java:117)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">66</span>        at net.sf.cglib.core.AbstractClassGenerator.create(AbstractClassGenerator.java:294)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">67</span>        at net.sf.cglib.proxy.Enhancer.createHelper(Enhancer.java:480)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">68</span>        at net.sf.cglib.proxy.Enhancer.create(Enhancer.java:305)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">69</span>        at test.metaspace.TestMetaSpace.main(TestMetaSpace.java:23)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">70</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">71</span>&#34;VM Thread&#34; os_prio=2 tid=0x02062c00 nid=0x1eac runnable
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">72</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">73</span>&#34;VM Periodic Task Thread&#34; os_prio=2 tid=0x14e73000 nid=0x1198 waiting on condition
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">74</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">75</span>JNI global references: 124
+</code></pre></div><ol start=8><li><strong>jcmd PID GC.heap_dump fileName</strong> 堆的转储</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 4236 GC.heap_dump  d:/aa.hprof
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>4236:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>Heap dump file created
+</code></pre></div><ol start=9><li><strong>jcmd PID VM.system_properties</strong> 查看JVM的系统属性</li><li><strong>jcmd PID VM.version</strong> 查看JVM的版本信息</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 2472 VM.version
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>2472:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>Java HotSpot(TM) Client VM version 25.131-b11
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>JDK 8.0_131
+</code></pre></div><ol start=11><li><strong>jcmd PID VM.command_line</strong> 查看JVM的命令行参数</li></ol><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 2472 VM.command_line
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>2472:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>VM Arguments:
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>jvm_args: -XX:MaxMetaspaceSize=300m -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2017.3.7\lib\idea_rt.jar=53002:C:\Program Files\JetBrains\IntelliJ IDEA 2017.3.7\bin -Dfile.encoding=UTF-8
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>java_command: test.metaspace.TestMetaSpace
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>java_class_path (initial): C:\Program Files\Java\jdk1.8.0_131\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\deploy.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\access-bridge.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\cldrdata.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\dnsns.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\jaccess.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\jfxrt.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\localedata.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\nashorn.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunec.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunjce_provider.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunmscapi.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\sunpkcs11.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\ext\zipfs.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\javaws.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jfxswt.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\management-agent.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\plugin.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_131\jre\lib\rt.jar;D:\develop\IdeaProjects\learning\test01\target\classes;D:\develop\maven_repo\io\netty\netty-all\4.1.0.Final\netty-all-4.1.0.Final.jar;D:\develop\maven_repo\cglib\cglib\3.2.10\cglib-3.2.10.jar;D:\develop\maven_repo\org\ow2\asm\asm\7.0\asm-7.0.jar;D:\develop\maven_repo\org\apache\ant\ant\1.10.3\ant-1.10.3.jar;D:\develop\maven_repo\org\apache\ant\ant-launcher\1.10.3\ant-launcher-1.10.3.jar;C:\Program Files\JetBrains\IntelliJ IDEA 2017.3.7\lib\idea_rt.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span>Launcher Type: SUN_STANDARD
+</code></pre></div><h1 id=jstack>jstack<a href=#jstack class=hanchor arialabel=Anchor>&#8983;</a></h1><p>专门查看线程堆栈信息。命令：<strong>jstack PID</strong>
+同jscmd PID Thread.print</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jstack 2472
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>2020-02-03 17:19:21
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>Full thread dump Java HotSpot(TM) Client VM (25.131-b11 mixed mode):
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>&#34;Service Thread&#34; #8 daemon prio=9 os_prio=0 tid=0x14d4b800 nid=0x18b0 runnable [0x00000000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>&#34;C1 CompilerThread0&#34; #7 daemon prio=9 os_prio=2 tid=0x14d4a800 nid=0x1de0 waiting on condition [0x00000000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>&#34;Monitor Ctrl-Break&#34; #6 daemon prio=5 os_prio=0 tid=0x14d4a000 nid=0x1d9c runnable [0x14faf000]
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>        at java.net.SocketInputStream.socketRead0(Native Method)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>        at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>        at java.net.SocketInputStream.read(SocketInputStream.java:171)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>        at java.net.SocketInputStream.read(SocketInputStream.java:141)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>        at sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:284)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>        at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:326)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>        at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>        - locked &lt;0x09da3e70&gt; (a java.io.InputStreamReader)
+</code></pre></div><h1 id=mbc-图形化jvm工具>MBC 图形化JVM工具<a href=#mbc-图形化jvm工具 class=hanchor arialabel=Anchor>&#8983;</a></h1><p>JVM自带的一个内存分析工具，类似Jvisualvm</p><h1 id=jhat>jhat<a href=#jhat class=hanchor arialabel=Anchor>&#8983;</a></h1><p>jhat 转储文件路径
+jhat用于解析转储文件hprof</p><h1 id=oql>OQL<a href=#oql class=hanchor arialabel=Anchor>&#8983;</a></h1><p>对象查询语言</p></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2020/07/09/jvm-learn-16/><span class=button__icon>←</span>
+<span class=button__text>JVM Learn 16 一个线程死锁的例子及问题排查</span></a></span>
+<span class="button next"><a href=https://dongzhi.me/2020/07/09/jvm-learn-18/><span class=button__text>JVM Learn 18 JVM垃圾回收模型概述</span>
+<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
+<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
+<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
