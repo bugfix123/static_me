@@ -1,31 +1,396 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on DongZhi.ME</title><link>https://dongzhi.me/post/</link><description>Recent content in Posts on DongZhi.ME</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 27 Aug 2020 20:09:50 +0800</lastBuildDate><atom:link href="https://dongzhi.me/post/index.xml" rel="self" type="application/rss+xml"/><item><title>记一次公司JVM堆溢出抽丝剥茧定位的过程</title><link>https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/</link><pubDate>Thu, 27 Aug 2020 20:09:50 +0800</pubDate><guid>https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/</guid><description>背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为</description></item><item><title>v2ray客户端配置简易说明</title><link>https://dongzhi.me/2020/08/21/kexueshangwang/</link><pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/08/21/kexueshangwang/</guid><description>&lt;blockquote>
-&lt;p>v2ray安卓客户端和windows客户端的配置简单说明.&lt;/p>
-&lt;/blockquote></description></item><item><title>Some Useful Licences</title><link>https://dongzhi.me/2020/08/04/some-useful-licences/</link><pubDate>Tue, 04 Aug 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/08/04/some-useful-licences/</guid><description>&lt;blockquote>
-&lt;p>Here are some useful licences.&lt;/p>
-&lt;/blockquote></description></item><item><title>你相信正义吗</title><link>https://dongzhi.me/2020/07/18/do-you-believe-justice/</link><pubDate>Sat, 18 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/18/do-you-believe-justice/</guid><description>&lt;blockquote>
-&lt;p>你相信正义吗？一段不错的视频，分享一下！&lt;/p>
-&lt;/blockquote></description></item><item><title>在CentOS7上如何下载Youtube视频?</title><link>https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/</link><pubDate>Sat, 11 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/</guid><description>下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。 前提条件： 一台国外的vps。</description></item><item><title>JVM Learn 16 一个线程死锁的例子及问题排查</title><link>https://dongzhi.me/2020/07/09/jvm-learn-16/</link><pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/09/jvm-learn-16/</guid><description>&lt;h2 id="死锁示例">死锁示例&lt;/h2>
-&lt;p>这次记录一个线程死锁的例子。直接上代码：&lt;/p></description></item><item><title>JVM Learn 17 JVM内存排查相关命令用法</title><link>https://dongzhi.me/2020/07/09/jvm-learn-17/</link><pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/09/jvm-learn-17/</guid><description/></item><item><title>JVM Learn 18 JVM垃圾回收模型概述</title><link>https://dongzhi.me/2020/07/09/jvm-learn-18/</link><pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/09/jvm-learn-18/</guid><description>Java虚拟机的垃圾回收主要从三个方面去概括： 垃圾判断算法 GC(垃圾回收)算法 垃圾回收器的实现和选择 垃圾判断算法 垃圾判断算法，用于确定什么是垃圾内存。主要包括引用计数算法和根搜索算法。 引用计数算法 引用</description></item><item><title>JVM Learn 19 JVM垃圾回收算法总结</title><link>https://dongzhi.me/2020/07/09/jvm-learn-19/</link><pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/09/jvm-learn-19/</guid><description>本文转载自JVM进阶之GC（四）垃圾收集器 。总结的非常好，拿过来学习一下。 上篇讲了下垃圾回收算法，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）</description></item><item><title>JVM Learn 20 Java Garbage Collection Basics</title><link>https://dongzhi.me/2020/07/09/jvm-learn-20/</link><pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/09/jvm-learn-20/</guid><description>&lt;blockquote>
-&lt;p>本文原文地址&lt;a href="https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html#RequiredSoftware/">：Java Garbage Collection Basics&lt;/a>&lt;/p>
-&lt;/blockquote></description></item><item><title>JVM Learn 08 线程上下文类加载器和Service Loader</title><link>https://dongzhi.me/2020/07/07/jvm-learn-08/</link><pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/07/jvm-learn-08/</guid><description>双亲委托机制的局限性 当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核</description></item><item><title>JVM Learn 09 类的字节码结构</title><link>https://dongzhi.me/2020/07/07/jvm-learn-09/</link><pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/07/jvm-learn-09/</guid><description>概念 字节码文件(.class)由JVM规范规定，主要包括魔数、JDK版本号(小版本和大版本)、常量池、类的访问标志、类的接口和父类信息、成员变量信息，方法信息等。 对于java中的数据类型，字节码中的对</description></item><item><title>JVM Learn 10 类的虚方法机制</title><link>https://dongzhi.me/2020/07/07/jvm-learn-10/</link><pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/07/jvm-learn-10/</guid><description>基本概念总结 符号引用在类的加载阶段或者第一次引用时转换成直接引用，这叫做静态解析。一些符号引用则在每次运行时转换成直接引用，这种转换是动态链接，java的多态正是在此时实现的。 方法调用的几个指令： in</description></item><item><title>JVM Learn 11 关于栈的指令操作的例子</title><link>https://dongzhi.me/2020/07/07/jvm-learn-11/</link><pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/07/jvm-learn-11/</guid><description>&lt;blockquote>
-&lt;p>本例以一个简单的加减乘除的例子，来熟悉虚拟机的操作数栈的工作流程。&lt;/p>
-&lt;/blockquote></description></item><item><title>JVM Learn 12 从字节码看动态代理</title><link>https://dongzhi.me/2020/07/07/jvm-learn-12/</link><pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/07/jvm-learn-12/</guid><description>&lt;p>动态代理是在运行时，通过反射机制实现动态代理，并且能够代理各种类型的对象。相对于静态代理，它的优势是不需要事先知道被代理的类型，可以与被代理的类解耦，同时可以大大减少代理类的数量。&lt;/p></description></item><item><title>JVM Learn 13 JVM的内存划分</title><link>https://dongzhi.me/2020/07/07/jvm-learn-13/</link><pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/07/jvm-learn-13/</guid><description>内存划分 java虚拟机的内存划分主要包括以下几个部分： 程序计数器：记录当前线程执行的下一条指令的地址，很小的空间 虚拟机栈(stack): 每个方法执行时候在栈里面创建一个栈帧，用于存储局部变量表，操作数</description></item><item><title>JVM Learn 14 java堆的转储与Jvisualvm</title><link>https://dongzhi.me/2020/07/07/jvm-learn-14/</link><pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/07/jvm-learn-14/</guid><description>&lt;blockquote>
-&lt;p>本文记录一下java队的转储和JVisualVM的用法。&lt;/p>
-&lt;/blockquote></description></item><item><title>JVM Learn 15 java栈的测试</title><link>https://dongzhi.me/2020/07/07/jvm-learn-15/</link><pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/07/jvm-learn-15/</guid><description>&lt;blockquote>
-&lt;p>java的虚拟机栈中可能会存在java.lang.StackOverflowError这个错误，本例中通过方法的递归来模拟出该异常，进而研究其细节。&lt;/p>
-&lt;/blockquote></description></item><item><title>JVM Learn 01.类的加载之初体验</title><link>https://dongzhi.me/2020/07/06/jvm-learn-01/</link><pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/06/jvm-learn-01/</guid><description>在java中，类型（可以理解成class）的加载、连接和初始化都是在程序运行期间完成的。在运行期完成可以为程序开发人员提供了更大的灵活性。 加载：将已经存在的class文件加载到内存,查找并加载类的二进</description></item><item><title>JVM Learn 02 常量的那点东西</title><link>https://dongzhi.me/2020/07/06/jvm-learn-02/</link><pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/06/jvm-learn-02/</guid><description>常量在编译阶段会存入调用这个常量的方法所在类的常量池中，本质上调用类并没有直接引用定义常量的类，因此并不会出发定义常量类的初始化。如果该常量值时动态生成的，则不会放在常量池中，会导致定义常量的类主动使</description></item><item><title>JVM Learn 03 理解类的初始化的一个简单例子</title><link>https://dongzhi.me/2020/07/06/jvm-learn-03/</link><pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/06/jvm-learn-03/</guid><description>这是一个经典例子，很多面试题中出现过。首先引入正常的情况： 1package com.test.jvm.learn01; 2 3public class Main2 { 4 public static void main(String[] args) { 5 System.out.println(Counter.counter1); 6 System.out.println(Counter.counter2); 7 } 8} 9 10 11package com.test.jvm.learn01; 12 13public class Counter { 14 15 public static int counter1; 16 public static int counter2 = 0; 17 public static Counter counter = new Counter(); 18 19 private Counter() { 20 counter1++; 21 counter2++; 22 System.out.println(counter1); 23 System.out.println(counter2); 24 } 25 26 public static Counter</description></item><item><title>JVM Learn 04 类加载器(一)</title><link>https://dongzhi.me/2020/07/06/jvm-learn-04/</link><pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/06/jvm-learn-04/</guid><description>基本概念 java的类加载器(class loader)，用来将java的字节码文件(.class)读取到内存中，生成一个Java.lang.Class对象。通过Class类的newInstance()方</description></item><item><title>JVM Learn 05 类加载器(二)</title><link>https://dongzhi.me/2020/07/06/jvm-learn-05/</link><pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/06/jvm-learn-05/</guid><description>父子类加载器的命名空间 类A中引用了类B，那么加载类B时，由类A的类加载器按照双亲委托机制尝试加载。子类加载器加载的类可以引用父类加载器加载的类，而父类加载器加载的类不能引用子类加载器加载的类。 测试案例</description></item><item><title>JVM Learn 06 类加载器(三)</title><link>https://dongzhi.me/2020/07/06/jvm-learn-06/</link><pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/06/jvm-learn-06/</guid><description>继续前面两篇类加载器的内容，本篇补充总结类加载的一些关键问题。 Java的类加载器本身如何被加载？ Java的根类加载器(Bootstrap Class Loader)，由C++编写，它是内建在JVM方法区内的一块字</description></item><item><title>JVM Learn 07 Launcher源码解析</title><link>https://dongzhi.me/2020/07/06/jvm-learn-07/</link><pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/07/06/jvm-learn-07/</guid><description>&lt;blockquote>
-&lt;p>这次重新阅读了一下sun.misc.Launcher这个类的源码，这里总结一下。&lt;/p>
-&lt;/blockquote></description></item><item><title>Shortcode用法</title><link>https://dongzhi.me/2020/07/05/shortcode%E7%94%A8%E6%B3%95/</link><pubDate>Sun, 05 Jul 2020 15:38:00 +0800</pubDate><guid>https://dongzhi.me/2020/07/05/shortcode%E7%94%A8%E6%B3%95/</guid><description>&lt;blockquote>
-&lt;p>本文汇总一下hugo常用的shortcode。&lt;/p>
-&lt;/blockquote></description></item><item><title>git仓库初始化</title><link>https://dongzhi.me/2020/07/04/git-init-repo/</link><pubDate>Sat, 04 Jul 2020 15:12:59 +0800</pubDate><guid>https://dongzhi.me/2020/07/04/git-init-repo/</guid><description>&lt;blockquote>
-&lt;p>Command line instructions
-You can also upload existing files from your computer using the instructions below.&lt;/p>
-&lt;/blockquote></description></item><item><title>Syntax Highlighting</title><link>https://dongzhi.me/2020/04/30/syntax-highlighting/</link><pubDate>Thu, 30 Apr 2020 16:01:23 +0800</pubDate><guid>https://dongzhi.me/2020/04/30/syntax-highlighting/</guid><description>&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1&lt;/span>&lt;span style="color:#66d9ef">function&lt;/span> &lt;span style="color:#a6e22e">helloWorld&lt;/span> () {
-&lt;span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2&lt;/span> &lt;span style="color:#a6e22e">alert&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;Hello, World!&amp;#34;&lt;/span>)
-&lt;span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3&lt;/span>}
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Markdown Syntax</title><link>https://dongzhi.me/2020/01/24/markdown-syntax/</link><pubDate>Fri, 24 Jan 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/01/24/markdown-syntax/</guid><description>&lt;p>This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p></description></item><item><title>Placeholder Text</title><link>https://dongzhi.me/2019/12/17/placeholder-text/</link><pubDate>Tue, 17 Dec 2019 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2019/12/17/placeholder-text/</guid><description>&lt;p>Lorem est tota propiore conpellat pectoribus de pectora summo.&lt;/p></description></item><item><title>Emoji Support</title><link>https://dongzhi.me/2019/12/03/emoji-support/</link><pubDate>Tue, 03 Dec 2019 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2019/12/03/emoji-support/</guid><description>Emoji can be enabled in a Hugo project in a number of ways.
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on DongZhi.ME</title>
+    <link>https://dongzhi.me/post/</link>
+    <description>Recent content in Posts on DongZhi.ME</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 27 Aug 2020 20:09:50 +0800</lastBuildDate>
+    
+	<atom:link href="https://dongzhi.me/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>记一次公司JVM堆溢出抽丝剥茧定位的过程</title>
+      <link>https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/</link>
+      <pubDate>Thu, 27 Aug 2020 20:09:50 +0800</pubDate>
+      
+      <guid>https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/</guid>
+      <description>背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为</description>
+    </item>
+    
+    <item>
+      <title>v2ray客户端配置简易说明</title>
+      <link>https://dongzhi.me/2020/08/21/kexueshangwang/</link>
+      <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/08/21/kexueshangwang/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;v2ray安卓客户端和windows客户端的配置简单说明.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Some Useful Licences</title>
+      <link>https://dongzhi.me/2020/08/04/some-useful-licences/</link>
+      <pubDate>Tue, 04 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/08/04/some-useful-licences/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Here are some useful licences.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>你相信正义吗</title>
+      <link>https://dongzhi.me/2020/07/18/do-you-believe-justice/</link>
+      <pubDate>Sat, 18 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/18/do-you-believe-justice/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;你相信正义吗？一段不错的视频，分享一下！&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>在CentOS7上如何下载Youtube视频?</title>
+      <link>https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/</link>
+      <pubDate>Sat, 11 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/</guid>
+      <description>下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。 前提条件： 一台国外的vps。</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 16 一个线程死锁的例子及问题排查</title>
+      <link>https://dongzhi.me/2020/07/09/jvm-learn-16/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/09/jvm-learn-16/</guid>
+      <description>&lt;h2 id=&#34;死锁示例&#34;&gt;死锁示例&lt;/h2&gt;
+&lt;p&gt;这次记录一个线程死锁的例子。直接上代码：&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 17 JVM内存排查相关命令用法</title>
+      <link>https://dongzhi.me/2020/07/09/jvm-learn-17/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/09/jvm-learn-17/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 18 JVM垃圾回收模型概述</title>
+      <link>https://dongzhi.me/2020/07/09/jvm-learn-18/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/09/jvm-learn-18/</guid>
+      <description>Java虚拟机的垃圾回收主要从三个方面去概括： 垃圾判断算法 GC(垃圾回收)算法 垃圾回收器的实现和选择 垃圾判断算法 垃圾判断算法，用于确定什么是垃圾内存。主要包括引用计数算法和根搜索算法。 引用计数算法 引用</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 19 JVM垃圾回收算法总结</title>
+      <link>https://dongzhi.me/2020/07/09/jvm-learn-19/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/09/jvm-learn-19/</guid>
+      <description>本文转载自JVM进阶之GC（四）垃圾收集器 。总结的非常好，拿过来学习一下。 上篇讲了下垃圾回收算法，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 20 Java Garbage Collection Basics</title>
+      <link>https://dongzhi.me/2020/07/09/jvm-learn-20/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/09/jvm-learn-20/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;本文原文地址&lt;a href=&#34;https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html#RequiredSoftware/&#34;&gt;：Java Garbage Collection Basics&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 08 线程上下文类加载器和Service Loader</title>
+      <link>https://dongzhi.me/2020/07/07/jvm-learn-08/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/07/jvm-learn-08/</guid>
+      <description>双亲委托机制的局限性 当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 09 类的字节码结构</title>
+      <link>https://dongzhi.me/2020/07/07/jvm-learn-09/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/07/jvm-learn-09/</guid>
+      <description>概念 字节码文件(.class)由JVM规范规定，主要包括魔数、JDK版本号(小版本和大版本)、常量池、类的访问标志、类的接口和父类信息、成员变量信息，方法信息等。 对于java中的数据类型，字节码中的对</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 10 类的虚方法机制</title>
+      <link>https://dongzhi.me/2020/07/07/jvm-learn-10/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/07/jvm-learn-10/</guid>
+      <description>基本概念总结 符号引用在类的加载阶段或者第一次引用时转换成直接引用，这叫做静态解析。一些符号引用则在每次运行时转换成直接引用，这种转换是动态链接，java的多态正是在此时实现的。 方法调用的几个指令： in</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 11 关于栈的指令操作的例子</title>
+      <link>https://dongzhi.me/2020/07/07/jvm-learn-11/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/07/jvm-learn-11/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;本例以一个简单的加减乘除的例子，来熟悉虚拟机的操作数栈的工作流程。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 12 从字节码看动态代理</title>
+      <link>https://dongzhi.me/2020/07/07/jvm-learn-12/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/07/jvm-learn-12/</guid>
+      <description>&lt;p&gt;动态代理是在运行时，通过反射机制实现动态代理，并且能够代理各种类型的对象。相对于静态代理，它的优势是不需要事先知道被代理的类型，可以与被代理的类解耦，同时可以大大减少代理类的数量。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 13 JVM的内存划分</title>
+      <link>https://dongzhi.me/2020/07/07/jvm-learn-13/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/07/jvm-learn-13/</guid>
+      <description>内存划分 java虚拟机的内存划分主要包括以下几个部分： 程序计数器：记录当前线程执行的下一条指令的地址，很小的空间 虚拟机栈(stack): 每个方法执行时候在栈里面创建一个栈帧，用于存储局部变量表，操作数</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 14 java堆的转储与Jvisualvm</title>
+      <link>https://dongzhi.me/2020/07/07/jvm-learn-14/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/07/jvm-learn-14/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;本文记录一下java队的转储和JVisualVM的用法。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 15 java栈的测试</title>
+      <link>https://dongzhi.me/2020/07/07/jvm-learn-15/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/07/jvm-learn-15/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;java的虚拟机栈中可能会存在java.lang.StackOverflowError这个错误，本例中通过方法的递归来模拟出该异常，进而研究其细节。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 01.类的加载之初体验</title>
+      <link>https://dongzhi.me/2020/07/06/jvm-learn-01/</link>
+      <pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/06/jvm-learn-01/</guid>
+      <description>在java中，类型（可以理解成class）的加载、连接和初始化都是在程序运行期间完成的。在运行期完成可以为程序开发人员提供了更大的灵活性。 加载：将已经存在的class文件加载到内存,查找并加载类的二进</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 02 常量的那点东西</title>
+      <link>https://dongzhi.me/2020/07/06/jvm-learn-02/</link>
+      <pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/06/jvm-learn-02/</guid>
+      <description>常量在编译阶段会存入调用这个常量的方法所在类的常量池中，本质上调用类并没有直接引用定义常量的类，因此并不会出发定义常量类的初始化。如果该常量值时动态生成的，则不会放在常量池中，会导致定义常量的类主动使</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 03 理解类的初始化的一个简单例子</title>
+      <link>https://dongzhi.me/2020/07/06/jvm-learn-03/</link>
+      <pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/06/jvm-learn-03/</guid>
+      <description>这是一个经典例子，很多面试题中出现过。首先引入正常的情况： 1package com.test.jvm.learn01; 2 3public class Main2 { 4 public static void main(String[] args) { 5 System.out.println(Counter.counter1); 6 System.out.println(Counter.counter2); 7 } 8} 9 10 11package com.test.jvm.learn01; 12 13public class Counter { 14 15 public static int counter1; 16 public static int counter2 = 0; 17 public static Counter counter = new Counter(); 18 19 private Counter() { 20 counter1++; 21 counter2++; 22 System.out.println(counter1); 23 System.out.println(counter2); 24 } 25 26 public static Counter</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 04 类加载器(一)</title>
+      <link>https://dongzhi.me/2020/07/06/jvm-learn-04/</link>
+      <pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/06/jvm-learn-04/</guid>
+      <description>基本概念 java的类加载器(class loader)，用来将java的字节码文件(.class)读取到内存中，生成一个Java.lang.Class对象。通过Class类的newInstance()方</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 05 类加载器(二)</title>
+      <link>https://dongzhi.me/2020/07/06/jvm-learn-05/</link>
+      <pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/06/jvm-learn-05/</guid>
+      <description>父子类加载器的命名空间 类A中引用了类B，那么加载类B时，由类A的类加载器按照双亲委托机制尝试加载。子类加载器加载的类可以引用父类加载器加载的类，而父类加载器加载的类不能引用子类加载器加载的类。 测试案例</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 06 类加载器(三)</title>
+      <link>https://dongzhi.me/2020/07/06/jvm-learn-06/</link>
+      <pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/06/jvm-learn-06/</guid>
+      <description>继续前面两篇类加载器的内容，本篇补充总结类加载的一些关键问题。 Java的类加载器本身如何被加载？ Java的根类加载器(Bootstrap Class Loader)，由C++编写，它是内建在JVM方法区内的一块字</description>
+    </item>
+    
+    <item>
+      <title>JVM Learn 07 Launcher源码解析</title>
+      <link>https://dongzhi.me/2020/07/06/jvm-learn-07/</link>
+      <pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/06/jvm-learn-07/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;这次重新阅读了一下sun.misc.Launcher这个类的源码，这里总结一下。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Shortcode用法</title>
+      <link>https://dongzhi.me/2020/07/05/shortcode%E7%94%A8%E6%B3%95/</link>
+      <pubDate>Sun, 05 Jul 2020 15:38:00 +0800</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/05/shortcode%E7%94%A8%E6%B3%95/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;本文汇总一下hugo常用的shortcode。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>git仓库初始化</title>
+      <link>https://dongzhi.me/2020/07/04/git-init-repo/</link>
+      <pubDate>Sat, 04 Jul 2020 15:12:59 +0800</pubDate>
+      
+      <guid>https://dongzhi.me/2020/07/04/git-init-repo/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Command line instructions
+You can also upload existing files from your computer using the instructions below.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Syntax Highlighting</title>
+      <link>https://dongzhi.me/2020/04/30/syntax-highlighting/</link>
+      <pubDate>Thu, 30 Apr 2020 16:01:23 +0800</pubDate>
+      
+      <guid>https://dongzhi.me/2020/04/30/syntax-highlighting/</guid>
+      <description>&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;helloWorld&lt;/span&gt; () {
+&lt;span style=&#34;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2&lt;/span&gt;  &lt;span style=&#34;color:#a6e22e&#34;&gt;alert&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Hello, World!&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3&lt;/span&gt;}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+    </item>
+    
+    <item>
+      <title>Markdown Syntax</title>
+      <link>https://dongzhi.me/2020/01/24/markdown-syntax/</link>
+      <pubDate>Fri, 24 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/01/24/markdown-syntax/</guid>
+      <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Placeholder Text</title>
+      <link>https://dongzhi.me/2019/12/17/placeholder-text/</link>
+      <pubDate>Tue, 17 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2019/12/17/placeholder-text/</guid>
+      <description>&lt;p&gt;Lorem est tota propiore conpellat pectoribus de pectora summo.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Emoji Support</title>
+      <link>https://dongzhi.me/2019/12/03/emoji-support/</link>
+      <pubDate>Tue, 03 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2019/12/03/emoji-support/</guid>
+      <description>Emoji can be enabled in a Hugo project in a number of ways.
 The emojify function can be called directly in templates or Inline Shortcodes.
 To enable emoji globally, set enableEmoji to true in your site’s configuration and then you can type emoji shorthand codes directly in content files; e.g.
 🙈 :see_no_evil: 🙉 :hear_no_evil: 🙊 :speak_no_evil:
 The Emoji cheat sheet is a useful reference for emoji shorthand codes.
-N.B. The above steps enable Unicode Standard emoji characters and sequences in Hugo, however the rendering of these glyphs depends on the browser and the platform. To style the emoji you can either use a third party emoji font or a font stack; e.</description></item><item><title>惊艳的danny MacAskill (一)</title><link>https://dongzhi.me/2019/08/13/awesome_danny_macaskill_01/</link><pubDate>Tue, 13 Aug 2019 22:06:46 +0800</pubDate><guid>https://dongzhi.me/2019/08/13/awesome_danny_macaskill_01/</guid><description>Danny MacAskill的作品精选！神一样的人物，神一样的存在！ Cascadia The Ridge</description></item><item><title>Inspired Bicycles</title><link>https://dongzhi.me/2019/08/13/inspired_bicycles/</link><pubDate>Tue, 13 Aug 2019 21:51:22 +0800</pubDate><guid>https://dongzhi.me/2019/08/13/inspired_bicycles/</guid><description>一则骑单车飞檐走壁的视频，许多年以前在优酷上偶然间看的，作者Danny MacAskill 真乃神人也！背景音乐也十分赞，十多年前特别喜欢听。</description></item><item><title>惊艳的danny MacAskill</title><link>https://dongzhi.me/2019/01/29/%E6%83%8A%E8%89%B3%E7%9A%84danny-macaskill/</link><pubDate>Tue, 29 Jan 2019 00:24:49 +0000</pubDate><guid>https://dongzhi.me/2019/01/29/%E6%83%8A%E8%89%B3%E7%9A%84danny-macaskill/</guid><description>Danny MacAskill的作品精选！神一样的人物，神一样的存在！ Cascadia The Ridge Inspired Bicycles</description></item><item><title>MyBatis之缓存原理</title><link>https://dongzhi.me/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/</link><pubDate>Mon, 28 Jan 2019 23:03:51 +0000</pubDate><guid>https://dongzhi.me/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/</guid><description>本篇文章记录MyBatis的缓存原理学习笔记。掌握缓存机制对于学习和使用MyBatis框架是十分有好处的。这是以前学习mybatis时记录的笔记，晚上翻了出来，就贴在这里。 缓存机制 MyBatis默认定</description></item><item><title>Centos7下科学上网的方法</title><link>https://dongzhi.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/</link><pubDate>Fri, 11 Jan 2019 09:00:52 +0000</pubDate><guid>https://dongzhi.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/</guid><description>本文就介绍一下如何在vps上搭建shadowsocks，让我们能够访问这些网站，以便于我们查阅资料，切勿用做其他不法用途。 常见VPS的服务商 活跃于大街小巷的搬瓦工，也是最适合新手使用的： https://bwh1.net/ （支持支付宝</description></item><item><title>码农使用电脑的日常</title><link>https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/</link><pubDate>Wed, 09 Jan 2019 18:43:07 +0000</pubDate><guid>https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/</guid><description>整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充 Github clone访问太慢 在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启s</description></item><item><title>CentOS软件的常用安装命令汇总</title><link>https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/</link><pubDate>Sun, 16 Dec 2018 23:41:20 +0000</pubDate><guid>https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/</guid><description>记录一下CentOS上常用软件的安装命令。备以后查用，将持续更新。我经常使用的服务器是CentOS7的64位版，有时候也在vps上使CentOS6，如果该服务商没有提供7的话。 shadowsocks 使用root用户登录，</description></item><item><title>同步异步和阻塞非阻塞的理解</title><link>https://dongzhi.me/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/</link><pubDate>Sun, 16 Dec 2018 20:58:22 +0000</pubDate><guid>https://dongzhi.me/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/</guid><description>同步、异步、阻塞和非阻塞这四个概念经常穿梭于IT教材和参考资料中，我也困惑久矣，晚上在知乎看到网友的一些讲解，写的非常好，于是特地记录总结一下。 我的理解 术语对比 同步和异步，描述的是请求方和响应方的通信</description></item></channel></rss>
+ N.B. The above steps enable Unicode Standard emoji characters and sequences in Hugo, however the rendering of these glyphs depends on the browser and the platform. To style the emoji you can either use a third party emoji font or a font stack; e.</description>
+    </item>
+    
+    <item>
+      <title>惊艳的danny MacAskill (一)</title>
+      <link>https://dongzhi.me/2019/08/13/awesome_danny_macaskill_01/</link>
+      <pubDate>Tue, 13 Aug 2019 22:06:46 +0800</pubDate>
+      
+      <guid>https://dongzhi.me/2019/08/13/awesome_danny_macaskill_01/</guid>
+      <description>Danny MacAskill的作品精选！神一样的人物，神一样的存在！ Cascadia The Ridge</description>
+    </item>
+    
+    <item>
+      <title>Inspired Bicycles</title>
+      <link>https://dongzhi.me/2019/08/13/inspired_bicycles/</link>
+      <pubDate>Tue, 13 Aug 2019 21:51:22 +0800</pubDate>
+      
+      <guid>https://dongzhi.me/2019/08/13/inspired_bicycles/</guid>
+      <description>一则骑单车飞檐走壁的视频，许多年以前在优酷上偶然间看的，作者Danny MacAskill 真乃神人也！背景音乐也十分赞，十多年前特别喜欢听。</description>
+    </item>
+    
+    <item>
+      <title>惊艳的danny MacAskill</title>
+      <link>https://dongzhi.me/2019/01/29/%E6%83%8A%E8%89%B3%E7%9A%84danny-macaskill/</link>
+      <pubDate>Tue, 29 Jan 2019 00:24:49 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2019/01/29/%E6%83%8A%E8%89%B3%E7%9A%84danny-macaskill/</guid>
+      <description>Danny MacAskill的作品精选！神一样的人物，神一样的存在！ Cascadia The Ridge Inspired Bicycles</description>
+    </item>
+    
+    <item>
+      <title>MyBatis之缓存原理</title>
+      <link>https://dongzhi.me/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/</link>
+      <pubDate>Mon, 28 Jan 2019 23:03:51 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/</guid>
+      <description>本篇文章记录MyBatis的缓存原理学习笔记。掌握缓存机制对于学习和使用MyBatis框架是十分有好处的。这是以前学习mybatis时记录的笔记，晚上翻了出来，就贴在这里。 缓存机制 MyBatis默认定</description>
+    </item>
+    
+    <item>
+      <title>Centos7下科学上网的方法</title>
+      <link>https://dongzhi.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Fri, 11 Jan 2019 09:00:52 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/</guid>
+      <description>本文就介绍一下如何在vps上搭建shadowsocks，让我们能够访问这些网站，以便于我们查阅资料，切勿用做其他不法用途。 常见VPS的服务商 活跃于大街小巷的搬瓦工，也是最适合新手使用的： https://bwh1.net/ （支持支付宝</description>
+    </item>
+    
+    <item>
+      <title>码农使用电脑的日常</title>
+      <link>https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/</link>
+      <pubDate>Wed, 09 Jan 2019 18:43:07 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/</guid>
+      <description>整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充 Github clone访问太慢 在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启s</description>
+    </item>
+    
+    <item>
+      <title>CentOS软件的常用安装命令汇总</title>
+      <link>https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/</link>
+      <pubDate>Sun, 16 Dec 2018 23:41:20 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/</guid>
+      <description>记录一下CentOS上常用软件的安装命令。备以后查用，将持续更新。我经常使用的服务器是CentOS7的64位版，有时候也在vps上使CentOS6，如果该服务商没有提供7的话。 shadowsocks 使用root用户登录，</description>
+    </item>
+    
+    <item>
+      <title>同步异步和阻塞非阻塞的理解</title>
+      <link>https://dongzhi.me/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/</link>
+      <pubDate>Sun, 16 Dec 2018 20:58:22 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/</guid>
+      <description>同步、异步、阻塞和非阻塞这四个概念经常穿梭于IT教材和参考资料中，我也困惑久矣，晚上在知乎看到网友的一些讲解，写的非常好，于是特地记录总结一下。 我的理解 术语对比 同步和异步，描述的是请求方和响应方的通信</description>
+    </item>
+    
+  </channel>
+</rss>
