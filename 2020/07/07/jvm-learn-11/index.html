@@ -1,130 +1,290 @@
-<!doctype html><html lang=en><head><title>JVM Learn 11 关于栈的指令操作的例子 :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="本例以一个简单的加减乘除的例子，来熟悉虚拟机的操作数栈的工作流程。"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2020/07/07/jvm-learn-11/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content="John Doe"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="JVM Learn 11 关于栈的指令操作的例子 :: DongZhi.ME"><meta property="og:description" content="本例以一个简单的加减乘除的例子，来熟悉虚拟机的操作数栈的工作流程。"><meta property="og:url" content="https://dongzhi.me/2020/07/07/jvm-learn-11/"><meta property="og:site_name" content="JVM Learn 11 关于栈的指令操作的例子"><meta property="og:image" content="https://dongzhi.me/"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:published_time" content="2020-07-07 00:00:00 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2020/07/07/jvm-learn-11/>JVM Learn 11 关于栈的指令操作的例子</a></h1><div class=post-meta><span class=post-date>2020-07-07</span>
-<span class=post-author>::
-John Doe</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/jvm/>jvm</a>&nbsp;</span><div class=post-content><div><blockquote><p>本例以一个简单的加减乘除的例子，来熟悉虚拟机的操作数栈的工作流程。</p></blockquote><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> test<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TestOperate</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>calc</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>        <span style=color:#66d9ef>int</span> a <span style=color:#f92672>=</span> 1<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>        <span style=color:#66d9ef>int</span> b <span style=color:#f92672>=</span> 2<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>        <span style=color:#66d9ef>int</span> c <span style=color:#f92672>=</span> 3<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>        <span style=color:#66d9ef>int</span> d <span style=color:#f92672>=</span> 4<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>        <span style=color:#66d9ef>int</span> r <span style=color:#f92672>=</span> <span style=color:#f92672>(</span>a <span style=color:#f92672>-</span> b <span style=color:#f92672>+</span> c<span style=color:#f92672>)</span> <span style=color:#f92672>*</span> d<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>        <span style=color:#66d9ef>return</span> r<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span><span style=color:#f92672>}</span>
-</code></pre></div><p>该类对应的字节码指令如下：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>Classfile /D:/develop/IdeaProjects/learning/test01/target/classes/test/TestOperate.class
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>  Last modified 2020-1-30; size <span style=color:#ae81ff>453</span> bytes
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>  MD5 checksum d2d815a9c2ff7ca0d14e3d492a46b05c
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>  Compiled from <span style=color:#e6db74>&#34;TestOperate.java&#34;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>public class test.TestOperate
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>  minor version: <span style=color:#ae81ff>0</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>  major version: <span style=color:#ae81ff>51</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>  flags: ACC_PUBLIC, ACC_SUPER
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>Constant pool:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>   <span style=color:#75715e>#1 = Methodref          #3.#21         // java/lang/Object.&#34;&lt;init&gt;&#34;:()V</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>   <span style=color:#75715e>#2 = Class              #22            // test/TestOperate</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>   <span style=color:#75715e>#3 = Class              #23            // java/lang/Object</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>   <span style=color:#75715e>#4 = Utf8               &lt;init&gt;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>   <span style=color:#75715e>#5 = Utf8               ()V</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>   <span style=color:#75715e>#6 = Utf8               Code</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>   <span style=color:#75715e>#7 = Utf8               LineNumberTable</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>   <span style=color:#75715e>#8 = Utf8               LocalVariableTable</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>   <span style=color:#75715e>#9 = Utf8               this</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>  <span style=color:#75715e>#10 = Utf8               Ltest/TestOperate;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>  <span style=color:#75715e>#11 = Utf8               calc</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>  <span style=color:#75715e>#12 = Utf8               ()I</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>  <span style=color:#75715e>#13 = Utf8               a</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>  <span style=color:#75715e>#14 = Utf8               I</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>  <span style=color:#75715e>#15 = Utf8               b</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>  <span style=color:#75715e>#16 = Utf8               c</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>  <span style=color:#75715e>#17 = Utf8               d</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>  <span style=color:#75715e>#18 = Utf8               r</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span>  <span style=color:#75715e>#19 = Utf8               SourceFile</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span>  <span style=color:#75715e>#20 = Utf8               TestOperate.java</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">30</span>  <span style=color:#75715e>#21 = NameAndType        #4:#5          // &#34;&lt;init&gt;&#34;:()V</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">31</span>  <span style=color:#75715e>#22 = Utf8               test/TestOperate</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">32</span>  <span style=color:#75715e>#23 = Utf8               java/lang/Object</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">33</span><span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">34</span>  public test.TestOperate<span style=color:#f92672>()</span>;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">35</span>    descriptor: <span style=color:#f92672>()</span>V
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">36</span>    flags: ACC_PUBLIC
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">37</span>    Code:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">38</span>      stack<span style=color:#f92672>=</span>1, locals<span style=color:#f92672>=</span>1, args_size<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">39</span>         0: aload_0
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">40</span>         1: invokespecial <span style=color:#75715e>#1                  // Method java/lang/Object.&#34;&lt;init&gt;&#34;:()V</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">41</span>         4: <span style=color:#66d9ef>return</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">42</span>      LineNumberTable:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">43</span>        line 3: <span style=color:#ae81ff>0</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">44</span>      LocalVariableTable:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">45</span>        Start  Length  Slot  Name   Signature
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">46</span>            <span style=color:#ae81ff>0</span>       <span style=color:#ae81ff>5</span>     <span style=color:#ae81ff>0</span>  this   Ltest/TestOperate;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">47</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">48</span>  public int calc<span style=color:#f92672>()</span>;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">49</span>    descriptor: <span style=color:#f92672>()</span>I
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">50</span>    flags: ACC_PUBLIC
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">51</span>    Code:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">52</span>      stack<span style=color:#f92672>=</span>2, locals<span style=color:#f92672>=</span>6, args_size<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">53</span>         0: iconst_1
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">54</span>         1: istore_1
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">55</span>         2: iconst_2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">56</span>         3: istore_2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">57</span>         4: iconst_3
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">58</span>         5: istore_3
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">59</span>         6: iconst_4
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">60</span>         7: istore        <span style=color:#ae81ff>4</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">61</span>         9: iload_1
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">62</span>        10: iload_2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">63</span>        11: isub
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">64</span>        12: iload_3
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">65</span>        13: iadd
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">66</span>        14: iload         <span style=color:#ae81ff>4</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">67</span>        16: imul
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">68</span>        17: istore        <span style=color:#ae81ff>5</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">69</span>        19: iload         <span style=color:#ae81ff>5</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">70</span>        21: ireturn
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">71</span>      LineNumberTable:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">72</span>        line 5: <span style=color:#ae81ff>0</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">73</span>        line 6: <span style=color:#ae81ff>2</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">74</span>        line 7: <span style=color:#ae81ff>4</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">75</span>        line 8: <span style=color:#ae81ff>6</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">76</span>        line 9: <span style=color:#ae81ff>9</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">77</span>        line 10: <span style=color:#ae81ff>19</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">78</span>      LocalVariableTable:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">79</span>        Start  Length  Slot  Name   Signature
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">80</span>            <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>22</span>     <span style=color:#ae81ff>0</span>  this   Ltest/TestOperate;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">81</span>            <span style=color:#ae81ff>2</span>      <span style=color:#ae81ff>20</span>     <span style=color:#ae81ff>1</span>     a   I
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">82</span>            <span style=color:#ae81ff>4</span>      <span style=color:#ae81ff>18</span>     <span style=color:#ae81ff>2</span>     b   I
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">83</span>            <span style=color:#ae81ff>6</span>      <span style=color:#ae81ff>16</span>     <span style=color:#ae81ff>3</span>     c   I
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">84</span>            <span style=color:#ae81ff>9</span>      <span style=color:#ae81ff>13</span>     <span style=color:#ae81ff>4</span>     d   I
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">85</span>           <span style=color:#ae81ff>19</span>       <span style=color:#ae81ff>3</span>     <span style=color:#ae81ff>5</span>     r   I
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">86</span><span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">87</span>SourceFile: <span style=color:#e6db74>&#34;TestOperate.java&#34;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">88</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>JVM Learn 11 关于栈的指令操作的例子 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content=" 本例以一个简单的加减乘除的例子，来熟悉虚拟机的操作数栈的工作流程。
+" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/07/07/jvm-learn-11/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="John Doe" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="JVM Learn 11 关于栈的指令操作的例子 :: DongZhi.ME" property="og:title"/>
+<meta content=" 本例以一个简单的加减乘除的例子，来熟悉虚拟机的操作数栈的工作流程。
+" property="og:description"/>
+<meta content="https://dongzhi.me/2020/07/07/jvm-learn-11/" property="og:url"/>
+<meta content="JVM Learn 11 关于栈的指令操作的例子" property="og:site_name"/>
+<meta content="https://dongzhi.me/" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-07-07 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-11/">JVM Learn 11 关于栈的指令操作的例子</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-07-07 
+      </span>
+<span class="post-author">::
+      John Doe
+    </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
+    
+  </span>
+<div class="post-content"><div>
+<blockquote>
+<p>本例以一个简单的加减乘除的例子，来熟悉虚拟机的操作数栈的工作流程。</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> test<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestOperate</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">calc</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>        <span style="color:#66d9ef">int</span> a <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>        <span style="color:#66d9ef">int</span> b <span style="color:#f92672">=</span> 2<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>        <span style="color:#66d9ef">int</span> c <span style="color:#f92672">=</span> 3<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>        <span style="color:#66d9ef">int</span> d <span style="color:#f92672">=</span> 4<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        <span style="color:#66d9ef">int</span> r <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>a <span style="color:#f92672">-</span> b <span style="color:#f92672">+</span> c<span style="color:#f92672">)</span> <span style="color:#f92672">*</span> d<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        <span style="color:#66d9ef">return</span> r<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span style="color:#f92672">}</span>
+</code></pre></div><p>该类对应的字节码指令如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>Classfile /D:/develop/IdeaProjects/learning/test01/target/classes/test/TestOperate.class
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>  Last modified 2020-1-30; size <span style="color:#ae81ff">453</span> bytes
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>  MD5 checksum d2d815a9c2ff7ca0d14e3d492a46b05c
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>  Compiled from <span style="color:#e6db74">"TestOperate.java"</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>public class test.TestOperate
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>  minor version: <span style="color:#ae81ff">0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>  major version: <span style="color:#ae81ff">51</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  flags: ACC_PUBLIC, ACC_SUPER
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>Constant pool:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>   <span style="color:#75715e">#1 = Methodref          #3.#21         // java/lang/Object."&lt;init&gt;":()V</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>   <span style="color:#75715e">#2 = Class              #22            // test/TestOperate</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>   <span style="color:#75715e">#3 = Class              #23            // java/lang/Object</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>   <span style="color:#75715e">#4 = Utf8               &lt;init&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>   <span style="color:#75715e">#5 = Utf8               ()V</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>   <span style="color:#75715e">#6 = Utf8               Code</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>   <span style="color:#75715e">#7 = Utf8               LineNumberTable</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>   <span style="color:#75715e">#8 = Utf8               LocalVariableTable</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>   <span style="color:#75715e">#9 = Utf8               this</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>  <span style="color:#75715e">#10 = Utf8               Ltest/TestOperate;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>  <span style="color:#75715e">#11 = Utf8               calc</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>  <span style="color:#75715e">#12 = Utf8               ()I</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>  <span style="color:#75715e">#13 = Utf8               a</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>  <span style="color:#75715e">#14 = Utf8               I</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>  <span style="color:#75715e">#15 = Utf8               b</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>  <span style="color:#75715e">#16 = Utf8               c</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>  <span style="color:#75715e">#17 = Utf8               d</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>  <span style="color:#75715e">#18 = Utf8               r</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>  <span style="color:#75715e">#19 = Utf8               SourceFile</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>  <span style="color:#75715e">#20 = Utf8               TestOperate.java</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>  <span style="color:#75715e">#21 = NameAndType        #4:#5          // "&lt;init&gt;":()V</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>  <span style="color:#75715e">#22 = Utf8               test/TestOperate</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>  <span style="color:#75715e">#23 = Utf8               java/lang/Object</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span><span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>  public test.TestOperate<span style="color:#f92672">()</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>    descriptor: <span style="color:#f92672">()</span>V
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>    flags: ACC_PUBLIC
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>    Code:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>      stack<span style="color:#f92672">=</span>1, locals<span style="color:#f92672">=</span>1, args_size<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>         0: aload_0
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>         1: invokespecial <span style="color:#75715e">#1                  // Method java/lang/Object."&lt;init&gt;":()V</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>         4: <span style="color:#66d9ef">return</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span>      LineNumberTable:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span>        line 3: <span style="color:#ae81ff">0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span>      LocalVariableTable:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span>        Start  Length  Slot  Name   Signature
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span>            <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">5</span>     <span style="color:#ae81ff">0</span>  this   Ltest/TestOperate;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48</span>  public int calc<span style="color:#f92672">()</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span>    descriptor: <span style="color:#f92672">()</span>I
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span>    flags: ACC_PUBLIC
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>    Code:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span>      stack<span style="color:#f92672">=</span>2, locals<span style="color:#f92672">=</span>6, args_size<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53</span>         0: iconst_1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54</span>         1: istore_1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55</span>         2: iconst_2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56</span>         3: istore_2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57</span>         4: iconst_3
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58</span>         5: istore_3
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59</span>         6: iconst_4
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60</span>         7: istore        <span style="color:#ae81ff">4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61</span>         9: iload_1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62</span>        10: iload_2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">63</span>        11: isub
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">64</span>        12: iload_3
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">65</span>        13: iadd
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">66</span>        14: iload         <span style="color:#ae81ff">4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">67</span>        16: imul
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">68</span>        17: istore        <span style="color:#ae81ff">5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">69</span>        19: iload         <span style="color:#ae81ff">5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">70</span>        21: ireturn
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">71</span>      LineNumberTable:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">72</span>        line 5: <span style="color:#ae81ff">0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">73</span>        line 6: <span style="color:#ae81ff">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">74</span>        line 7: <span style="color:#ae81ff">4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">75</span>        line 8: <span style="color:#ae81ff">6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">76</span>        line 9: <span style="color:#ae81ff">9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">77</span>        line 10: <span style="color:#ae81ff">19</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">78</span>      LocalVariableTable:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">79</span>        Start  Length  Slot  Name   Signature
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">80</span>            <span style="color:#ae81ff">0</span>      <span style="color:#ae81ff">22</span>     <span style="color:#ae81ff">0</span>  this   Ltest/TestOperate;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">81</span>            <span style="color:#ae81ff">2</span>      <span style="color:#ae81ff">20</span>     <span style="color:#ae81ff">1</span>     a   I
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">82</span>            <span style="color:#ae81ff">4</span>      <span style="color:#ae81ff">18</span>     <span style="color:#ae81ff">2</span>     b   I
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">83</span>            <span style="color:#ae81ff">6</span>      <span style="color:#ae81ff">16</span>     <span style="color:#ae81ff">3</span>     c   I
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">84</span>            <span style="color:#ae81ff">9</span>      <span style="color:#ae81ff">13</span>     <span style="color:#ae81ff">4</span>     d   I
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">85</span>           <span style="color:#ae81ff">19</span>       <span style="color:#ae81ff">3</span>     <span style="color:#ae81ff">5</span>     r   I
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">86</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">87</span>SourceFile: <span style="color:#e6db74">"TestOperate.java"</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">88</span>
 </code></pre></div><p>下面重点关注clac方法的方法体指令：
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_11_byte_001.png alt=image></p><p><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_11_byte_002.png alt=image></p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>   stack=2, locals=6, args_size=1
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>         0: iconst_1
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>         1: istore_1
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>         2: iconst_2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>         3: istore_2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>         4: iconst_3
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>         5: istore_3
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>         6: iconst_4
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>         7: istore        4
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>         9: iload_1
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>        10: iload_2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>        11: isub
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>        12: iload_3
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>        13: iadd
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>        14: iload         4
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>        16: imul
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>        17: istore        5
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>        19: iload         5
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>        21: ireturn
+<img alt="image" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_11_byte_001.png"/></p>
+<p><img alt="image" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_11_byte_002.png"/></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>   stack=2, locals=6, args_size=1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>         0: iconst_1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>         1: istore_1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>         2: iconst_2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>         3: istore_2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>         4: iconst_3
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>         5: istore_3
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>         6: iconst_4
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>         7: istore        4
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>         9: iload_1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        10: iload_2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        11: isub
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>        12: iload_3
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>        13: iadd
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>        14: iload         4
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>        16: imul
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>        17: istore        5
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>        19: iload         5
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>        21: ireturn
 </code></pre></div><p>栈深为2，局部变量为6：
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_11_byte_003.png alt=image></p><ol><li>iconst_1:把整型1压入栈顶</li><li>istore_1：弹出栈顶元素，将栈顶元素的值设置到局部变量表中索引为1的变量中，也就是变量a的值现在为1</li><li>iconst_2：将整型2压入栈顶</li><li>istore_2：弹出栈顶元素，将其值2设置给局部变量表中的第2个变量b，也就是b=2</li><li>iconst_3：将3压入栈顶</li><li>istore_3：弹出栈顶元素3，将其设置到局部变量表的第3个变量c，也就是c=3</li><li>iconst_4：将4压入栈顶</li><li>istore 4：将栈顶元素弹出，将其值4设置到局部变量表的第4个元素d，也就是d=4</li><li>iload_1：iload表示将局部变量中的值压入栈顶，这里是把第一个变量a的值1压入栈顶</li><li>iload_2：将第二个变量的值2压入栈顶，此时已经入栈的值1进入栈底</li><li>isub：弹出2个元素进行相减，将结果压入栈顶，这里依次弹出2和1，结果1-2=-1压入栈顶</li><li>iload_3：将变量c的值3压入栈顶，此时已经入栈的元素-1进入栈底</li><li>iadd：弹出2个元素相加，将结果压入栈顶，也就是此时栈顶元素的值是2</li><li>iload 4：将第四个变量d的值4压入栈顶，这时栈顶为4，栈底为2</li><li>imul：弹出2个元素，相乘后将结果压入栈顶，也就是此时栈顶为8，栈顶为空</li><li>istore 5：将栈顶元素的值8弹出，设置到第5个局部变量r</li><li>iload 5：将第5个局部变量r的值8压入栈顶</li><li>ireturn：返回方法的结果，也就是弹出栈顶元素8，将其压入调用方法栈帧的操作数栈的栈顶，当前方法的操作数栈的其他元素将会全部被丢弃。</li></ol></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2020/07/07/jvm-learn-10/><span class=button__icon>←</span>
-<span class=button__text>JVM Learn 10 类的虚方法机制</span></a></span>
-<span class="button next"><a href=https://dongzhi.me/2020/07/07/jvm-learn-12/><span class=button__text>JVM Learn 12 从字节码看动态代理</span>
-<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
-<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
-<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
+<img alt="image" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_11_byte_003.png"/></p>
+<ol>
+<li>iconst_1:把整型1压入栈顶</li>
+<li>istore_1：弹出栈顶元素，将栈顶元素的值设置到局部变量表中索引为1的变量中，也就是变量a的值现在为1</li>
+<li>iconst_2：将整型2压入栈顶</li>
+<li>istore_2：弹出栈顶元素，将其值2设置给局部变量表中的第2个变量b，也就是b=2</li>
+<li>iconst_3：将3压入栈顶</li>
+<li>istore_3：弹出栈顶元素3，将其设置到局部变量表的第3个变量c，也就是c=3</li>
+<li>iconst_4：将4压入栈顶</li>
+<li>istore  4：将栈顶元素弹出，将其值4设置到局部变量表的第4个元素d，也就是d=4</li>
+<li>iload_1：iload表示将局部变量中的值压入栈顶，这里是把第一个变量a的值1压入栈顶</li>
+<li>iload_2：将第二个变量的值2压入栈顶，此时已经入栈的值1进入栈底</li>
+<li>isub：弹出2个元素进行相减，将结果压入栈顶，这里依次弹出2和1，结果1-2=-1压入栈顶</li>
+<li>iload_3：将变量c的值3压入栈顶，此时已经入栈的元素-1进入栈底</li>
+<li>iadd：弹出2个元素相加，将结果压入栈顶，也就是此时栈顶元素的值是2</li>
+<li>iload 4：将第四个变量d的值4压入栈顶，这时栈顶为4，栈底为2</li>
+<li>imul：弹出2个元素，相乘后将结果压入栈顶，也就是此时栈顶为8，栈顶为空</li>
+<li>istore  5：将栈顶元素的值8弹出，设置到第5个局部变量r</li>
+<li>iload   5：将第5个局部变量r的值8压入栈顶</li>
+<li>ireturn：返回方法的结果，也就是弹出栈顶元素8，将其压入调用方法栈帧的操作数栈的栈顶，当前方法的操作数栈的其他元素将会全部被丢弃。</li>
+</ol>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-10/">
+<span class="button__icon">←</span>
+<span class="button__text">JVM Learn 10 类的虚方法机制</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-12/">
+<span class="button__text">JVM Learn 12 从字节码看动态代理</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<div id="hyvor-talk-view"></div>
+<script type="text/javascript">
+		var HYVOR_TALK_WEBSITE = 1505; 
+		var HYVOR_TALK_CONFIG = {
+        url: false,
+        id: false
+		};
+	  </script>
+<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

@@ -1,95 +1,268 @@
-<!doctype html><html lang=en><head><title>JVM Learn 10 类的虚方法机制 :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="基本概念总结 符号引用在类的加载阶段或者第一次引用时转换成直接引用，这叫做静态解析。一些符号引用则在每次运行时转换成直接引用，这种转换是动态链接，java的多态正是在此时实现的。 方法调用的几个指令： in"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2020/07/07/jvm-learn-10/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content="John Doe"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="JVM Learn 10 类的虚方法机制 :: DongZhi.ME"><meta property="og:description" content="基本概念总结 符号引用在类的加载阶段或者第一次引用时转换成直接引用，这叫做静态解析。一些符号引用则在每次运行时转换成直接引用，这种转换是动态链接，java的多态正是在此时实现的。 方法调用的几个指令： in"><meta property="og:url" content="https://dongzhi.me/2020/07/07/jvm-learn-10/"><meta property="og:site_name" content="JVM Learn 10 类的虚方法机制"><meta property="og:image" content="https://dongzhi.me/"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:published_time" content="2020-07-07 00:00:00 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2020/07/07/jvm-learn-10/>JVM Learn 10 类的虚方法机制</a></h1><div class=post-meta><span class=post-date>2020-07-07</span>
-<span class=post-author>::
-John Doe</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/jvm/>jvm</a>&nbsp;</span><div class=post-content><div><h1 id=基本概念总结>基本概念总结<a href=#基本概念总结 class=hanchor arialabel=Anchor>&#8983;</a></h1><p>符号引用在类的加载阶段或者第一次引用时转换成直接引用，这叫做静态解析。一些符号引用则在每次运行时转换成直接引用，这种转换是动态链接，java的多态正是在此时实现的。</p><p>方法调用的几个指令：</p><ul><li>invokeinterface:调用接口中的方法</li><li>invokestatic:调用静态方法</li><li>invokespecial:调用自己的私有方法、构造方法和父类的方法</li><li>invokevitural:调用虚方法，运行期间动态查找虚方法</li><li>invokedynamic:动态调用方法</li></ul><p>静态解析的四种情形：</p><ul><li>静态方法</li><li>父类方法</li><li>构造方法</li><li>私有方法
-以上四种方法称为非虚方法，他们是在类加载阶段将符号引用转换成直接引用。</li></ul><h1 id=重载的静态分派>重载的静态分派<a href=#重载的静态分派 class=hanchor arialabel=Anchor>&#8983;</a></h1><p>如果类B继承类A，对于A a = new B();变量a的静态类型是A，变量a的实际类型是B。变量的静态类型永远不会改变，而变量引用所指向的实际类型可以发生变化。</p><p>对于如下例子：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> test<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TestOverload</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>    <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>test</span><span style=color:#f92672>(</span>GrandFather gf<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;test GrandFather!&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>    <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>test</span><span style=color:#f92672>(</span>Father f<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;test Father!&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>    <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>test</span><span style=color:#f92672>(</span>Son s<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;test Son&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>        TestOverload testOverload <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> TestOverload<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>        GrandFather g1 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> GrandFather<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>        GrandFather g2 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Father<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>        GrandFather g3 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Son<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>        testOverload<span style=color:#f92672>.</span><span style=color:#a6e22e>test</span><span style=color:#f92672>(</span>g1<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>        testOverload<span style=color:#f92672>.</span><span style=color:#a6e22e>test</span><span style=color:#f92672>(</span>g2<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>        testOverload<span style=color:#f92672>.</span><span style=color:#a6e22e>test</span><span style=color:#f92672>(</span>g3<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span><span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>GrandFather</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span><span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">30</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">31</span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Father</span> <span style=color:#66d9ef>extends</span> GrandFather <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">32</span><span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">33</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">34</span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Son</span> <span style=color:#66d9ef>extends</span> Father <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">35</span><span style=color:#f92672>}</span>
-</code></pre></div><p>输出结果是：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>test GrandFather!
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>test GrandFather!
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>test GrandFather!
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>Process finished with exit code 0
-</code></pre></div><p>从输出结果可以看出，类的方法重载是一种静态分派，在编译时已经可以确定方法调用。也就是查找方法时，根据传入参数的静态类型来选定方法。本例中g1，g2和g3的静态类型都是GrandFather，所以TestOverload的第一个方法被调用。</p><h1 id=重写的动态分派>重写的动态分派<a href=#重写的动态分派 class=hanchor arialabel=Anchor>&#8983;</a></h1><p>重新是一种动态分派。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> test<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TestOverride</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>        Fruit apple <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Apple<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>        apple<span style=color:#f92672>.</span><span style=color:#a6e22e>test</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>        Fruit orange <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Orange<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>        orange<span style=color:#f92672>.</span><span style=color:#a6e22e>test</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span><span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Fruit</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>    <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>test</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;test Fruit&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span><span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Apple</span> <span style=color:#66d9ef>extends</span> Fruit <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>    <span style=color:#a6e22e>@Override</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>    <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>test</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;test Apple&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span><span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Orange</span> <span style=color:#66d9ef>extends</span> Fruit <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span>    <span style=color:#a6e22e>@Override</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">30</span>    <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>test</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">31</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;test Orange&#34;</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">32</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">33</span><span style=color:#f92672>}</span>
-</code></pre></div><p>main方法的4行代码对于的字节码指令如下：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span> 0 new #2 &lt;test/Apple&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span> 3 dup
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span> 4 invokespecial #3 &lt;test/Apple.&lt;init&gt;&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span> 7 astore_1
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span> 8 aload_1
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span> 9 invokevirtual #4 &lt;test/Fruit.test&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>12 new #5 &lt;test/Orange&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>15 dup
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>16 invokespecial #6 &lt;test/Orange.&lt;init&gt;&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>19 astore_2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>20 aload_2
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>21 invokevirtual #4 &lt;test/Fruit.test&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>24 return
-</code></pre></div><p>解释如下：</p><ol><li>new #2 &lt;test/Apple> 表示创建对象，该指令在堆上为该对象分配内存空间，并将地址压入操作数栈顶</li><li>dup指令复制操作数栈顶的值，并将其压入栈顶，此时操作数栈上有两个连续的相同的对象地址</li><li>invokespecial #3 &lt;test/Apple.<init>> 调用刚创建的实例的构造方法，因为是实例方法，所以需要从操作数栈顶弹出一个this引用，也就是说这一步会弹出一个之前入栈的对象地址</li><li>astore_1 弹出栈顶元素存储到局部变量表中的一个变量</li><li>aload_1 存储在局部变量表中的第一个变量的对象引用，将被压入栈顶</li><li>invokevirtual #4 &lt;test/Fruit.test> 调用虚方法，注意这里引用的是Fruit类的test方法，也就是引用变量的静态类型的方法。</li><li>后面的指令依此类推</li></ol><p>invokevirtual指令查找方法过程：</p><ol><li>到操作数栈顶寻找栈顶元素所指向的对象实际类型</li><li>如果实际类型中存在和静态类型方法的方法名和描述符都相同的方法（并且权限校验通过），则直接返回该目标方法的直接引用</li><li>如果不存在，则根据类的继承层次依次向上查找，如果最终没有找到，则抛出异常。</li></ol><p>可见，方法的重载是编译期静态行为，而方法重写是运行期动态行为。</p></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2020/07/07/jvm-learn-09/><span class=button__icon>←</span>
-<span class=button__text>JVM Learn 09 类的字节码结构</span></a></span>
-<span class="button next"><a href=https://dongzhi.me/2020/07/07/jvm-learn-11/><span class=button__text>JVM Learn 11 关于栈的指令操作的例子</span>
-<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
-<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
-<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>JVM Learn 10 类的虚方法机制 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="基本概念总结 符号引用在类的加载阶段或者第一次引用时转换成直接引用，这叫做静态解析。一些符号引用则在每次运行时转换成直接引用，这种转换是动态链接，java的多态正是在此时实现的。 方法调用的几个指令： in" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/07/07/jvm-learn-10/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="John Doe" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="JVM Learn 10 类的虚方法机制 :: DongZhi.ME" property="og:title"/>
+<meta content="基本概念总结 符号引用在类的加载阶段或者第一次引用时转换成直接引用，这叫做静态解析。一些符号引用则在每次运行时转换成直接引用，这种转换是动态链接，java的多态正是在此时实现的。 方法调用的几个指令： in" property="og:description"/>
+<meta content="https://dongzhi.me/2020/07/07/jvm-learn-10/" property="og:url"/>
+<meta content="JVM Learn 10 类的虚方法机制" property="og:site_name"/>
+<meta content="https://dongzhi.me/" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-07-07 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-10/">JVM Learn 10 类的虚方法机制</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-07-07 
+      </span>
+<span class="post-author">::
+      John Doe
+    </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
+    
+  </span>
+<div class="post-content"><div>
+<h1 id="基本概念总结">基本概念总结<a arialabel="Anchor" class="hanchor" href="#基本概念总结">⌗</a> </h1>
+<p>符号引用在类的加载阶段或者第一次引用时转换成直接引用，这叫做静态解析。一些符号引用则在每次运行时转换成直接引用，这种转换是动态链接，java的多态正是在此时实现的。</p>
+<p>方法调用的几个指令：</p>
+<ul>
+<li>invokeinterface:调用接口中的方法</li>
+<li>invokestatic:调用静态方法</li>
+<li>invokespecial:调用自己的私有方法、构造方法和父类的方法</li>
+<li>invokevitural:调用虚方法，运行期间动态查找虚方法</li>
+<li>invokedynamic:动态调用方法</li>
+</ul>
+<p>静态解析的四种情形：</p>
+<ul>
+<li>静态方法</li>
+<li>父类方法</li>
+<li>构造方法</li>
+<li>私有方法
+以上四种方法称为非虚方法，他们是在类加载阶段将符号引用转换成直接引用。</li>
+</ul>
+<h1 id="重载的静态分派">重载的静态分派<a arialabel="Anchor" class="hanchor" href="#重载的静态分派">⌗</a> </h1>
+<p>如果类B继承类A，对于A a = new B();变量a的静态类型是A，变量a的实际类型是B。变量的静态类型永远不会改变，而变量引用所指向的实际类型可以发生变化。</p>
+<p>对于如下例子：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> test<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestOverload</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test</span><span style="color:#f92672">(</span>GrandFather gf<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"test GrandFather!"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test</span><span style="color:#f92672">(</span>Father f<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"test Father!"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test</span><span style="color:#f92672">(</span>Son s<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"test Son"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>        TestOverload testOverload <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TestOverload<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>        GrandFather g1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> GrandFather<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>        GrandFather g2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Father<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>        GrandFather g3 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Son<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>        testOverload<span style="color:#f92672">.</span><span style="color:#a6e22e">test</span><span style="color:#f92672">(</span>g1<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>        testOverload<span style="color:#f92672">.</span><span style="color:#a6e22e">test</span><span style="color:#f92672">(</span>g2<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>        testOverload<span style="color:#f92672">.</span><span style="color:#a6e22e">test</span><span style="color:#f92672">(</span>g3<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GrandFather</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Father</span> <span style="color:#66d9ef">extends</span> GrandFather <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Son</span> <span style="color:#66d9ef">extends</span> Father <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span><span style="color:#f92672">}</span>
+</code></pre></div><p>输出结果是：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>test GrandFather!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>test GrandFather!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>test GrandFather!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>Process finished with exit code 0
+</code></pre></div><p>从输出结果可以看出，类的方法重载是一种静态分派，在编译时已经可以确定方法调用。也就是查找方法时，根据传入参数的静态类型来选定方法。本例中g1，g2和g3的静态类型都是GrandFather，所以TestOverload的第一个方法被调用。</p>
+<h1 id="重写的动态分派">重写的动态分派<a arialabel="Anchor" class="hanchor" href="#重写的动态分派">⌗</a> </h1>
+<p>重新是一种动态分派。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> test<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestOverride</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>        Fruit apple <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Apple<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>        apple<span style="color:#f92672">.</span><span style="color:#a6e22e">test</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        Fruit orange <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Orange<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        orange<span style="color:#f92672">.</span><span style="color:#a6e22e">test</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Fruit</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"test Fruit"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Apple</span> <span style="color:#66d9ef">extends</span> Fruit <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>    <span style="color:#a6e22e">@Override</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"test Apple"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Orange</span> <span style="color:#66d9ef">extends</span> Fruit <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>    <span style="color:#a6e22e">@Override</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"test Orange"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span><span style="color:#f92672">}</span>
+</code></pre></div><p>main方法的4行代码对于的字节码指令如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span> 0 new #2 &lt;test/Apple&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span> 3 dup
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span> 4 invokespecial #3 &lt;test/Apple.&lt;init&gt;&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span> 7 astore_1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span> 8 aload_1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span> 9 invokevirtual #4 &lt;test/Fruit.test&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>12 new #5 &lt;test/Orange&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>15 dup
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>16 invokespecial #6 &lt;test/Orange.&lt;init&gt;&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>19 astore_2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>20 aload_2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>21 invokevirtual #4 &lt;test/Fruit.test&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>24 return
+</code></pre></div><p>解释如下：</p>
+<ol>
+<li>new #2 &lt;test/Apple&gt; 表示创建对象，该指令在堆上为该对象分配内存空间，并将地址压入操作数栈顶</li>
+<li>dup指令复制操作数栈顶的值，并将其压入栈顶，此时操作数栈上有两个连续的相同的对象地址</li>
+<li>invokespecial #3 &lt;test/Apple.<init>&gt; 调用刚创建的实例的构造方法，因为是实例方法，所以需要从操作数栈顶弹出一个this引用，也就是说这一步会弹出一个之前入栈的对象地址</init></li>
+<li>astore_1 弹出栈顶元素存储到局部变量表中的一个变量</li>
+<li>aload_1 存储在局部变量表中的第一个变量的对象引用，将被压入栈顶</li>
+<li>invokevirtual #4 &lt;test/Fruit.test&gt; 调用虚方法，注意这里引用的是Fruit类的test方法，也就是引用变量的静态类型的方法。</li>
+<li>后面的指令依此类推</li>
+</ol>
+<p>invokevirtual指令查找方法过程：</p>
+<ol>
+<li>到操作数栈顶寻找栈顶元素所指向的对象实际类型</li>
+<li>如果实际类型中存在和静态类型方法的方法名和描述符都相同的方法（并且权限校验通过），则直接返回该目标方法的直接引用</li>
+<li>如果不存在，则根据类的继承层次依次向上查找，如果最终没有找到，则抛出异常。</li>
+</ol>
+<p>可见，方法的重载是编译期静态行为，而方法重写是运行期动态行为。</p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-09/">
+<span class="button__icon">←</span>
+<span class="button__text">JVM Learn 09 类的字节码结构</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-11/">
+<span class="button__text">JVM Learn 11 关于栈的指令操作的例子</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<div id="hyvor-talk-view"></div>
+<script type="text/javascript">
+		var HYVOR_TALK_WEBSITE = 1505; 
+		var HYVOR_TALK_CONFIG = {
+        url: false,
+        id: false
+		};
+	  </script>
+<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

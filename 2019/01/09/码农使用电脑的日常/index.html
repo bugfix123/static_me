@@ -1,48 +1,199 @@
-<!doctype html><html lang=en><head><title>码农使用电脑的日常 :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充 Github clone访问太慢 在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启s"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="码农使用电脑的日常 :: DongZhi.ME"><meta property="og:description" content="整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充 Github clone访问太慢 在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启s"><meta property="og:url" content="https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/"><meta property="og:site_name" content="码农使用电脑的日常"><meta property="og:image" content="https://dongzhi.me/img/favicon/orange.png"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:section" content="技术"><meta property="article:published_time" content="2019-01-09 18:43:07 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/>码农使用电脑的日常</a></h1><div class=post-meta><span class=post-date>2019-01-09</span></div><div class=post-content><div><blockquote><p>整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充</p></blockquote><h1 id=github-clone访问太慢>Github clone访问太慢<a href=#github-clone访问太慢 class=hanchor arialabel=Anchor>&#8983;</a></h1><p>在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启ss全局代理，不管用。测试发现，用socks5代理比较快。</p><ul><li>电脑环境：win7 64</li><li>ss客户端版本: 4.1.3.1
-在cmd中输入以下指令：</li></ul><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>git config --global http.proxy socks5://127.0.0.1:1080
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>git config --global https.proxy socks5://127.0.0.1:1080
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>码农使用电脑的日常 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充 Github clone访问太慢 在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启s" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="码农使用电脑的日常 :: DongZhi.ME" property="og:title"/>
+<meta content="整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充 Github clone访问太慢 在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启s" property="og:description"/>
+<meta content="https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/" property="og:url"/>
+<meta content="码农使用电脑的日常" property="og:site_name"/>
+<meta content="https://dongzhi.me/img/favicon/orange.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="技术" property="article:section"/>
+<meta content="2019-01-09 18:43:07 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/">码农使用电脑的日常</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2019-01-09 
+      </span>
+</div>
+<div class="post-content"><div>
+<blockquote>
+<p>整一篇博文记录一下折腾电脑过程中遇到的问题，省得每次都去百度，比较繁琐。持续补充</p>
+</blockquote>
+<!-- more -->
+<h1 id="github-clone访问太慢">Github clone访问太慢<a arialabel="Anchor" class="hanchor" href="#github-clone访问太慢">⌗</a> </h1>
+<p>在我电脑上，git clone一直都很慢，我可是百兆光纤哎。百度了一下，修改hosts，不管用，开启ss全局代理，不管用。测试发现，用socks5代理比较快。</p>
+<ul>
+<li>电脑环境：win7 64</li>
+<li>ss客户端版本: 4.1.3.1
+在cmd中输入以下指令：</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>git config --global http.proxy socks5://127.0.0.1:1080
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>git config --global https.proxy socks5://127.0.0.1:1080
 </code></pre></div><p>（端口号看你自己的配置，一般都是1080）
-如果要取消代理修改：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>git config --global --unset http.proxy
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>git config --global --unset https.proxy
-</code></pre></div><p>代理后git clone速度真的快了很多~我这边能到1MB/s以上。ps，我的ss是买的搬瓦工搭建了，比较稳定。</p><h1 id=如何在浏览器js中引用node-js->如何在浏览器js中引用node js ？<a href=#如何在浏览器js中引用node-js- class=hanchor arialabel=Anchor>&#8983;</a></h1><p><strong>首先</strong>，安装browserify，</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>npm install  browserify -g
-</code></pre></div><p><strong>然后</strong>，进入要打包的node project中，找到index.js文件</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span style=color:#75715e># test为自定义的模块名</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span> browserify -r ./index.js:<span style=color:#e6db74>&#39;test&#39;</span> &gt; bundle.js
-</code></pre></div><p><strong>最后</strong>，在html文件中引用test模块即可</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>&lt;<span style=color:#f92672>html</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>    &lt;<span style=color:#f92672>meta</span> <span style=color:#a6e22e>charset</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;utf-8&#34;</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>    &lt;<span style=color:#f92672>head</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>        &lt;<span style=color:#f92672>tittle</span>&gt;js调用nodejs模块&lt;/<span style=color:#f92672>tittle</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>        &lt;<span style=color:#f92672>script</span> <span style=color:#a6e22e>type</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;text/javascript&#34;</span> <span style=color:#a6e22e>src</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;bundle.js&#34;</span>&gt;&lt;/<span style=color:#f92672>script</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>        &lt;<span style=color:#f92672>script</span> <span style=color:#a6e22e>type</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;text/javascript&#34;</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>            <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>postStr</span>(){                
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>                <span style=color:#66d9ef>try</span>{
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>                    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>uniq</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>require</span>(<span style=color:#e6db74>&#39;test&#39;</span>);
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>                    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>nums</span> <span style=color:#f92672>=</span> [<span style=color:#ae81ff>5</span>,<span style=color:#ae81ff>2</span>,<span style=color:#ae81ff>1</span>,<span style=color:#ae81ff>3</span>,<span style=color:#ae81ff>2</span>,<span style=color:#ae81ff>5</span>];
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>                    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>numsUniq</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>uniq</span>(<span style=color:#a6e22e>nums</span>)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>                    <span style=color:#a6e22e>console</span>.<span style=color:#a6e22e>log</span>(<span style=color:#a6e22e>numsUniq</span>);
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>                    document.<span style=color:#a6e22e>getElementById</span>(<span style=color:#e6db74>&#34;info&#34;</span>).<span style=color:#a6e22e>innerHTML</span><span style=color:#f92672>=</span><span style=color:#a6e22e>numsUniq</span>;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>                }
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>                <span style=color:#66d9ef>catch</span>(<span style=color:#a6e22e>err</span>){
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>                    <span style=color:#a6e22e>alert</span>(<span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>message</span>);
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>                }
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>            }
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>        &lt;/<span style=color:#f92672>script</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>    &lt;/<span style=color:#f92672>head</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>    &lt;<span style=color:#f92672>body</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>        &lt;<span style=color:#f92672>form</span> <span style=color:#a6e22e>action</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;&#34;</span>&gt;                 
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>            &lt;<span style=color:#f92672>p</span>&gt;&lt;<span style=color:#f92672>div</span> <span style=color:#a6e22e>id</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;info&#34;</span>&gt;使用uniq函数后数组内容&lt;/<span style=color:#f92672>div</span>&gt; &lt;/<span style=color:#f92672>p</span>&gt;                    
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>            &lt;<span style=color:#f92672>p</span>&gt;&lt;<span style=color:#f92672>input</span> <span style=color:#a6e22e>type</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;button&#34;</span> <span style=color:#a6e22e>id</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;btn_post&#34;</span> <span style=color:#a6e22e>onclick</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;postStr()&#34;</span> <span style=color:#a6e22e>value</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;测试调用node函数&#34;</span>/&gt;&lt;/<span style=color:#f92672>p</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span>        &lt;/<span style=color:#f92672>form</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span>    &lt;/<span style=color:#f92672>body</span>&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">30</span>&lt;/<span style=color:#f92672>html</span>&gt;
-</code></pre></div><p>参考了这篇文章：</p><ul><li><a href=https://blog.csdn.net/w88193363/article/details/86238624>浏览器js调用nodejs模块，以uniq模块的调用为例</a></li><li><a href=https://stackoverflow.com/questions/24329690/how-to-expose-require-to-the-browser-when-using-browserify-from-within-gulp>How to expose &lsquo;require&rsquo; to the browser when using browserify from within gulp?</a></li></ul><h1 id=mp4视频添加srt字幕>mp4视频添加srt字幕<a href=#mp4视频添加srt字幕 class=hanchor arialabel=Anchor>&#8983;</a></h1><p>有的时候你需要给视频加一个字幕(subtitle)，使用ffmpeg也可以做。一般我们见到的字幕以srt字幕为主，在ffmpeg里需要首先将srt字幕转化为ass字幕，然后就可以集成到视频中了(不是单独的字幕流，而是直接改写视频流)。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>ffmpeg -i my_subtitle.srt my_subtitle.ass
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>ffmpeg -i inputfile.mp4 -vf ass=my_subtitle.ass outputfile.mp4
-</code></pre></div><p>但是值得注意的是：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>my_subtitle.srt需要使用UTF8编码，老外不会注意到这一点，但是中文这是必须要考虑的；
-</code></pre></div><p>参考地址：<a href=https://github.com/tonydeng/fmj/blob/master/ffmpeg.md>FFMPEG 使用说明</a></p></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/><span class=button__icon>←</span>
-<span class=button__text>Centos7下科学上网的方法</span></a></span>
-<span class="button next"><a href=https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/><span class=button__text>CentOS软件的常用安装命令汇总</span>
-<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
-<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
-<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
+如果要取消代理修改：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>git config --global --unset http.proxy
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>git config --global --unset https.proxy
+</code></pre></div><p>代理后git clone速度真的快了很多~我这边能到1MB/s以上。ps，我的ss是买的搬瓦工搭建了，比较稳定。</p>
+<h1 id="如何在浏览器js中引用node-js-">如何在浏览器js中引用node js ？<a arialabel="Anchor" class="hanchor" href="#如何在浏览器js中引用node-js-">⌗</a> </h1>
+<p><strong>首先</strong>，安装browserify，</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>npm install  browserify -g
+</code></pre></div><p><strong>然后</strong>，进入要打包的node project中，找到index.js文件</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#75715e"># test为自定义的模块名</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span> browserify -r ./index.js:<span style="color:#e6db74">'test'</span> &gt; bundle.js
+</code></pre></div><p><strong>最后</strong>，在html文件中引用test模块即可</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>&lt;<span style="color:#f92672">html</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">"utf-8"</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>    &lt;<span style="color:#f92672">head</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>        &lt;<span style="color:#f92672">tittle</span>&gt;js调用nodejs模块&lt;/<span style="color:#f92672">tittle</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>        &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">"text/javascript"</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">"bundle.js"</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>        &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">"text/javascript"</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>            <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">postStr</span>(){                
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>                <span style="color:#66d9ef">try</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>                    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">uniq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">'test'</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>                    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">nums</span> <span style="color:#f92672">=</span> [<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">5</span>];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>                    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">numsUniq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">uniq</span>(<span style="color:#a6e22e">nums</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>                    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">numsUniq</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>                    document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">"info"</span>).<span style="color:#a6e22e">innerHTML</span><span style="color:#f92672">=</span><span style="color:#a6e22e">numsUniq</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>                }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>                <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">err</span>){
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>                    <span style="color:#a6e22e">alert</span>(<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">message</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>                }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>        &lt;/<span style="color:#f92672">script</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>    &lt;/<span style="color:#f92672">head</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>    &lt;<span style="color:#f92672">body</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>        &lt;<span style="color:#f92672">form</span> <span style="color:#a6e22e">action</span><span style="color:#f92672">=</span><span style="color:#e6db74">""</span>&gt;                 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>            &lt;<span style="color:#f92672">p</span>&gt;&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">"info"</span>&gt;使用uniq函数后数组内容&lt;/<span style="color:#f92672">div</span>&gt; &lt;/<span style="color:#f92672">p</span>&gt;                    
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>            &lt;<span style="color:#f92672">p</span>&gt;&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">"button"</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">"btn_post"</span> <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">"postStr()"</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">"测试调用node函数"</span>/&gt;&lt;/<span style="color:#f92672">p</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>        &lt;/<span style="color:#f92672">form</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>    &lt;/<span style="color:#f92672">body</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>&lt;/<span style="color:#f92672">html</span>&gt;
+</code></pre></div><p>参考了这篇文章：</p>
+<ul>
+<li><a href="https://blog.csdn.net/w88193363/article/details/86238624">浏览器js调用nodejs模块，以uniq模块的调用为例</a></li>
+<li><a href="https://stackoverflow.com/questions/24329690/how-to-expose-require-to-the-browser-when-using-browserify-from-within-gulp">How to expose ‘require’ to the browser when using browserify from within gulp?</a></li>
+</ul>
+<h1 id="mp4视频添加srt字幕">mp4视频添加srt字幕<a arialabel="Anchor" class="hanchor" href="#mp4视频添加srt字幕">⌗</a> </h1>
+<p>有的时候你需要给视频加一个字幕(subtitle)，使用ffmpeg也可以做。一般我们见到的字幕以srt字幕为主，在ffmpeg里需要首先将srt字幕转化为ass字幕，然后就可以集成到视频中了(不是单独的字幕流，而是直接改写视频流)。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>ffmpeg -i my_subtitle.srt my_subtitle.ass
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>ffmpeg -i inputfile.mp4 -vf ass=my_subtitle.ass outputfile.mp4
+</code></pre></div><p>但是值得注意的是：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>my_subtitle.srt需要使用UTF8编码，老外不会注意到这一点，但是中文这是必须要考虑的；
+</code></pre></div><p>参考地址：<a href="https://github.com/tonydeng/fmj/blob/master/ffmpeg.md">FFMPEG 使用说明</a></p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://dongzhi.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/">
+<span class="button__icon">←</span>
+<span class="button__text">Centos7下科学上网的方法</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://dongzhi.me/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/">
+<span class="button__text">CentOS软件的常用安装命令汇总</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<div id="hyvor-talk-view"></div>
+<script type="text/javascript">
+		var HYVOR_TALK_WEBSITE = 1505; 
+		var HYVOR_TALK_CONFIG = {
+        url: false,
+        id: false
+		};
+	  </script>
+<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

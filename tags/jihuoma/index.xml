@@ -1,5 +1,37 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>jihuoma on DongZhi.ME</title><link>https://dongzhi.me/tags/jihuoma/</link><description>Recent content in jihuoma on DongZhi.ME</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 21 Aug 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://dongzhi.me/tags/jihuoma/index.xml" rel="self" type="application/rss+xml"/><item><title>v2ray客户端配置简易说明</title><link>https://dongzhi.me/2020/08/21/kexueshangwang/</link><pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/08/21/kexueshangwang/</guid><description>&lt;blockquote>
-&lt;p>v2ray安卓客户端和windows客户端的配置简单说明.&lt;/p>
-&lt;/blockquote></description></item><item><title>Some Useful Licences</title><link>https://dongzhi.me/2020/08/04/some-useful-licences/</link><pubDate>Tue, 04 Aug 2020 00:00:00 +0000</pubDate><guid>https://dongzhi.me/2020/08/04/some-useful-licences/</guid><description>&lt;blockquote>
-&lt;p>Here are some useful licences.&lt;/p>
-&lt;/blockquote></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>jihuoma on DongZhi.ME</title>
+    <link>https://dongzhi.me/tags/jihuoma/</link>
+    <description>Recent content in jihuoma on DongZhi.ME</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 21 Aug 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://dongzhi.me/tags/jihuoma/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>v2ray客户端配置简易说明</title>
+      <link>https://dongzhi.me/2020/08/21/kexueshangwang/</link>
+      <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/08/21/kexueshangwang/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;v2ray安卓客户端和windows客户端的配置简单说明.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Some Useful Licences</title>
+      <link>https://dongzhi.me/2020/08/04/some-useful-licences/</link>
+      <pubDate>Tue, 04 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/08/04/some-useful-licences/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Here are some useful licences.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
