@@ -1,9 +1,94 @@
-<!doctype html><html lang=en><head><title>JVM Learn 20 Java Garbage Collection Basics :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="本文原文地址：Java Garbage Collection Basics"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2020/07/09/jvm-learn-20/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content="Joe John"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="JVM Learn 20 Java Garbage Collection Basics :: DongZhi.ME"><meta property="og:description" content="本文原文地址：Java Garbage Collection Basics"><meta property="og:url" content="https://dongzhi.me/2020/07/09/jvm-learn-20/"><meta property="og:site_name" content="JVM Learn 20 Java Garbage Collection Basics"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/garbage_collectors.jpg"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:published_time" content="2020-07-09 00:00:00 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2020/07/09/jvm-learn-20/>JVM Learn 20 Java Garbage Collection Basics</a></h1><div class=post-meta><span class=post-date>2020-07-09</span>
-<span class=post-author>::
-Joe John</span></div><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/garbage_collectors.jpg class=post-cover alt="JVM Learn 20 Java Garbage Collection Basics"><div class=post-content><div><blockquote><p>本文原文地址<a href=https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html#RequiredSoftware/>：Java Garbage Collection Basics</a></p></blockquote><h1 id=java-garbage-collection-basics>Java Garbage Collection Basics<a href=#java-garbage-collection-basics class=hanchor arialabel=Anchor>&#8983;</a></h1><p>Topic List Expand All Topics Hide All Images Print</p><h2 id=overview>Overview<a href=#overview class=hanchor arialabel=Anchor>&#8983;</a></h2><h4 id=purpose>Purpose<a href=#purpose class=hanchor arialabel=Anchor>&#8983;</a></h4><p>This tutorial covers the basics of how Garbage Collection works with the
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>JVM Learn 20 Java Garbage Collection Basics :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content=" 本文原文地址：Java Garbage Collection Basics
+" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/07/09/jvm-learn-20/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="Joe John" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="JVM Learn 20 Java Garbage Collection Basics :: DongZhi.ME" property="og:title"/>
+<meta content=" 本文原文地址：Java Garbage Collection Basics
+" property="og:description"/>
+<meta content="https://dongzhi.me/2020/07/09/jvm-learn-20/" property="og:url"/>
+<meta content="JVM Learn 20 Java Garbage Collection Basics" property="og:site_name"/>
+<meta content="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/garbage_collectors.jpg" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-07-09 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/09/jvm-learn-20/">JVM Learn 20 Java Garbage Collection Basics</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-07-09 
+      </span>
+<span class="post-author">::
+      Joe John
+    </span>
+</div>
+<img alt="JVM Learn 20 Java Garbage Collection Basics" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/garbage_collectors.jpg"/>
+<div class="post-content"><div>
+<blockquote>
+<p>本文原文地址<a href="https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html#RequiredSoftware/">：Java Garbage Collection Basics</a></p>
+</blockquote>
+<h1 id="java-garbage-collection-basics">Java Garbage Collection Basics<a arialabel="Anchor" class="hanchor" href="#java-garbage-collection-basics">⌗</a> </h1>
+<p>Topic List Expand All Topics Hide All Images Print</p>
+<h2 id="overview">Overview<a arialabel="Anchor" class="hanchor" href="#overview">⌗</a> </h2>
+<h4 id="purpose">Purpose<a arialabel="Anchor" class="hanchor" href="#purpose">⌗</a> </h4>
+<p>This tutorial covers the basics of how Garbage Collection works with the
 Hotspot JVM. Once you have learned how the garbage collector functions, learn
 how to monitor the garbage collection process using Visual VM. Finally, learn
-which garbage collectors are available in the Java SE 7 Hotspot JVM.</p><h4 id=time-to-complete>Time to Complete<a href=#time-to-complete class=hanchor arialabel=Anchor>&#8983;</a></h4><p>Approximately 1 hour</p><h4 id=introduction>Introduction<a href=#introduction class=hanchor arialabel=Anchor>&#8983;</a></h4><p>This OBE covers the basics of Java Virtual Machine(JVM) Garbage Collection
+which garbage collectors are available in the Java SE 7 Hotspot JVM.</p>
+<h4 id="time-to-complete">Time to Complete<a arialabel="Anchor" class="hanchor" href="#time-to-complete">⌗</a> </h4>
+<p>Approximately 1 hour</p>
+<h4 id="introduction">Introduction<a arialabel="Anchor" class="hanchor" href="#introduction">⌗</a> </h4>
+<p>This OBE covers the basics of Java Virtual Machine(JVM) Garbage Collection
 (GC) in Java. In the first part of the OBE, an overview of the JVM is provided
 along with an introduction to Garbage Collection and performance. Next
 students are provided a step by step guide to how Garbage Collection works
@@ -11,52 +96,90 @@ inside the JVM. Next a hands on activity is provided for learners to try out
 some of the monitoring tools provided in the Java JDK and put what they have
 just learned about Garbage Collection into practice. Finally, a section is
 provided covering the Garbage Collection scheme options available in the
-Hotspot JVM.</p><h4 id=hardware-and-software-requirements>Hardware and Software Requirements<a href=#hardware-and-software-requirements class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The following is a list of hardware and software requirements:</p><ul><li>A PC running Windows XP or later, Mac OS X or Linux. Note that the hands on is done with Windows 7 and has not been tested on all platforms. However, everything should work fine on OS X or Linux. Also a machine with more than one core is preferable.</li><li>Java 7 Update 7 or later</li><li>The latest Java 7 Demos and Samples Zip file</li></ul><h4 id=prerequisites>Prerequisites<a href=#prerequisites class=hanchor arialabel=Anchor>&#8983;</a></h4><p>Before starting this tutorial, you should:</p><ul><li>If you have not done so, download and install the latest version of the Java JDK (JDK 7 u7 or later).<br><a href=http://www.oracle.com/technetwork/java/javase/downloads/index.html>Java 7 JDK Downloads</a></li><li>Download and install the Demos and Samples zip file from the same location. Unzip the file and place the contents in a directory. For example: <code>C:\javademos</code></li></ul><h2 id=java-technology-and-the-jvm>Java Technology and the JVM<a href=#java-technology-and-the-jvm class=hanchor arialabel=Anchor>&#8983;</a></h2><h3 id=java-overview>Java Overview<a href=#java-overview class=hanchor arialabel=Anchor>&#8983;</a></h3><p>Java is a programming language and computing platform first released by Sun
+Hotspot JVM.</p>
+<h4 id="hardware-and-software-requirements">Hardware and Software Requirements<a arialabel="Anchor" class="hanchor" href="#hardware-and-software-requirements">⌗</a> </h4>
+<p>The following is a list of hardware and software requirements:</p>
+<ul>
+<li>A PC running Windows XP or later, Mac OS X or Linux. Note that the hands on is done with Windows 7 and has not been tested on all platforms. However, everything should work fine on OS X or Linux. Also a machine with more than one core is preferable.</li>
+<li>Java 7 Update 7 or later</li>
+<li>The latest Java 7 Demos and Samples Zip file</li>
+</ul>
+<h4 id="prerequisites">Prerequisites<a arialabel="Anchor" class="hanchor" href="#prerequisites">⌗</a> </h4>
+<p>Before starting this tutorial, you should:</p>
+<ul>
+<li>If you have not done so, download and install the latest version of the Java JDK (JDK 7 u7 or later).<br/>
+<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Java 7 JDK Downloads</a></li>
+<li>Download and install the Demos and Samples zip file from the same location. Unzip the file and place the contents in a directory. For example: <code>C:\javademos</code></li>
+</ul>
+<h2 id="java-technology-and-the-jvm">Java Technology and the JVM<a arialabel="Anchor" class="hanchor" href="#java-technology-and-the-jvm">⌗</a> </h2>
+<h3 id="java-overview">Java Overview<a arialabel="Anchor" class="hanchor" href="#java-overview">⌗</a> </h3>
+<p>Java is a programming language and computing platform first released by Sun
 Microsystems in 1995. It is the underlying technology that powers Java
 programs including utilities, games, and business applications. Java runs on
 more than 850 million personal computers worldwide, and on billions of devices
 worldwide, including mobile and TV devices. Java is composed of a number of
-key components that, as a whole, create the Java platform.</p><h4 id=java-runtime-edition>Java Runtime Edition<a href=#java-runtime-edition class=hanchor arialabel=Anchor>&#8983;</a></h4><p>When you download Java, you get the Java Runtime Environment (JRE). The JRE
+key components that, as a whole, create the Java platform.</p>
+<h4 id="java-runtime-edition">Java Runtime Edition<a arialabel="Anchor" class="hanchor" href="#java-runtime-edition">⌗</a> </h4>
+<p>When you download Java, you get the Java Runtime Environment (JRE). The JRE
 consists of the Java Virtual Machine (JVM), Java platform core classes, and
 supporting Java platform libraries. All three are required to run Java
 applications on your computer. With Java 7, Java applications run as desktop
 applications from the operating system, as a desktop application but installed
 from the Web using Java Web Start, or as a Web Embedded application in a
-browser (using JavaFX).</p><h4 id=java-programming-language>Java Programming Language<a href=#java-programming-language class=hanchor arialabel=Anchor>&#8983;</a></h4><p>Java is an object-oriented programming language that includes the following
-features.</p><ul><li>Platform Independence - Java applications are compiled into <em>bytecode</em> which is stored in class files and loaded in a JVM. Since applications run in a JVM, they can be run on many different operating systems and devices.</li><li>Object-Oriented - Java is an object-oriented language that take many of the features of C and C++ and improves upon them.</li><li>Automatic Garbage Collection - Java automatically allocates and deallocates memory so programs are not burdened with that task.</li><li>Rich Standard Library - Java includes a vast number of premade objects that can be used to perform such tasks as input/output, networking, and date manipulation.</li></ul><h4 id=java-development-kit>Java Development Kit<a href=#java-development-kit class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The Java Development Kit (JDK) is a collection of tools for developing Java
+browser (using JavaFX).</p>
+<h4 id="java-programming-language">Java Programming Language<a arialabel="Anchor" class="hanchor" href="#java-programming-language">⌗</a> </h4>
+<p>Java is an object-oriented programming language that includes the following
+features.</p>
+<ul>
+<li>Platform Independence - Java applications are compiled into <em>bytecode</em> which is stored in class files and loaded in a JVM. Since applications run in a JVM, they can be run on many different operating systems and devices.</li>
+<li>Object-Oriented - Java is an object-oriented language that take many of the features of C and C++ and improves upon them.</li>
+<li>Automatic Garbage Collection - Java automatically allocates and deallocates memory so programs are not burdened with that task.</li>
+<li>Rich Standard Library - Java includes a vast number of premade objects that can be used to perform such tasks as input/output, networking, and date manipulation.</li>
+</ul>
+<h4 id="java-development-kit">Java Development Kit<a arialabel="Anchor" class="hanchor" href="#java-development-kit">⌗</a> </h4>
+<p>The Java Development Kit (JDK) is a collection of tools for developing Java
 applications. With the JDK, you can compile programs written in the Java
 Programming language and run them in a JVM. In addition, the JDK provides
-tools for packaging and distributing your applications.</p><p>The JDK and the JRE share the Java Application Programming Interfaces (<a href=http://docs.oracle.com/javase/7/docs/api/>Java
+tools for packaging and distributing your applications.</p>
+<p>The JDK and the JRE share the Java Application Programming Interfaces (<a href="http://docs.oracle.com/javase/7/docs/api/">Java
 API</a>). The Java API is a collection
 of prepackaged libraries developers use to create Java applications. The Java
 API makes development easier by providing the tools to complete many common
 programming tasks including string manipulation, date/time processing,
 networking, and implementing data structures (e.g., lists, maps, stacks, and
-queues).</p><h4 id=java-virtual-machine>Java Virtual Machine<a href=#java-virtual-machine class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The Java Virtual Machine (JVM) is an abstract computing machine. The JVM is a
+queues).</p>
+<h4 id="java-virtual-machine">Java Virtual Machine<a arialabel="Anchor" class="hanchor" href="#java-virtual-machine">⌗</a> </h4>
+<p>The Java Virtual Machine (JVM) is an abstract computing machine. The JVM is a
 program that looks like a machine to the programs written to execute in it.
 This way, Java programs are written to the same set of interfaces and
 libraries. Each JVM implementation for a specific operating system, translates
 the Java programming instructions into instructions and commands that run on
 the local operating system. This way, Java programs achieve platform
-independence.</p><p>The first prototype implementation of the Java virtual machine, done at Sun
+independence.</p>
+<p>The first prototype implementation of the Java virtual machine, done at Sun
 Microsystems, Inc., emulated the Java virtual machine instruction set in
 software hosted by a handheld device that resembled a contemporary Personal
-Digital Assistant (PDA). Oracle&rsquo;s current implementations emulate the Java
+Digital Assistant (PDA). Oracle’s current implementations emulate the Java
 virtual machine on mobile, desktop and server devices, but the Java virtual
 machine does not assume any particular implementation technology, host
 hardware, or host operating system. It is not inherently interpreted, but can
 just as well be implemented by compiling its instruction set to that of a
-silicon CPU. It may also be implemented in microcode or directly in silicon.</p><p>The Java virtual machine knows nothing of the Java programming language, only
+silicon CPU. It may also be implemented in microcode or directly in silicon.</p>
+<p>The Java virtual machine knows nothing of the Java programming language, only
 of a particular binary format, the class file format. A class file contains
 Java virtual machine instructions (or bytecodes) and a symbol table, as well
-as other ancillary information.</p><p>For the sake of security, the Java virtual machine imposes strong syntactic
+as other ancillary information.</p>
+<p>For the sake of security, the Java virtual machine imposes strong syntactic
 and structural constraints on the code in a class file. However, any language
 with functionality that can be expressed in terms of a valid class file can be
 hosted by the Java virtual machine. Attracted by a generally available,
 machine-independent platform, implementors of other languages can turn to the
-Java virtual machine as a delivery vehicle for their languages. (1) <a href=http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-1.html>The Java
+Java virtual machine as a delivery vehicle for their languages. (1) <a href="http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-1.html">The Java
 Virtual
-Machine</a></p><h3 id=exploring-the-jvm-architecture>Exploring the JVM Architecture<a href=#exploring-the-jvm-architecture class=hanchor arialabel=Anchor>&#8983;</a></h3><h4 id=hotspot-architecture>Hotspot Architecture<a href=#hotspot-architecture class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The HotSpot JVM possesses an architecture that supports a strong foundation of
+Machine</a></p>
+<h3 id="exploring-the-jvm-architecture">Exploring the JVM Architecture<a arialabel="Anchor" class="hanchor" href="#exploring-the-jvm-architecture">⌗</a> </h3>
+<h4 id="hotspot-architecture">Hotspot Architecture<a arialabel="Anchor" class="hanchor" href="#hotspot-architecture">⌗</a> </h4>
+<p>The HotSpot JVM possesses an architecture that supports a strong foundation of
 features and capabilities and supports the ability to realize high performance
 and massive scalability. For example, the HotSpot JVM JIT compilers generate
 dynamic optimizations. In other words, they make optimization decisions while
@@ -65,214 +188,478 @@ instructions targeted for the underlying system architecture. In addition,
 through the maturing evolution and continuous engineering of its runtime
 environment and multithreaded garbage collector, the HotSpot JVM yields high
 scalability on even the largest available computer systems.
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1.png alt=Slide1></p><p>The main components of the JVM include the classloader, the runtime data
-areas, and the execution engine.</p><h4 id=key-hotspot-components>Key Hotspot Components<a href=#key-hotspot-components class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The key components of the JVM that relate to performance are highlighted in
+<img alt="Slide1" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1.png"/></p>
+<p>The main components of the JVM include the classloader, the runtime data
+areas, and the execution engine.</p>
+<h4 id="key-hotspot-components">Key Hotspot Components<a arialabel="Anchor" class="hanchor" href="#key-hotspot-components">⌗</a> </h4>
+<p>The key components of the JVM that relate to performance are highlighted in
 the following image.
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide2.png alt=Slide2></p><p>There are three components of the JVM that are focused on when tuning
+<img alt="Slide2" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide2.png"/></p>
+<p>There are three components of the JVM that are focused on when tuning
 performance. The <em>heap</em> is where your object data is stored. This area is then
 managed by the garbage collector selected at startup. Most tuning options
 relate to sizing the heap and choosing the most appropriate garbage collector
 for your situation. The JIT compiler also has a big impact on performance but
-rarely requires tuning with the newer versions of the JVM.</p><h3 id=performance-basics>Performance Basics<a href=#performance-basics class=hanchor arialabel=Anchor>&#8983;</a></h3><p>Typically, when tuning a Java application, the focus is on one of two main
+rarely requires tuning with the newer versions of the JVM.</p>
+<h3 id="performance-basics">Performance Basics<a arialabel="Anchor" class="hanchor" href="#performance-basics">⌗</a> </h3>
+<p>Typically, when tuning a Java application, the focus is on one of two main
 goals: responsiveness or throughput. We will refer back to these concepts as
-the tutorial progresses.</p><h4 id=responsiveness>Responsiveness<a href=#responsiveness class=hanchor arialabel=Anchor>&#8983;</a></h4><p>Responsiveness refers to how quickly an application or system responds with a
-requested piece of data. Examples include:</p><ul><li>How quickly a desktop UI responds to an event</li><li>How fast a website returns a page</li><li>How fast a database query is returned</li></ul><p>For applications that focus on responsiveness, large pause times are not
-acceptable. The focus is on responding in short periods of time.</p><h4 id=throughput>Throughput<a href=#throughput class=hanchor arialabel=Anchor>&#8983;</a></h4><p>Throughput focuses on maximizing the amount of work by an application in a
-specific period of time. Examples of how throughput might be measured include:</p><ul><li>The number of transactions completed in a given time.</li><li>The number of jobs that a batch program can complete in an hour.</li><li>The number of database queries that can be completed in an hour.</li></ul><p>High pause times are acceptable for applications that focus on throughput.
+the tutorial progresses.</p>
+<h4 id="responsiveness">Responsiveness<a arialabel="Anchor" class="hanchor" href="#responsiveness">⌗</a> </h4>
+<p>Responsiveness refers to how quickly an application or system responds with a
+requested piece of data. Examples include:</p>
+<ul>
+<li>How quickly a desktop UI responds to an event</li>
+<li>How fast a website returns a page</li>
+<li>How fast a database query is returned</li>
+</ul>
+<p>For applications that focus on responsiveness, large pause times are not
+acceptable. The focus is on responding in short periods of time.</p>
+<h4 id="throughput">Throughput<a arialabel="Anchor" class="hanchor" href="#throughput">⌗</a> </h4>
+<p>Throughput focuses on maximizing the amount of work by an application in a
+specific period of time. Examples of how throughput might be measured include:</p>
+<ul>
+<li>The number of transactions completed in a given time.</li>
+<li>The number of jobs that a batch program can complete in an hour.</li>
+<li>The number of database queries that can be completed in an hour.</li>
+</ul>
+<p>High pause times are acceptable for applications that focus on throughput.
 Since high throughput applications focus on benchmarks over longer periods of
-time, quick response time is not a consideration.</p><h2 id=describing-garbage-collection>Describing Garbage Collection<a href=#describing-garbage-collection class=hanchor arialabel=Anchor>&#8983;</a></h2><h3 id=what-is-automatic-garbage-collection>What is Automatic Garbage Collection?<a href=#what-is-automatic-garbage-collection class=hanchor arialabel=Anchor>&#8983;</a></h3><p>Automatic garbage collection is the process of looking at heap memory,
+time, quick response time is not a consideration.</p>
+<h2 id="describing-garbage-collection">Describing Garbage Collection<a arialabel="Anchor" class="hanchor" href="#describing-garbage-collection">⌗</a> </h2>
+<h3 id="what-is-automatic-garbage-collection">What is Automatic Garbage Collection?<a arialabel="Anchor" class="hanchor" href="#what-is-automatic-garbage-collection">⌗</a> </h3>
+<p>Automatic garbage collection is the process of looking at heap memory,
 identifying which objects are in use and which are not, and deleting the
 unused objects. An in use object, or a referenced object, means that some part
 of your program still maintains a pointer to that object. An unused object, or
 unreferenced object, is no longer referenced by any part of your program. So
-the memory used by an unreferenced object can be reclaimed.</p><p>In a programming language like C, allocating and deallocating memory is a
+the memory used by an unreferenced object can be reclaimed.</p>
+<p>In a programming language like C, allocating and deallocating memory is a
 manual process. In Java, process of deallocating memory is handled
 automatically by the garbage collector. The basic process can be described as
-follows.</p><h4 id=step-1-marking>Step 1: Marking<a href=#step-1-marking class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The first step in the process is called marking. This is where the garbage
+follows.</p>
+<h4 id="step-1-marking">Step 1: Marking<a arialabel="Anchor" class="hanchor" href="#step-1-marking">⌗</a> </h4>
+<p>The first step in the process is called marking. This is where the garbage
 collector identifies which pieces of memory are in use and which are not.
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide3.png alt=Slide3>
+<img alt="Slide3" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide3.png"/>
 Referenced objects are shown in blue. Unreferenced objects are shown in gold.
 All objects are scanned in the marking phase to make this determination. This
 can be a very time consuming process if all objects in a system must be
-scanned.</p><h4 id=step-2-normal-deletion>Step 2: Normal Deletion<a href=#step-2-normal-deletion class=hanchor arialabel=Anchor>&#8983;</a></h4><p>Normal deletion removes unreferenced objects leaving referenced objects and
+scanned.</p>
+<h4 id="step-2-normal-deletion">Step 2: Normal Deletion<a arialabel="Anchor" class="hanchor" href="#step-2-normal-deletion">⌗</a> </h4>
+<p>Normal deletion removes unreferenced objects leaving referenced objects and
 pointers to free space.
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1b.png alt=Slide1b>
+<img alt="Slide1b" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1b.png"/>
 The memory allocator holds references to blocks of free space where new object
-can be allocated.</p><h4 id=step-2a-deletion-with-compacting>Step 2a: Deletion with Compacting<a href=#step-2a-deletion-with-compacting class=hanchor arialabel=Anchor>&#8983;</a></h4><p>To further improve performance, in addition to deleting unreferenced objects,
+can be allocated.</p>
+<h4 id="step-2a-deletion-with-compacting">Step 2a: Deletion with Compacting<a arialabel="Anchor" class="hanchor" href="#step-2a-deletion-with-compacting">⌗</a> </h4>
+<p>To further improve performance, in addition to deleting unreferenced objects,
 you can also compact the remaining referenced objects. By moving referenced
 object together, this makes new memory allocation much easier and faster.
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide4.png alt=Slide4></p><h4 id=why-generational-garbage-collection>Why Generational Garbage Collection?<a href=#why-generational-garbage-collection class=hanchor arialabel=Anchor>&#8983;</a></h4><p>As stated earlier, having to mark and compact all the objects in a JVM is
+<img alt="Slide4" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide4.png"/></p>
+<h4 id="why-generational-garbage-collection">Why Generational Garbage Collection?<a arialabel="Anchor" class="hanchor" href="#why-generational-garbage-collection">⌗</a> </h4>
+<p>As stated earlier, having to mark and compact all the objects in a JVM is
 inefficient. As more and more objects are allocated, the list of objects grows
 and grows leading to longer and longer garbage collection time. However,
 empirical analysis of applications has shown that most objects are short
-lived.</p><p>Here is an example of such data. The Y axis shows the number of bytes
+lived.</p>
+<p>Here is an example of such data. The Y axis shows the number of bytes
 allocated and the X access shows the number of bytes allocated over time.
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_ObjectLifetime.gif alt=ObjectLifetime></p><p>As you can see, fewer and fewer objects remain allocated over time. In fact
+<img alt="ObjectLifetime" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_ObjectLifetime.gif"/></p>
+<p>As you can see, fewer and fewer objects remain allocated over time. In fact
 most objects have a very short life as shown by the higher values on the left
-side of the graph.</p><h4 id=jvm-generations>JVM Generations<a href=#jvm-generations class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The information learned from the object allocation behavior can be used to
+side of the graph.</p>
+<h4 id="jvm-generations">JVM Generations<a arialabel="Anchor" class="hanchor" href="#jvm-generations">⌗</a> </h4>
+<p>The information learned from the object allocation behavior can be used to
 enhance the performance of the JVM. Therefore, the heap is broken up into
 smaller parts or generations. The heap parts are: Young Generation, Old or
 Tenured Generation, and Permanent Generation
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide5.png alt=Slide5>
+<img alt="Slide5" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide5.png"/>
 The <strong>Young Generation</strong> is where all new objects are allocated and aged. When
 the young generation fills up, this causes a <strong><em>minor garbage collection</em></strong>.
 Minor collections can be optimized assuming a high object mortality rate. A
 young generation full of dead objects is collected very quickly. Some
-surviving objects are aged and eventually move to the old generation.</p><p><strong>Stop the World Event</strong> - All minor garbage collections are &ldquo;Stop the World&rdquo;
+surviving objects are aged and eventually move to the old generation.</p>
+<p><strong>Stop the World Event</strong> - All minor garbage collections are “Stop the World”
 events. This means that all application threads are stopped until the
 operation completes. Minor garbage collections are <em>always</em> Stop the World
-events.</p><p>The <strong>Old Generation</strong> is used to store long surviving objects. Typically, a
+events.</p>
+<p>The <strong>Old Generation</strong> is used to store long surviving objects. Typically, a
 threshold is set for young generation object and when that age is met, the
 object gets moved to the old generation. Eventually the old generation needs
-to be collected. This event is called a <strong><em>major garbage collection</em></strong>.</p><p>Major garbage collection are also Stop the World events. Often a major
+to be collected. This event is called a <strong><em>major garbage collection</em></strong>.</p>
+<p>Major garbage collection are also Stop the World events. Often a major
 collection is much slower because it involves all live objects. So for
 Responsive applications, major garbage collections should be minimized. Also
 note, that the length of the Stop the World event for a major garbage
 collection is affected by the kind of garbage collector that is used for the
-old generation space.</p><p>The <strong>Permanent generation</strong> contains metadata required by the JVM to describe
+old generation space.</p>
+<p>The <strong>Permanent generation</strong> contains metadata required by the JVM to describe
 the classes and methods used in the application. The permanent generation is
 populated by the JVM at runtime based on classes in use by the application. In
-addition, Java SE library classes and methods may be stored here.</p><p>Classes may get collected (unloaded) if the JVM finds they are no longer
+addition, Java SE library classes and methods may be stored here.</p>
+<p>Classes may get collected (unloaded) if the JVM finds they are no longer
 needed and space may be needed for other classes. The permanent generation is
-included in a full garbage collection.</p><p>(2) <a href=http://www.oracle.com/technetwork/java/gc-tuning-5-138395.html>Tuning GC with JVM 5 - Section 3
-Generations</a></p><h2 id=the-generational-garbage-collection-process>The Generational Garbage Collection Process<a href=#the-generational-garbage-collection-process class=hanchor arialabel=Anchor>&#8983;</a></h2><p>Now that you understand why the heap is separted into different generations,
+included in a full garbage collection.</p>
+<p>(2) <a href="http://www.oracle.com/technetwork/java/gc-tuning-5-138395.html">Tuning GC with JVM 5 - Section 3
+Generations</a></p>
+<h2 id="the-generational-garbage-collection-process">The Generational Garbage Collection Process<a arialabel="Anchor" class="hanchor" href="#the-generational-garbage-collection-process">⌗</a> </h2>
+<p>Now that you understand why the heap is separted into different generations,
 it is time to look at how exactly these spaces interact. The pictures that
-follow walks through the object allocation and aging process in the JVM.</p><ol><li>First, any new objects are allocated to the eden space. Both survivor spaces
+follow walks through the object allocation and aging process in the JVM.</p>
+<ol>
+<li>First, any new objects are allocated to the eden space. Both survivor spaces
 start out empty.
-<img src=https://note.youdao.com/yws/res/3970/A9656AC46B6D4AC49ACC7A331EA89B51 alt=Slide13></li></ol><p>2.When the eden space fills up, a minor garbage collection is triggered.
-<img src=82CBACBEBEDC4C2FBCDBCA099CDFAE46 alt=Slide14></p><p>3.Referenced objects are moved to the first survivor space. Unreferenced objects
+<img alt="Slide13" src="https://note.youdao.com/yws/res/3970/A9656AC46B6D4AC49ACC7A331EA89B51"/></li>
+</ol>
+<p>2.When the eden space fills up, a minor garbage collection is triggered.
+<img alt="Slide14" src="82CBACBEBEDC4C2FBCDBCA099CDFAE46"/></p>
+<p>3.Referenced objects are moved to the first survivor space. Unreferenced objects
 are deleted when the eden space is cleared.
-<img src=5B549F837D49437280CB017F2742BC80 alt=Slide6></p><p>4.At the next minor GC, the same thing happens for the eden space. Unreferenced
+<img alt="Slide6" src="5B549F837D49437280CB017F2742BC80"/></p>
+<p>4.At the next minor GC, the same thing happens for the eden space. Unreferenced
 objects are deleted and referenced objects are moved to a survivor space.
 However, in this case, they are moved to the second survivor space (S1). In
 addition, objects from the last minor GC on the first survivor space (S0) have
 their age incremented and get moved to S1. Once all surviving objects have
 been moved to S1, both S0 and eden are cleared. Notice we now have differently
 aged object in the survivor space.
-<img src=01C2FCC33C914386A39CFBD27BE7165D alt=Slide8></p><p>5.At the next minor GC, the same process repeats. However this time the survivor
+<img alt="Slide8" src="01C2FCC33C914386A39CFBD27BE7165D"/></p>
+<p>5.At the next minor GC, the same process repeats. However this time the survivor
 spaces switch. Referenced objects are moved to S0. Surviving objects are aged.
 Eden and S1 are cleared.
-<img src=971404E313C94EC7B91F84A798FC4EDA alt=Slide9></p><p>6.This slide demonstrates promotion. After a minor GC, when aged objects reach a
+<img alt="Slide9" src="971404E313C94EC7B91F84A798FC4EDA"/></p>
+<p>6.This slide demonstrates promotion. After a minor GC, when aged objects reach a
 certain age threshold (8 in this example) they are promoted from young
 generation to old generation.
-<img src=8E0D587931D1430D974AE7CE0F4C5271 alt=Slide7></p><p>7.As minor GCs continue to occure objects will continue to be promoted to the
+<img alt="Slide7" src="8E0D587931D1430D974AE7CE0F4C5271"/></p>
+<p>7.As minor GCs continue to occure objects will continue to be promoted to the
 old generation space.
-<img src=5D0F0126A35F4925AFDC009302B08F6F alt=Slide10></p><p>8.So that pretty much covers the entire process with the young generation.
+<img alt="Slide10" src="5D0F0126A35F4925AFDC009302B08F6F"/></p>
+<p>8.So that pretty much covers the entire process with the young generation.
 Eventually, a major GC will be performed on the old generation which cleans up
 and compacts that space.
-<img src=A33836FB90FD43A991129CC2584C4287 alt=Slide11></p><h2 id=performing-your-own-observations>Performing Your Own Observations<a href=#performing-your-own-observations class=hanchor arialabel=Anchor>&#8983;</a></h2><h3 id=overview-1>Overview<a href=#overview-1 class=hanchor arialabel=Anchor>&#8983;</a></h3><p>You have seen the garbage collection process using a series of pictures. Now
+<img alt="Slide11" src="A33836FB90FD43A991129CC2584C4287"/></p>
+<h2 id="performing-your-own-observations">Performing Your Own Observations<a arialabel="Anchor" class="hanchor" href="#performing-your-own-observations">⌗</a> </h2>
+<h3 id="overview-1">Overview<a arialabel="Anchor" class="hanchor" href="#overview-1">⌗</a> </h3>
+<p>You have seen the garbage collection process using a series of pictures. Now
 it is time to experience and explore the process live. In this activity, you
 will run a Java application and analyze the garbage collection process using
 Visual VM. The Visual VM program is included with the JDK and allows
-developers to monitor various aspects of a running JVM.</p><h3 id=hands-on-activities>Hands On Activities<a href=#hands-on-activities class=hanchor arialabel=Anchor>&#8983;</a></h3><h4 id=step-1-initial-setup>Step 1: Initial Setup<a href=#step-1-initial-setup class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The software required to do this activity is described at the beginning of
+developers to monitor various aspects of a running JVM.</p>
+<h3 id="hands-on-activities">Hands On Activities<a arialabel="Anchor" class="hanchor" href="#hands-on-activities">⌗</a> </h3>
+<h4 id="step-1-initial-setup">Step 1: Initial Setup<a arialabel="Anchor" class="hanchor" href="#step-1-initial-setup">⌗</a> </h4>
+<p>The software required to do this activity is described at the beginning of
 this OBE. If you have not downloaded and installed the required software as
-described, do so now.</p><p>The software must be installed before you can continue.</p><h4 id=step-2-start-a-demo-application>Step 2: Start a Demo Application<a href=#step-2-start-a-demo-application class=hanchor arialabel=Anchor>&#8983;</a></h4><p>With the Java JDK and demos installed, you can now run demo application that
+described, do so now.</p>
+<p>The software must be installed before you can continue.</p>
+<h4 id="step-2-start-a-demo-application">Step 2: Start a Demo Application<a arialabel="Anchor" class="hanchor" href="#step-2-start-a-demo-application">⌗</a> </h4>
+<p>With the Java JDK and demos installed, you can now run demo application that
 will be analyzed in this activity. For this example, the demos are installed
-in <code>c:\javademos</code>.</p><p>The demo application is a 2D graphics demo. To execute it type: <code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseSerialGC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p><p><strong>Note:</strong> The meaning of these switches are explained later in the OBE.</p><p>The Java 2D Demo should launch and look something like this:
-<img src=D70B9D73DACA46F48C1343079D03735E alt=Java2DStartScreen></p><p>You can see a number of different tabs that demonstrate various Java graphics
-features.</p><p>Click on the Transforms tabs. You should see a new screen that looks like
+in <code>c:\javademos</code>.</p>
+<p>The demo application is a 2D graphics demo. To execute it type: <code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseSerialGC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p>
+<p><strong>Note:</strong> The meaning of these switches are explained later in the OBE.</p>
+<p>The Java 2D Demo should launch and look something like this:
+<img alt="Java2DStartScreen" src="D70B9D73DACA46F48C1343079D03735E"/></p>
+<p>You can see a number of different tabs that demonstrate various Java graphics
+features.</p>
+<p>Click on the Transforms tabs. You should see a new screen that looks like
 this:
-<img src=1BDE9E6536CA4447961D97DF2AF3C372 alt=Java2DTransforms></p><p>This part of the application creates some nice garbage collection behavior
+<img alt="Java2DTransforms" src="1BDE9E6536CA4447961D97DF2AF3C372"/></p>
+<p>This part of the application creates some nice garbage collection behavior
 that we can observe. Leave the application running, we will return to it
-shortly.</p><h4 id=step-3-start-visualvm>Step 3: Start VisualVM<a href=#step-3-start-visualvm class=hanchor arialabel=Anchor>&#8983;</a></h4><p>To start Visual VM, use the <code>jvisualvm</code> executable in the <code>C:\Program Files\Java\jdk1.7.0_XX\bin</code> directory. I recommend that you add this directory
-to you path. On Windows 7 the steps would be: <strong>Start -> Computer -> System
-Properties -> Advanced System Settings -> Environment Variables</strong>. Then under
+shortly.</p>
+<h4 id="step-3-start-visualvm">Step 3: Start VisualVM<a arialabel="Anchor" class="hanchor" href="#step-3-start-visualvm">⌗</a> </h4>
+<p>To start Visual VM, use the <code>jvisualvm</code> executable in the <code>C:\Program Files\Java\jdk1.7.0_XX\bin</code> directory. I recommend that you add this directory
+to you path. On Windows 7 the steps would be: <strong>Start -&gt; Computer -&gt; System
+Properties -&gt; Advanced System Settings -&gt; Environment Variables</strong>. Then under
 <strong>System Variables</strong> select <code>Path</code> and add <code>C:\Program Files\Java\jdk1.7.0_XX\bin;</code> to the <code>Path</code> (where XX is the current version of
-the JDK). Click <strong>Ok</strong> several times and then close the dialog.</p><p>Once this is done, you should be able to open a <strong>Command Prompt</strong> windows and
-type <code>jvisualvm</code>.</p><p>The first time Visual VM runs, it will do a calibration of your system. You
+the JDK). Click <strong>Ok</strong> several times and then close the dialog.</p>
+<p>Once this is done, you should be able to open a <strong>Command Prompt</strong> windows and
+type <code>jvisualvm</code>.</p>
+<p>The first time Visual VM runs, it will do a calibration of your system. You
 will see messages like the following:
-<img src=637855F59D204B31A7D8B31D5F92CB2E alt=visualvm01></p><p>Then a message like this:
-<img src=F6D466F6F903475595CBD62AA94B0E07 alt=visualvm02></p><p>Finally the main user interface loads.
-<img src=9E9E2E5138E544B68096F35DF14086E6 alt=visualvm03></p><p>From here, we can monitor running JVMs. However, for this activty we need to
-add the VisualGC plugin.</p><h4 id=step-4-install-visual-gc>Step 4: Install Visual GC<a href=#step-4-install-visual-gc class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The Visual GC plugin for Visual VM provides a graphical representation of the
+<img alt="visualvm01" src="637855F59D204B31A7D8B31D5F92CB2E"/></p>
+<p>Then a message like this:
+<img alt="visualvm02" src="F6D466F6F903475595CBD62AA94B0E07"/></p>
+<p>Finally the main user interface loads.
+<img alt="visualvm03" src="9E9E2E5138E544B68096F35DF14086E6"/></p>
+<p>From here, we can monitor running JVMs. However, for this activty we need to
+add the VisualGC plugin.</p>
+<h4 id="step-4-install-visual-gc">Step 4: Install Visual GC<a arialabel="Anchor" class="hanchor" href="#step-4-install-visual-gc">⌗</a> </h4>
+<p>The Visual GC plugin for Visual VM provides a graphical representation of the
 garbage collectors activity in the JVM. It is free and can be added to your
-installation by following these steps.</p><pre><code>1. To install Visual GC, from the menu select **Tools --&gt; Plugins**. You should get the following dialog.
-</code></pre><p><img src=0B1F19353BAF41A4A9445EAA4715FC94 alt=VisualGCIns01></p><pre><code>2. Select **Visual GC** and then select the **Install** button.
-</code></pre><p><img src=11957D5A28E44F43A4D93EB97EAAADB3 alt=VisualGCIns02></p><pre><code>3. The plugin installer starts. Click **Next**.
-</code></pre><p><img src=B32D7A11E5A44A2DAEBBE3FEBBF7EE10 alt=VisualGCIns03></p><pre><code>4. Read and accept the license agreement. Click **Install**. The plugin will now be installed.
-</code></pre><p><img src=7D9BEA35C9EE4818BA4088D6ED4F35AD alt=VisualGCIns04></p><pre><code>5. The plugin is now installed. Click **Finish** to complete the installation.
-</code></pre><p><img src=35BB6C8957EE4707A9C47FBB758CBBCE alt=VisualGCIns05></p><pre><code>6. Click the **Close** button to close the Plugins dialog.
-</code></pre><p>VisualGC is installed. Now we can examine the Java2Demo to see what sort of
-things are going on.</p><h4 id=step-5-analyze-the-java2demo>Step 5: Analyze the Java2Demo<a href=#step-5-analyze-the-java2demo class=hanchor arialabel=Anchor>&#8983;</a></h4><p>Time to analyze the application we started in step 2.</p><ol><li><p>First, right click the Java2Demo application in the Local applications list of the Applications tab. Select <strong>Open</strong>.
-<img src=F63F3931390D45F3A1EFA325B1EAB22A alt=Java2Demo01></p></li><li><p>The application is loaded into Visual VM. Notice a number of tabs are loaded on the right side of the interface. Click the <strong>Visual GC</strong> tab.
-<img src=BE16F6710F194E9A875325E5E9DEF286 alt=Java2Demo02></p></li><li><p>The Visual GC tab shows all the activity going on in the Garbage Collector. You can watch as the Eden space is filled up and data is moved between the two survivor spaces S1 and S0. In addition, graphs and stats of related to the garbage collector are shown at the right.
-<img src=5043E36751824EBB9D7746B6D1153B93 alt=Java2Demo03></p></li></ol><p>Feel free to try the other tabs and see what information is presented about
+installation by following these steps.</p>
+<pre><code>1. To install Visual GC, from the menu select **Tools --&gt; Plugins**. You should get the following dialog.
+</code></pre>
+<p><img alt="VisualGCIns01" src="0B1F19353BAF41A4A9445EAA4715FC94"/></p>
+<pre><code>2. Select **Visual GC** and then select the **Install** button.
+</code></pre>
+<p><img alt="VisualGCIns02" src="11957D5A28E44F43A4D93EB97EAAADB3"/></p>
+<pre><code>3. The plugin installer starts. Click **Next**.
+</code></pre>
+<p><img alt="VisualGCIns03" src="B32D7A11E5A44A2DAEBBE3FEBBF7EE10"/></p>
+<pre><code>4. Read and accept the license agreement. Click **Install**. The plugin will now be installed.
+</code></pre>
+<p><img alt="VisualGCIns04" src="7D9BEA35C9EE4818BA4088D6ED4F35AD"/></p>
+<pre><code>5. The plugin is now installed. Click **Finish** to complete the installation.
+</code></pre>
+<p><img alt="VisualGCIns05" src="35BB6C8957EE4707A9C47FBB758CBBCE"/></p>
+<pre><code>6. Click the **Close** button to close the Plugins dialog.
+</code></pre>
+<p>VisualGC is installed. Now we can examine the Java2Demo to see what sort of
+things are going on.</p>
+<h4 id="step-5-analyze-the-java2demo">Step 5: Analyze the Java2Demo<a arialabel="Anchor" class="hanchor" href="#step-5-analyze-the-java2demo">⌗</a> </h4>
+<p>Time to analyze the application we started in step 2.</p>
+<ol>
+<li>
+<p>First, right click the Java2Demo application in the Local applications list of the Applications tab. Select <strong>Open</strong>.
+<img alt="Java2Demo01" src="F63F3931390D45F3A1EFA325B1EAB22A"/></p>
+</li>
+<li>
+<p>The application is loaded into Visual VM. Notice a number of tabs are loaded on the right side of the interface. Click the <strong>Visual GC</strong> tab.
+<img alt="Java2Demo02" src="BE16F6710F194E9A875325E5E9DEF286"/></p>
+</li>
+<li>
+<p>The Visual GC tab shows all the activity going on in the Garbage Collector. You can watch as the Eden space is filled up and data is moved between the two survivor spaces S1 and S0. In addition, graphs and stats of related to the garbage collector are shown at the right.
+<img alt="Java2Demo03" src="5043E36751824EBB9D7746B6D1153B93"/></p>
+</li>
+</ol>
+<p>Feel free to try the other tabs and see what information is presented about
 the JVM. In addition, you can try changing the number of strings or images
 shown in our sample application to see how that affects the garbage collection
-process.</p><h2 id=java-garbage-collectors>Java Garbage Collectors<a href=#java-garbage-collectors class=hanchor arialabel=Anchor>&#8983;</a></h2><p>You now know the basics of garbage collection and have observed the garbage
+process.</p>
+<h2 id="java-garbage-collectors">Java Garbage Collectors<a arialabel="Anchor" class="hanchor" href="#java-garbage-collectors">⌗</a> </h2>
+<p>You now know the basics of garbage collection and have observed the garbage
 collector in action on a sample application. In this section, you will learn
 about the garbage collectors available for Java and the command line switches
-you need to select them.</p><h3 id=common-heap-related-switches>Common Heap Related Switches<a href=#common-heap-related-switches class=hanchor arialabel=Anchor>&#8983;</a></h3><p>There are many different command line switches that can be used with Java.
+you need to select them.</p>
+<h3 id="common-heap-related-switches">Common Heap Related Switches<a arialabel="Anchor" class="hanchor" href="#common-heap-related-switches">⌗</a> </h3>
+<p>There are many different command line switches that can be used with Java.
 This section describes some of the more commonly used switches that are also
-used in this OBE.</p><table><thead><tr><th><strong>Switch</strong></th><th><strong>Description</strong></th></tr></thead><tbody><tr><td><code>-Xms</code></td><td>Sets the initial heap size for when the JVM starts.</td></tr><tr><td><code>-Xmx</code></td><td>Sets the maximum heap size.</td></tr><tr><td><code>-Xmn</code></td><td>Sets the size of the Young Generation.</td></tr><tr><td>-XX:PermSize</td><td>Sets the starting size of the Permanent Generation.</td></tr><tr><td>-XX:MaxPermSize</td><td>Sets the maximum size of the Permanent Generation</td></tr></tbody></table><h3 id=the-serial-gc>The Serial GC<a href=#the-serial-gc class=hanchor arialabel=Anchor>&#8983;</a></h3><p>The serial collector is the default for client style machines in Java SE 5 and
+used in this OBE.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Switch</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-Xms</code></td>
+<td>Sets the initial heap size for when the JVM starts.</td>
+</tr>
+<tr>
+<td><code>-Xmx</code></td>
+<td>Sets the maximum heap size.</td>
+</tr>
+<tr>
+<td><code>-Xmn</code></td>
+<td>Sets the size of the Young Generation.</td>
+</tr>
+<tr>
+<td>-XX:PermSize</td>
+<td>Sets the starting size of the Permanent Generation.</td>
+</tr>
+<tr>
+<td>-XX:MaxPermSize</td>
+<td>Sets the maximum size of the Permanent Generation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-serial-gc">The Serial GC<a arialabel="Anchor" class="hanchor" href="#the-serial-gc">⌗</a> </h3>
+<p>The serial collector is the default for client style machines in Java SE 5 and
 6. With the serial collector, both minor and major garbage collections are
 done serially (using a single virtual CPU). In addition, it uses a mark-
 compact collection method. This method moves older memory to the beginning of
 the heap so that new memory allocations are made into a single continuous
 chunk of memory at the end of the heap. This compacting of memory makes it
-faster to allocate new chunks of memory to the heap.</p><h4 id=usage-cases>Usage Cases<a href=#usage-cases class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The Serial GC is the garbage collector of choice for most applications that do
+faster to allocate new chunks of memory to the heap.</p>
+<h4 id="usage-cases">Usage Cases<a arialabel="Anchor" class="hanchor" href="#usage-cases">⌗</a> </h4>
+<p>The Serial GC is the garbage collector of choice for most applications that do
 not have low pause time requirements and run on client-style machines. It
 takes advantage of only a single virtual processor for garbage collection work
-(therefore, its name). Still, on today&rsquo;s hardware, the Serial GC can
+(therefore, its name). Still, on today’s hardware, the Serial GC can
 efficiently manage a lot of non-trivial applications with a few hundred MBs of
 Java heap, with relatively short worst-case pauses (around a couple of seconds
-for full garbage collections).</p><p>Another popular use for the Serial GC is in environments where a high number
+for full garbage collections).</p>
+<p>Another popular use for the Serial GC is in environments where a high number
 of JVMs are run on the same machine (in some cases, more JVMs than available
 processors!). In such environments when a JVM does a garbage collection it is
 better to use only one processor to minimize the interference on the remaining
 JVMs, even if the garbage collection might last longer. And the Serial GC fits
-this trade-off nicely.</p><p>Finally, with the proliferation of embedded hardware with minimal memory and
-few cores, the Serial GC could make a comeback.</p><h4 id=command-line-switches>Command Line Switches<a href=#command-line-switches class=hanchor arialabel=Anchor>&#8983;</a></h4><p>To enable the Serial Collector use:<br><code>-XX:+UseSerialGC</code></p><p>Here is a sample command line for starting the <code>Java2Demo</code>:<br><code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseSerialGC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p><h3 id=the-parallel-gc>The Parallel GC<a href=#the-parallel-gc class=hanchor arialabel=Anchor>&#8983;</a></h3><p>The parallel garbage collector uses multiple threads to perform the young
+this trade-off nicely.</p>
+<p>Finally, with the proliferation of embedded hardware with minimal memory and
+few cores, the Serial GC could make a comeback.</p>
+<h4 id="command-line-switches">Command Line Switches<a arialabel="Anchor" class="hanchor" href="#command-line-switches">⌗</a> </h4>
+<p>To enable the Serial Collector use:<br/>
+<code>-XX:+UseSerialGC</code></p>
+<p>Here is a sample command line for starting the <code>Java2Demo</code>:<br/>
+<code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseSerialGC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p>
+<h3 id="the-parallel-gc">The Parallel GC<a arialabel="Anchor" class="hanchor" href="#the-parallel-gc">⌗</a> </h3>
+<p>The parallel garbage collector uses multiple threads to perform the young
 genertion garbage collection. By default on a host with N CPUs, the parallel
 garbage collector uses N garbage collector threads in the collection. The
 number of garbage collector threads can be controlled with command-line
-options:<br><code>-XX:ParallelGCThreads=&lt;desired number></code></p><p>On a host with a single CPU the default garbage collector is used even if the
+options:<br/>
+<code>-XX:ParallelGCThreads=&lt;desired number&gt;</code></p>
+<p>On a host with a single CPU the default garbage collector is used even if the
 parallel garbage collector has been requested. On a host with two CPUs the
 parallel garbage collector generally performs as well as the default garbage
 collector and a reduction in the young generationgarbage collector pause times
 can be expected on hosts with more than two CPUs. The Parallel GC comes in two
-flavors.</p><h4 id=usage-cases-1>Usage Cases<a href=#usage-cases-1 class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The Parallel collector is also called a throughput collector. Since it can use
+flavors.</p>
+<h4 id="usage-cases-1">Usage Cases<a arialabel="Anchor" class="hanchor" href="#usage-cases-1">⌗</a> </h4>
+<p>The Parallel collector is also called a throughput collector. Since it can use
 multilple CPUs to speed up application throughput. This collector should be
 used when a lot of work need to be done and long pauses are acceptable. For
 example, batch processing like printing reports or bills or performing a large
-number of database queries.</p><h4 id=-xxuseparallelgc><code>-XX:+UseParallelGC</code><a href=#-xxuseparallelgc class=hanchor arialabel=Anchor>&#8983;</a></h4><p>With this command line option you get a multi-thread young generation
+number of database queries.</p>
+<h4 id="-xxuseparallelgc"><code>-XX:+UseParallelGC</code><a arialabel="Anchor" class="hanchor" href="#-xxuseparallelgc">⌗</a> </h4>
+<p>With this command line option you get a multi-thread young generation
 collector with a single-threaded old generation collector. The option also
-does single-threaded compaction of old generation.</p><p>Here is a sample command line for starting the <code>Java2Demo</code>:<br><code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseParallelGC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p><h4 id=-xxuseparalleloldgc><code>-XX:+UseParallelOldGC</code><a href=#-xxuseparalleloldgc class=hanchor arialabel=Anchor>&#8983;</a></h4><p>With the <code>-XX:+UseParallelOldGC</code> option, the GC is both a multithreaded young
+does single-threaded compaction of old generation.</p>
+<p>Here is a sample command line for starting the <code>Java2Demo</code>:<br/>
+<code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseParallelGC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p>
+<h4 id="-xxuseparalleloldgc"><code>-XX:+UseParallelOldGC</code><a arialabel="Anchor" class="hanchor" href="#-xxuseparalleloldgc">⌗</a> </h4>
+<p>With the <code>-XX:+UseParallelOldGC</code> option, the GC is both a multithreaded young
 generation collector and multithreaded old generation collector. It is also a
 multithreaded compacting collector. HotSpot does compaction only in the old
 generation. Young generation in HotSpot is considered a copy collector;
-therefore, there is no need for compaction.</p><p>Compacting describes the act of moving objects in a way that there are no
+therefore, there is no need for compaction.</p>
+<p>Compacting describes the act of moving objects in a way that there are no
 holes between objects. After a garbage collection sweep, there may be holes
 left between live objects. Compacting moves objects so that there are no
 remaining holes. It is possible that a garbage collector be a non-compacting
 collector. Therefore, the difference between a parallel collector and a
 parallel compacting collector could be the latter compacts the space after a
-garbage collection sweep. The former would not.</p><p>Here is a sample command line for starting the <code>Java2Demo</code>:<br><code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseParallelOldGC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p><h3 id=the-concurrent-mark-sweep-cms-collector>The Concurrent Mark Sweep (CMS) Collector<a href=#the-concurrent-mark-sweep-cms-collector class=hanchor arialabel=Anchor>&#8983;</a></h3><p>The Concurrent Mark Sweep (CMS) collector (also referred to as the concurrent
+garbage collection sweep. The former would not.</p>
+<p>Here is a sample command line for starting the <code>Java2Demo</code>:<br/>
+<code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseParallelOldGC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p>
+<h3 id="the-concurrent-mark-sweep-cms-collector">The Concurrent Mark Sweep (CMS) Collector<a arialabel="Anchor" class="hanchor" href="#the-concurrent-mark-sweep-cms-collector">⌗</a> </h3>
+<p>The Concurrent Mark Sweep (CMS) collector (also referred to as the concurrent
 low pause collector) collects the tenured generation. It attempts to minimize
 the pauses due to garbage collection by doing most of the garbage collection
 work concurrently with the application threads. Normally the concurrent low
 pause collector does not copy or compact the live objects. A garbage
 collection is done without moving the live objects. If fragmentation becomes a
-problem, allocate a larger heap.</p><p><strong>Note:</strong> CMS collector on young generation uses the same algorithm as that of
-the parallel collector.</p><h4 id=usage-cases-2>Usage Cases<a href=#usage-cases-2 class=hanchor arialabel=Anchor>&#8983;</a></h4><p>The CMS collector should be used for applications that require low pause times
+problem, allocate a larger heap.</p>
+<p><strong>Note:</strong> CMS collector on young generation uses the same algorithm as that of
+the parallel collector.</p>
+<h4 id="usage-cases-2">Usage Cases<a arialabel="Anchor" class="hanchor" href="#usage-cases-2">⌗</a> </h4>
+<p>The CMS collector should be used for applications that require low pause times
 and can share resources with the garbage collector. Examples include desktop
 UI application that respond to events, a webserver responding to a request or
-a database responding to queries.</p><h4 id=command-line-switches-1>Command Line Switches<a href=#command-line-switches-1 class=hanchor arialabel=Anchor>&#8983;</a></h4><p>To enable the CMS Collector use:<br><code>-XX:+UseConcMarkSweepGC</code><br>and to set the number of threads use:<br><code>-XX:ParallelCMSThreads=&lt;n></code></p><p>Here is a sample command line for starting the <code>Java2Demo</code>:<br><code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseConcMarkSweepGC -XX:ParallelCMSThreads=2 -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p><h3 id=the-g1-garbage-collector>The G1 Garbage Collector<a href=#the-g1-garbage-collector class=hanchor arialabel=Anchor>&#8983;</a></h3><p>The Garbage First or G1 garbage collector is available in Java 7 and is
+a database responding to queries.</p>
+<h4 id="command-line-switches-1">Command Line Switches<a arialabel="Anchor" class="hanchor" href="#command-line-switches-1">⌗</a> </h4>
+<p>To enable the CMS Collector use:<br/>
+<code>-XX:+UseConcMarkSweepGC</code><br/>
+and to set the number of threads use:<br/>
+<code>-XX:ParallelCMSThreads=&lt;n&gt;</code></p>
+<p>Here is a sample command line for starting the <code>Java2Demo</code>:<br/>
+<code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseConcMarkSweepGC -XX:ParallelCMSThreads=2 -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p>
+<h3 id="the-g1-garbage-collector">The G1 Garbage Collector<a arialabel="Anchor" class="hanchor" href="#the-g1-garbage-collector">⌗</a> </h3>
+<p>The Garbage First or G1 garbage collector is available in Java 7 and is
 designed to be the long term replacement for the CMS collector. The G1
 collector is a parallel, concurrent, and incrementally compacting low-pause
 garbage collector that has quite a different layout from the other garbage
 collectors described previously. However, detailed discussion is beyond the
-scope of this OBE.</p><h4 id=command-line-switches-2>Command Line Switches<a href=#command-line-switches-2 class=hanchor arialabel=Anchor>&#8983;</a></h4><p>To enable the G1 Collector use:<br><code>-XX:+UseG1GC</code></p><p>Here is a sample command line for starting the <code>Java2Demo</code>:<br><code>java -Xmx12m -Xms3m -XX:+UseG1GC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p><h2 id=summary>Summary<a href=#summary class=hanchor arialabel=Anchor>&#8983;</a></h2><p>In this OBE, you have been given an overview of garbage collection system on
+scope of this OBE.</p>
+<h4 id="command-line-switches-2">Command Line Switches<a arialabel="Anchor" class="hanchor" href="#command-line-switches-2">⌗</a> </h4>
+<p>To enable the G1 Collector use:<br/>
+<code>-XX:+UseG1GC</code></p>
+<p>Here is a sample command line for starting the <code>Java2Demo</code>:<br/>
+<code>java -Xmx12m -Xms3m -XX:+UseG1GC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p>
+<h2 id="summary">Summary<a arialabel="Anchor" class="hanchor" href="#summary">⌗</a> </h2>
+<p>In this OBE, you have been given an overview of garbage collection system on
 the Java JVM. First you learned how the Heap and the Garbage Collector are key
 parts of any Java JVM. Automatic garbage collection is accomplished using
 generational garbage collection approach. Once you learned the process, you
 observed it using the Visual VM tool. Finally, you reviewed the garbage
-collectors that are available in the Java Hospot JVM.</p><p>In this tutorial, you have learned:</p><ul><li>The components of the Java JVM</li><li>How automatic garbage collection works</li><li>The generational garbage collection process</li><li>How to monitor your JVM with Visual VM</li><li>The types of garbage collectors available on the JVM</li></ul><h4 id=resources>Resources<a href=#resources class=hanchor arialabel=Anchor>&#8983;</a></h4><p>For more information and related information please see these site and links.</p><ul><li><a href="http://education.oracle.com/pls/web_prod-plq-dad/db_pages.getpage?page_id=609&p_org_id=1001&lang=US&get_params=dc:D67232GC10,p_preview:N">Java SE 7: Develop Rich Client Applications</a></li><li><a href="http://www.amazon.com/Java-Performance-Charlie-Hunt/dp/0137142528/ref=sr_1_1">Java Performance - Charlie Hunt and Binu John</a></li><li><a href=http://www.oracle.com/oll>Oracle Learning Library</a></li></ul><h4 id=credits>Credits<a href=#credits class=hanchor arialabel=Anchor>&#8983;</a></h4><ul><li>Curriculum Developer: Michael J Williams</li><li>QA: Krishnanjani Chitta</li></ul><p>Help<a href=http://www.oracle.com/goto/oll> OLL</a><a href=http://www.oracle.com/us/corporate/index.html> About
+collectors that are available in the Java Hospot JVM.</p>
+<p>In this tutorial, you have learned:</p>
+<ul>
+<li>The components of the Java JVM</li>
+<li>How automatic garbage collection works</li>
+<li>The generational garbage collection process</li>
+<li>How to monitor your JVM with Visual VM</li>
+<li>The types of garbage collectors available on the JVM</li>
+</ul>
+<h4 id="resources">Resources<a arialabel="Anchor" class="hanchor" href="#resources">⌗</a> </h4>
+<p>For more information and related information please see these site and links.</p>
+<ul>
+<li><a href="http://education.oracle.com/pls/web_prod-plq-dad/db_pages.getpage?page_id=609&amp;p_org_id=1001&amp;lang=US&amp;get_params=dc:D67232GC10,p_preview:N">Java SE 7: Develop Rich Client Applications</a></li>
+<li><a href="http://www.amazon.com/Java-Performance-Charlie-Hunt/dp/0137142528/ref=sr_1_1">Java Performance - Charlie Hunt and Binu John</a></li>
+<li><a href="http://www.oracle.com/oll">Oracle Learning Library</a></li>
+</ul>
+<h4 id="credits">Credits<a arialabel="Anchor" class="hanchor" href="#credits">⌗</a> </h4>
+<ul>
+<li>Curriculum Developer: Michael J Williams</li>
+<li>QA: Krishnanjani Chitta</li>
+</ul>
+<p>Help<a href="http://www.oracle.com/goto/oll"> OLL</a><a href="http://www.oracle.com/us/corporate/index.html"> About
 Oracle</a><a href="http://apex.oracle.com/pls/apex/f?p=44785:34:0"> Contact
-Us</a><a href=http://www.oracle.com/us/legal/terms/index.html> Terms of
-Use</a></p></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2020/07/09/jvm-learn-19/><span class=button__icon>←</span>
-<span class=button__text>JVM Learn 19 JVM垃圾回收算法总结</span></a></span>
-<span class="button next"><a href=https://dongzhi.me/2020/07/07/jvm-learn-08/><span class=button__text>JVM Learn 08 线程上下文类加载器和Service Loader</span>
-<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
-<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
-<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
+Us</a><a href="http://www.oracle.com/us/legal/terms/index.html"> Terms of
+Use</a></p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://dongzhi.me/2020/07/09/jvm-learn-19/">
+<span class="button__icon">←</span>
+<span class="button__text">JVM Learn 19 JVM垃圾回收算法总结</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-08/">
+<span class="button__text">JVM Learn 08 线程上下文类加载器和Service Loader</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<div id="hyvor-talk-view"></div>
+<script type="text/javascript">
+		var HYVOR_TALK_WEBSITE = 1505; 
+		var HYVOR_TALK_CONFIG = {
+        url: false,
+        id: false
+		};
+	  </script>
+<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

@@ -1,65 +1,211 @@
-<!doctype html><html lang=en><head><title>JVM Learn 03 理解类的初始化的一个简单例子 :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="这是一个经典例子，很多面试题中出现过。首先引入正常的情况： 1package com.test.jvm.learn01; 2 3public class Main2 { 4 public static void main(String[] args) { 5 System.out.println(Counter.counter1); 6 System.out.println(Counter.counter2); 7 } 8} 9 10 11package com.test.jvm.learn01; 12 13public class Counter { 14 15 public static int counter1; 16 public static int counter2 = 0; 17 public static Counter counter = new Counter(); 18 19 private Counter() { 20 counter1++; 21 counter2++; 22 System.out.println(counter1); 23 System.out.println(counter2); 24 } 25 26 public static Counter"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2020/07/06/jvm-learn-03/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content="John Doe"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="JVM Learn 03 理解类的初始化的一个简单例子 :: DongZhi.ME"><meta property="og:description" content="这是一个经典例子，很多面试题中出现过。首先引入正常的情况："><meta property="og:url" content="https://dongzhi.me/2020/07/06/jvm-learn-03/"><meta property="og:site_name" content="JVM Learn 03 理解类的初始化的一个简单例子"><meta property="og:image" content="https://dongzhi.me/"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:published_time" content="2020-07-06 00:00:00 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2020/07/06/jvm-learn-03/>JVM Learn 03 理解类的初始化的一个简单例子</a></h1><div class=post-meta><span class=post-date>2020-07-06</span>
-<span class=post-author>::
-John Doe</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/jvm/>jvm</a>&nbsp;</span><div class=post-content><div><blockquote><p>这是一个经典例子，很多面试题中出现过。首先引入正常的情况：</p></blockquote><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> com.test.jvm.learn01<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Main2</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>		System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span>Counter<span style=color:#f92672>.</span><span style=color:#a6e22e>counter1</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>		System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span>Counter<span style=color:#f92672>.</span><span style=color:#a6e22e>counter2</span><span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>	<span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span><span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span><span style=color:#f92672>package</span> com.test.jvm.learn01<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Counter</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> counter1<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> counter2 <span style=color:#f92672>=</span> 0<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> Counter counter <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Counter<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>	<span style=color:#66d9ef>private</span> <span style=color:#a6e22e>Counter</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>		counter1<span style=color:#f92672>++;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>		counter2<span style=color:#f92672>++;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>		System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span>counter1<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>		System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span>counter2<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>	<span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> Counter <span style=color:#a6e22e>getInstance</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>		<span style=color:#66d9ef>return</span> counter<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span>	<span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span><span style=color:#f92672>}</span>
-</code></pre></div><p>输出结果为：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span style=color:#ae81ff>1</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span style=color:#ae81ff>1</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span style=color:#ae81ff>1</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span><span style=color:#ae81ff>1</span>
-</code></pre></div><p>如果把第6行private static int counter2 = 0;挪到第15行，即：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> com.test.jvm.learn01<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Counter</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> counter1<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> Counter counter <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Counter<span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>	<span style=color:#66d9ef>private</span> <span style=color:#a6e22e>Counter</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>		counter1<span style=color:#f92672>++;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>		counter2<span style=color:#f92672>++;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>		System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span>counter1<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>		System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span>counter2<span style=color:#f92672>);</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>	<span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> counter2 <span style=color:#f92672>=</span> 0<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> Counter <span style=color:#a6e22e>getInstance</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>		<span style=color:#66d9ef>return</span> counter<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>	<span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span><span style=color:#f92672>}</span>
-</code></pre></div><p>然后输出的结果：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span style=color:#ae81ff>1</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span style=color:#ae81ff>1</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span style=color:#ae81ff>1</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span><span style=color:#ae81ff>0</span>
-</code></pre></div><p>第一种情况是正常输出，下面从类的加载和初始化上解释第二种情况的结果:</p><ol><li>main方法中调用了Counter类的静态字段Counter.counter1，所以Counter类被主动使用，触发Counter类的初始化。</li><li>在类的连接过程中的准备阶段，静态变量分配内存且赋上默认值，所以从上到下，counter1=0，counter =null,counter2 =0</li><li>然后在类的初始化过程中，从上到下依次初始化各个字段：counter1为初始化为0</li><li>在初始化counter时需要创建Counter对象，Counter的构造方法被调用，所以初始化counter后，counter1=1，counter2=1</li><li>初始化counter引用后，紧接着初始化counter2，此时counter2被显式赋值为0，所以此时，counter1=1，counter2=0</li><li>最后打印输出即为第4步的结果</li></ol></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2020/07/06/jvm-learn-02/><span class=button__icon>←</span>
-<span class=button__text>JVM Learn 02 常量的那点东西</span></a></span>
-<span class="button next"><a href=https://dongzhi.me/2020/07/06/jvm-learn-04/><span class=button__text>JVM Learn 04 类加载器(一)</span>
-<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
-<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
-<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>JVM Learn 03 理解类的初始化的一个简单例子 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="这是一个经典例子，很多面试题中出现过。首先引入正常的情况： 1package com.test.jvm.learn01; 2 3public class Main2 { 4 public static void main(String[] args) { 5 System.out.println(Counter.counter1); 6 System.out.println(Counter.counter2); 7 } 8} 9 10 11package com.test.jvm.learn01; 12 13public class Counter { 14 15 public static int counter1; 16 public static int counter2 = 0; 17 public static Counter counter = new Counter(); 18 19 private Counter() { 20 counter1++; 21 counter2++; 22 System.out.println(counter1); 23 System.out.println(counter2); 24 } 25 26 public static Counter" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/07/06/jvm-learn-03/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="John Doe" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="JVM Learn 03 理解类的初始化的一个简单例子 :: DongZhi.ME" property="og:title"/>
+<meta content="这是一个经典例子，很多面试题中出现过。首先引入正常的情况：" property="og:description"/>
+<meta content="https://dongzhi.me/2020/07/06/jvm-learn-03/" property="og:url"/>
+<meta content="JVM Learn 03 理解类的初始化的一个简单例子" property="og:site_name"/>
+<meta content="https://dongzhi.me/" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-07-06 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/06/jvm-learn-03/">JVM Learn 03 理解类的初始化的一个简单例子</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-07-06 
+      </span>
+<span class="post-author">::
+      John Doe
+    </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
+    
+  </span>
+<div class="post-content"><div>
+<blockquote>
+<p>这是一个经典例子，很多面试题中出现过。首先引入正常的情况：</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> com.test.jvm.learn01<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Main2</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>		System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Counter<span style="color:#f92672">.</span><span style="color:#a6e22e">counter1</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>		System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Counter<span style="color:#f92672">.</span><span style="color:#a6e22e">counter2</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>	<span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span style="color:#f92672">package</span> com.test.jvm.learn01<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Counter</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> counter1<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> counter2 <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Counter counter <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Counter<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>	<span style="color:#66d9ef">private</span> <span style="color:#a6e22e">Counter</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>		counter1<span style="color:#f92672">++;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>		counter2<span style="color:#f92672">++;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>		System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>counter1<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>		System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>counter2<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>	<span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Counter <span style="color:#a6e22e">getInstance</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>		<span style="color:#66d9ef">return</span> counter<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>	<span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span><span style="color:#f92672">}</span>
+</code></pre></div><p>输出结果为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#ae81ff">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span style="color:#ae81ff">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span style="color:#ae81ff">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span style="color:#ae81ff">1</span>
+</code></pre></div><p>如果把第6行private static int counter2 = 0;挪到第15行，即：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> com.test.jvm.learn01<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Counter</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> counter1<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Counter counter <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Counter<span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>	<span style="color:#66d9ef">private</span> <span style="color:#a6e22e">Counter</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>		counter1<span style="color:#f92672">++;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>		counter2<span style="color:#f92672">++;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>		System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>counter1<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>		System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>counter2<span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>	<span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> counter2 <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Counter <span style="color:#a6e22e">getInstance</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>		<span style="color:#66d9ef">return</span> counter<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>	<span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span style="color:#f92672">}</span>
+</code></pre></div><p>然后输出的结果：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#ae81ff">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span style="color:#ae81ff">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span style="color:#ae81ff">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span style="color:#ae81ff">0</span>
+</code></pre></div><p>第一种情况是正常输出，下面从类的加载和初始化上解释第二种情况的结果:</p>
+<ol>
+<li>main方法中调用了Counter类的静态字段Counter.counter1，所以Counter类被主动使用，触发Counter类的初始化。</li>
+<li>在类的连接过程中的准备阶段，静态变量分配内存且赋上默认值，所以从上到下，counter1=0，counter =null,counter2 =0</li>
+<li>然后在类的初始化过程中，从上到下依次初始化各个字段：counter1为初始化为0</li>
+<li>在初始化counter时需要创建Counter对象，Counter的构造方法被调用，所以初始化counter后，counter1=1，counter2=1</li>
+<li>初始化counter引用后，紧接着初始化counter2，此时counter2被显式赋值为0，所以此时，counter1=1，counter2=0</li>
+<li>最后打印输出即为第4步的结果</li>
+</ol>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://dongzhi.me/2020/07/06/jvm-learn-02/">
+<span class="button__icon">←</span>
+<span class="button__text">JVM Learn 02 常量的那点东西</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://dongzhi.me/2020/07/06/jvm-learn-04/">
+<span class="button__text">JVM Learn 04 类加载器(一)</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<div id="hyvor-talk-view"></div>
+<script type="text/javascript">
+		var HYVOR_TALK_WEBSITE = 1505; 
+		var HYVOR_TALK_CONFIG = {
+        url: false,
+        id: false
+		};
+	  </script>
+<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

@@ -1,10 +1,243 @@
-<!doctype html><html lang=en><head><meta name=generator content="Hugo 0.74.3"><title>DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="A simple, retro blog for latest information technology!"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content><meta property="og:locale" content="en"><meta property="og:type" content="website"><meta property="og:title" content="DongZhi.ME"><meta property="og:description" content="A simple, retro blog for latest information technology!"><meta property="og:url" content="https://dongzhi.me/"><meta property="og:site_name" content="DongZhi.ME"><meta property="og:image" content="https://dongzhi.me/img/favicon/orange.png"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><link href=/index.xml rel=alternate type=application/rss+xml title=DongZhi.ME><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=posts><div class="post on-list"><h1 class=post-title><a href=https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/>记一次公司JVM堆溢出抽丝剥茧定位的过程</a></h1><div class=post-meta><span class=post-date>2020-08-27</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/jvm/>jvm</a>&nbsp;</span>
-<a href=/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png class=post-cover alt=记一次公司JVM堆溢出抽丝剥茧定位的过程></a><div class=post-content>背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为</div><div><a class="read-more button" href=/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/>Read more →</a></div></div><div class="post on-list"><h1 class=post-title><a href=https://dongzhi.me/2020/08/21/kexueshangwang/>v2ray客户端配置简易说明</a></h1><div class=post-meta><span class=post-date>2020-08-21</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/jihuoma/>jihuoma</a>&nbsp;</span><div class=post-content>v2ray客户端配置简易说明</div><div><a class="read-more button" href=/2020/08/21/kexueshangwang/>Read more →</a></div></div><div class="post on-list"><h1 class=post-title><a href=https://dongzhi.me/2020/08/04/some-useful-licences/>Some Useful Licences</a></h1><div class=post-meta><span class=post-date>2020-08-04</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/jihuoma/>jihuoma</a>&nbsp;</span><div class=post-content>整理一些激活码</div><div><a class="read-more button" href=/2020/08/04/some-useful-licences/>Read more →</a></div></div><div class="post on-list"><h1 class=post-title><a href=https://dongzhi.me/2020/07/18/do-you-believe-justice/>你相信正义吗</a></h1><div class=post-meta><span class=post-date>2020-07-18</span>
-<span class=post-author>::John Doe</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/life/>life</a>&nbsp;</span>
-<a href=/2020/07/18/do-you-believe-justice/><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/cuiyongyuan.jpg class=post-cover alt=你相信正义吗></a><div class=post-content><blockquote><p>你相信正义吗？一段不错的视频，分享一下！</p></blockquote></div><div><a class="read-more button" href=/2020/07/18/do-you-believe-justice/>Read more →</a></div></div><div class="post on-list"><h1 class=post-title><a href=https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/>在CentOS7上如何下载Youtube视频?</a></h1><div class=post-meta><span class=post-date>2020-07-11</span>
-<span class=post-author>::John Doe</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/linux/>linux</a>&nbsp;</span>
-<a href=/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/youtube_download.jpg class=post-cover alt=在CentOS7上如何下载Youtube视频?></a><div class=post-content>下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。 前提条件： 一台国外的vps。</div><div><a class="read-more button" href=/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/>Read more →</a></div></div><div class="post on-list"><h1 class=post-title><a href=https://dongzhi.me/2020/07/09/jvm-learn-16/>JVM Learn 16 一个线程死锁的例子及问题排查</a></h1><div class=post-meta><span class=post-date>2020-07-09</span>
-<span class=post-author>::Joe John</span></div><a href=/2020/07/09/jvm-learn-16/><img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/thread_life_cycle.png class=post-cover alt="JVM Learn 16 一个线程死锁的例子及问题排查"></a><div class=post-content><h2 id=死锁示例>死锁示例</h2><p>这次记录一个线程死锁的例子。直接上代码：</div><div><a class="read-more button" href=/2020/07/09/jvm-learn-16/>Read more →</a></div></div><div class=pagination><div class=pagination__buttons><span class="button next"><a href=/page/2/><span class=button__text>Older posts</span>
-<span class=button__icon>→</span></a></span></div></div></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
-<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
-<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta content="Hugo 0.74.3" name="generator"/>
+<title>DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="A simple, retro blog for latest information technology!" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="website" property="og:type"/>
+<meta content="DongZhi.ME" property="og:title"/>
+<meta content="A simple, retro blog for latest information technology!" property="og:description"/>
+<meta content="https://dongzhi.me/" property="og:url"/>
+<meta content="DongZhi.ME" property="og:site_name"/>
+<meta content="https://dongzhi.me/img/favicon/orange.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<link href="/index.xml" rel="alternate" title="DongZhi.ME" type="application/rss+xml"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="posts">
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/">记一次公司JVM堆溢出抽丝剥茧定位的过程</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-08-27
+          </span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<a href="/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/">
+<img alt="记一次公司JVM堆溢出抽丝剥茧定位的过程" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png"/>
+</a>
+<div class="post-content">
+          
+          
+          背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/08/21/kexueshangwang/">v2ray客户端配置简易说明</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-08-21
+          </span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://dongzhi.me/tags/jihuoma/">jihuoma</a> 
+            
+          </span>
+<div class="post-content">
+          
+          v2ray客户端配置简易说明
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/08/21/kexueshangwang/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/08/04/some-useful-licences/">Some Useful Licences</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-08-04
+          </span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://dongzhi.me/tags/jihuoma/">jihuoma</a> 
+            
+          </span>
+<div class="post-content">
+          
+          整理一些激活码
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/08/04/some-useful-licences/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/18/do-you-believe-justice/">你相信正义吗</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-18
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://dongzhi.me/tags/life/">life</a> 
+            
+          </span>
+<a href="/2020/07/18/do-you-believe-justice/">
+<img alt="你相信正义吗" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/cuiyongyuan.jpg"/>
+</a>
+<div class="post-content">
+<blockquote>
+<p>你相信正义吗？一段不错的视频，分享一下！</p>
+</blockquote>
+</div>
+<div>
+<a class="read-more button" href="/2020/07/18/do-you-believe-justice/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/">在CentOS7上如何下载Youtube视频?</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-11
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://dongzhi.me/tags/linux/">linux</a> 
+            
+          </span>
+<a href="/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/">
+<img alt="在CentOS7上如何下载Youtube视频?" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/youtube_download.jpg"/>
+</a>
+<div class="post-content">
+          
+          
+          下载youtube视频是一个老调常谈的问题，这几天发现fast.io这个好东西，可以把它用做托管博客的音视频和图片等资源，于是又开始折腾如何下载youtube视频这个问题。 前提条件： 一台国外的vps。
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/09/jvm-learn-16/">JVM Learn 16 一个线程死锁的例子及问题排查</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-09
+          </span>
+<span class="post-author">::Joe John</span>
+</div>
+<a href="/2020/07/09/jvm-learn-16/">
+<img alt="JVM Learn 16 一个线程死锁的例子及问题排查" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/thread_life_cycle.png"/>
+</a>
+<div class="post-content">
+<h2 id="死锁示例">死锁示例</h2>
+<p>这次记录一个线程死锁的例子。直接上代码：
+          
+          
+        </p></div>
+<div>
+<a class="read-more button" href="/2020/07/09/jvm-learn-16/">Read more →</a>
+</div>
+</div>
+<div class="pagination">
+<div class="pagination__buttons">
+<span class="button next">
+<a href="/page/2/">
+<span class="button__text">Older posts</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+</body>
+</html>
