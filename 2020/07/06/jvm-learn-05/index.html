@@ -1,383 +1,211 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>JVM Learn 05 类加载器(二) :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
-<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="父子类加载器的命名空间 类A中引用了类B，那么加载类B时，由类A的类加载器按照双亲委托机制尝试加载。子类加载器加载的类可以引用父类加载器加载的类，而父类加载器加载的类不能引用子类加载器加载的类。 测试案例" name="description"/>
-<meta content="" name="keywords"/>
-<meta content="noodp" name="robots"/>
-<link href="https://dongzhi.me/2020/07/06/jvm-learn-05/" rel="canonical"/>
-<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
-<meta content="summary" name="twitter:card"/>
-<meta content="John Doe" name="twitter:creator"/>
-<meta content="en" property="og:locale"/>
-<meta content="article" property="og:type"/>
-<meta content="JVM Learn 05 类加载器(二) :: DongZhi.ME" property="og:title"/>
-<meta content="父子类加载器的命名空间 类A中引用了类B，那么加载类B时，由类A的类加载器按照双亲委托机制尝试加载。子类加载器加载的类可以引用父类加载器加载的类，而父类加载器加载的类不能引用子类加载器加载的类。 测试案例" property="og:description"/>
-<meta content="https://dongzhi.me/2020/07/06/jvm-learn-05/" property="og:url"/>
-<meta content="JVM Learn 05 类加载器(二)" property="og:site_name"/>
-<meta content="https://dongzhi.me/" property="og:image"/>
-<meta content="2048" property="og:image:width"/>
-<meta content="1024" property="og:image:height"/>
-<meta content="2020-07-06 00:00:00 +0000 UTC" property="article:published_time"/>
-<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
-</head>
-<body class="">
-<div class="container center headings--one-size">
-<header class="header">
-<div class="header__inner">
-<div class="header__logo">
-<a href="/">
-<div class="logo">
-    DongZhi.ME
-  </div>
-</a>
-</div>
-<div class="menu-trigger">menu</div>
-</div>
-<nav class="menu">
-<ul class="menu__inner menu__inner--desktop">
-<li><a href="/">Home</a></li>
-<li><a href="/archives">Archives</a></li>
-<li><a href="/tags">Tags</a></li>
-<li><a href="/search">Search</a></li>
-<li><a href="/about">About</a></li>
-</ul>
-<ul class="menu__inner menu__inner--mobile">
-<li><a href="/">Home</a></li>
-<li><a href="/archives">Archives</a></li>
-<li><a href="/tags">Tags</a></li>
-<li><a href="/search">Search</a></li>
-<li><a href="/about">About</a></li>
-</ul>
-</nav>
-</header>
-<div class="content">
-<div class="post">
-<h1 class="post-title">
-<a href="https://dongzhi.me/2020/07/06/jvm-learn-05/">JVM Learn 05 类加载器(二)</a></h1>
-<div class="post-meta">
-<span class="post-date">
-        2020-07-06 
-      </span>
-<span class="post-author">::
-      John Doe
-    </span>
-</div>
-<span class="post-tags">
-    
-    #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
-    
-  </span>
-<div class="post-content"><div>
-<h2 id="父子类加载器的命名空间">父子类加载器的命名空间<a arialabel="Anchor" class="hanchor" href="#父子类加载器的命名空间">⌗</a> </h2>
-<p>类A中引用了类B，那么加载类B时，由类A的类加载器按照双亲委托机制尝试加载。<strong>子类加载器加载的类可以引用父类加载器加载的类，而父类加载器加载的类不能引用子类加载器加载的类。</strong></p>
-<p>测试案例如下：
-<img alt="image" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_05_cl02.jpg"/></p>
-<p>MyClassLoader.java:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> io.dongzhi<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#f92672">import</span> java.io.*<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClassLoader</span> <span style="color:#66d9ef">extends</span> ClassLoader <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> String ext <span style="color:#f92672">=</span> <span style="color:#e6db74">".class"</span><span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>    <span style="color:#66d9ef">private</span> String path<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">MyClassLoader</span><span style="color:#f92672">(</span>String path<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">path</span> <span style="color:#f92672">=</span> path<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">MyClassLoader</span><span style="color:#f92672">(</span>String path<span style="color:#f92672">,</span> ClassLoader parent<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        <span style="color:#66d9ef">super</span><span style="color:#f92672">(</span>parent<span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">path</span> <span style="color:#f92672">=</span> path<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>    <span style="color:#a6e22e">@Override</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">toString</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">super</span><span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">()</span> <span style="color:#f92672">+</span> System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">();</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>    <span style="color:#a6e22e">@Override</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>    <span style="color:#66d9ef">protected</span> Class<span style="color:#f92672">&lt;?&gt;</span> findClass<span style="color:#f92672">(</span>String name<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>        String fullPath <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">path</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">"/"</span> <span style="color:#f92672">+</span> name<span style="color:#f92672">.</span><span style="color:#a6e22e">replace</span><span style="color:#f92672">(</span><span style="color:#e6db74">"."</span><span style="color:#f92672">,</span> <span style="color:#e6db74">"/"</span><span style="color:#f92672">)</span> <span style="color:#f92672">+</span> ext<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>        <span style="color:#66d9ef">try</span> <span style="color:#f92672">(</span>ByteArrayOutputStream bos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ByteArrayOutputStream<span style="color:#f92672">();</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>             FileInputStream fis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileInputStream<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> File<span style="color:#f92672">(</span>fullPath<span style="color:#f92672">));)</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>            <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> buffer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>512<span style="color:#f92672">];</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>            <span style="color:#66d9ef">int</span> count <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>            <span style="color:#66d9ef">while</span> <span style="color:#f92672">((</span>count <span style="color:#f92672">=</span> fis<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span><span style="color:#f92672">(</span>buffer<span style="color:#f92672">))</span> <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>                bos<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>buffer<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> count<span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>            <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">super</span><span style="color:#f92672">.</span><span style="color:#a6e22e">defineClass</span><span style="color:#f92672">(</span>name<span style="color:#f92672">,</span> bos<span style="color:#f92672">.</span><span style="color:#a6e22e">toByteArray</span><span style="color:#f92672">(),</span> 0<span style="color:#f92672">,</span> bos<span style="color:#f92672">.</span><span style="color:#a6e22e">size</span><span style="color:#f92672">());</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>FileNotFoundException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>        <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>IOException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>            e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>        <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span><span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>
-</code></pre></div><p>Person.java:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> io.dongzhi<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>    <span style="color:#66d9ef">private</span> Student student <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Student<span style="color:#f92672">();</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Person</span><span style="color:#f92672">(</span>Student student<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">student</span> <span style="color:#f92672">=</span> student<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Person</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"person constructor invoked!"</span><span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"person class loader:"</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getClassLoader</span><span style="color:#f92672">());</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#f92672">}</span>
-</code></pre></div><p>Student.java:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#f92672">package</span> io.dongzhi<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Student</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Student</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"Student constructor invoked!"</span><span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"Student class loader:"</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getClassLoader</span><span style="color:#f92672">());</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span><span style="color:#f92672">}</span>
-</code></pre></div><p>APP.java:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> io.dongzhi<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#75715e">/**
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#75715e"> * Hello world!
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#75715e"> *
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span style="color:#75715e"> */</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">App</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span> String<span style="color:#f92672">[]</span> args <span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        MyClassLoader loader1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> MyClassLoader<span style="color:#f92672">(</span><span style="color:#e6db74">"D:\\dongzhi\\Desktop"</span><span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        Class clazz <span style="color:#f92672">=</span> loader1<span style="color:#f92672">.</span><span style="color:#a6e22e">loadClass</span><span style="color:#f92672">(</span><span style="color:#e6db74">"io.dongzhi.Person"</span><span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        Object instance <span style="color:#f92672">=</span> clazz<span style="color:#f92672">.</span><span style="color:#a6e22e">newInstance</span><span style="color:#f92672">();</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#f92672">}</span>
-</code></pre></div><p>执行main方法，结果如下：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>Student constructor invoked!
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>Student class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>person constructor invoked!
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>person class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>Process finished with exit code <span style="color:#ae81ff">0</span>
+<!doctype html><html lang=en><head><title>JVM Learn 05 类加载器(二) :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="父子类加载器的命名空间 类A中引用了类B，那么加载类B时，由类A的类加载器按照双亲委托机制尝试加载。子类加载器加载的类可以引用父类加载器加载的类，而父类加载器加载的类不能引用子类加载器加载的类。 测试案例"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2020/07/06/jvm-learn-05/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content="John Doe"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="JVM Learn 05 类加载器(二) :: DongZhi.ME"><meta property="og:description" content="父子类加载器的命名空间 类A中引用了类B，那么加载类B时，由类A的类加载器按照双亲委托机制尝试加载。子类加载器加载的类可以引用父类加载器加载的类，而父类加载器加载的类不能引用子类加载器加载的类。 测试案例"><meta property="og:url" content="https://dongzhi.me/2020/07/06/jvm-learn-05/"><meta property="og:site_name" content="JVM Learn 05 类加载器(二)"><meta property="og:image" content="https://dongzhi.me/"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:published_time" content="2020-07-06 00:00:00 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2020/07/06/jvm-learn-05/>JVM Learn 05 类加载器(二)</a></h1><div class=post-meta><span class=post-date>2020-07-06</span>
+<span class=post-author>::
+John Doe</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/jvm/>jvm</a>&nbsp;</span><div class=post-content><div><h2 id=父子类加载器的命名空间>父子类加载器的命名空间<a href=#父子类加载器的命名空间 class=hanchor arialabel=Anchor>&#8983;</a></h2><p>类A中引用了类B，那么加载类B时，由类A的类加载器按照双亲委托机制尝试加载。<strong>子类加载器加载的类可以引用父类加载器加载的类，而父类加载器加载的类不能引用子类加载器加载的类。</strong></p><p>测试案例如下：
+<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_05_cl02.jpg alt=image></p><p>MyClassLoader.java:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> io.dongzhi<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span><span style=color:#f92672>import</span> java.io.*<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>MyClassLoader</span> <span style=color:#66d9ef>extends</span> ClassLoader <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>final</span> String ext <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;.class&#34;</span><span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>    <span style=color:#66d9ef>private</span> String path<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>    <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>MyClassLoader</span><span style=color:#f92672>(</span>String path<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>        <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>path</span> <span style=color:#f92672>=</span> path<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>    <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>MyClassLoader</span><span style=color:#f92672>(</span>String path<span style=color:#f92672>,</span> ClassLoader parent<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>        <span style=color:#66d9ef>super</span><span style=color:#f92672>(</span>parent<span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>        <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>path</span> <span style=color:#f92672>=</span> path<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>    <span style=color:#a6e22e>@Override</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>    <span style=color:#66d9ef>public</span> String <span style=color:#a6e22e>toString</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>super</span><span style=color:#f92672>.</span><span style=color:#a6e22e>toString</span><span style=color:#f92672>()</span> <span style=color:#f92672>+</span> System<span style=color:#f92672>.</span><span style=color:#a6e22e>currentTimeMillis</span><span style=color:#f92672>();</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>    <span style=color:#a6e22e>@Override</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>    <span style=color:#66d9ef>protected</span> Class<span style=color:#f92672>&lt;?&gt;</span> findClass<span style=color:#f92672>(</span>String name<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>        String fullPath <span style=color:#f92672>=</span> <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>path</span> <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34;/&#34;</span> <span style=color:#f92672>+</span> name<span style=color:#f92672>.</span><span style=color:#a6e22e>replace</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;.&#34;</span><span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;/&#34;</span><span style=color:#f92672>)</span> <span style=color:#f92672>+</span> ext<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>        <span style=color:#66d9ef>try</span> <span style=color:#f92672>(</span>ByteArrayOutputStream bos <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> ByteArrayOutputStream<span style=color:#f92672>();</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>             FileInputStream fis <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> FileInputStream<span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> File<span style=color:#f92672>(</span>fullPath<span style=color:#f92672>));)</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>            <span style=color:#66d9ef>byte</span><span style=color:#f92672>[]</span> buffer <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#66d9ef>byte</span><span style=color:#f92672>[</span>512<span style=color:#f92672>];</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>            <span style=color:#66d9ef>int</span> count <span style=color:#f92672>=</span> 0<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span>            <span style=color:#66d9ef>while</span> <span style=color:#f92672>((</span>count <span style=color:#f92672>=</span> fis<span style=color:#f92672>.</span><span style=color:#a6e22e>read</span><span style=color:#f92672>(</span>buffer<span style=color:#f92672>))</span> <span style=color:#f92672>!=</span> <span style=color:#f92672>-</span>1<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span>                bos<span style=color:#f92672>.</span><span style=color:#a6e22e>write</span><span style=color:#f92672>(</span>buffer<span style=color:#f92672>,</span> 0<span style=color:#f92672>,</span> count<span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">30</span>            <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">31</span>            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>super</span><span style=color:#f92672>.</span><span style=color:#a6e22e>defineClass</span><span style=color:#f92672>(</span>name<span style=color:#f92672>,</span> bos<span style=color:#f92672>.</span><span style=color:#a6e22e>toByteArray</span><span style=color:#f92672>(),</span> 0<span style=color:#f92672>,</span> bos<span style=color:#f92672>.</span><span style=color:#a6e22e>size</span><span style=color:#f92672>());</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">32</span>        <span style=color:#f92672>}</span> <span style=color:#66d9ef>catch</span> <span style=color:#f92672>(</span>FileNotFoundException e<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">33</span>            e<span style=color:#f92672>.</span><span style=color:#a6e22e>printStackTrace</span><span style=color:#f92672>();</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">34</span>        <span style=color:#f92672>}</span> <span style=color:#66d9ef>catch</span> <span style=color:#f92672>(</span>IOException e<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">35</span>            e<span style=color:#f92672>.</span><span style=color:#a6e22e>printStackTrace</span><span style=color:#f92672>();</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">36</span>        <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">37</span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">38</span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">39</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">40</span><span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">41</span>
+</code></pre></div><p>Person.java:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> io.dongzhi<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Person</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>    <span style=color:#66d9ef>private</span> Student student <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Student<span style=color:#f92672>();</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>    <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Person</span><span style=color:#f92672>(</span>Student student<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>        <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>student</span> <span style=color:#f92672>=</span> student<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>    <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Person</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;person constructor invoked!&#34;</span><span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;person class loader:&#34;</span> <span style=color:#f92672>+</span> <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>getClass</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getClassLoader</span><span style=color:#f92672>());</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span><span style=color:#f92672>}</span>
+</code></pre></div><p>Student.java:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span style=color:#f92672>package</span> io.dongzhi<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Student</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>    <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Student</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Student constructor invoked!&#34;</span><span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Student class loader:&#34;</span> <span style=color:#f92672>+</span> <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>getClass</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getClassLoader</span><span style=color:#f92672>());</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">8</span><span style=color:#f92672>}</span>
+</code></pre></div><p>APP.java:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> io.dongzhi<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#75715e>/**
+</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span><span style=color:#75715e> * Hello world!
+</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span><span style=color:#75715e> *
+</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span><span style=color:#75715e> */</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>App</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>(</span> String<span style=color:#f92672>[]</span> args <span style=color:#f92672>)</span> <span style=color:#66d9ef>throws</span> Exception <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>        MyClassLoader loader1 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> MyClassLoader<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;D:\\dongzhi\\Desktop&#34;</span><span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>        Class clazz <span style=color:#f92672>=</span> loader1<span style=color:#f92672>.</span><span style=color:#a6e22e>loadClass</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;io.dongzhi.Person&#34;</span><span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>        Object instance <span style=color:#f92672>=</span> clazz<span style=color:#f92672>.</span><span style=color:#a6e22e>newInstance</span><span style=color:#f92672>();</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span><span style=color:#f92672>}</span>
+</code></pre></div><p>执行main方法，结果如下：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>Student constructor invoked!
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>Student class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>person constructor invoked!
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>person class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>Process finished with exit code <span style=color:#ae81ff>0</span>
 </code></pre></div><p>可见，加载Person和Student的类加载器都是系统类加载器。
-将Perosn.class和Student.class剪切到D:/dongzhi/Desktop/io/dongzhi/目录，执行结果如下：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>Student constructor invoked!
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>Student class loader:io.dongzhi.MyClassLoader@677327b61578062529660
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>person constructor invoked!
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>person class loader:io.dongzhi.MyClassLoader@677327b61578062529660
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>Process finished with exit code <span style="color:#ae81ff">0</span>
-</code></pre></div><p>这时候，类加载器都是MyClassLoader。删除项目target目录的Person.class,保留Student.class文件。此时的输出结果是:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>Student constructor invoked!
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>Student class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>person constructor invoked!
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>person class loader:io.dongzhi.MyClassLoader@677327b61578062873859
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>Process finished with exit code <span style="color:#ae81ff">0</span>
-</code></pre></div><p>项目类路径没有Person类，所以由自定义类加载器加载，该类加载器接着尝试去加载Student类，它首先委托给父类加载器AppClassLoader加载，显然可以加载成功。所以，Person的类加载器是MyClassLoader，Student的类加载器是AppClassLoader。</p>
-<p>修改Student类，引用Person类：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#f92672">package</span> io.dongzhi<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Student</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Student</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"Student constructor invoked!"</span><span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"Student class loader:"</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getClassLoader</span><span style="color:#f92672">());</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"Student invoke Person:"</span> <span style="color:#f92672">+</span> Person<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span><span style="color:#75715e">// 引用Person**
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span><span style="color:#75715e"></span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span><span style="color:#f92672">}</span>
-</code></pre></div><p>由于Student的类加载器是Person类加载器的父类加载器，高层级类命名空间中类无法访问下一层类加载器空间的类，所以Student引用Person类时会报找不到该类异常。此时输出结果：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>Student constructor invoked!
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>Student class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>Exception in thread <span style="color:#e6db74">"main"</span> java.lang.NoClassDefFoundError: io/dongzhi/Person
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>	at io.dongzhi.Student.&lt;init&gt;<span style="color:#f92672">(</span>Student.java:7<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>	at io.dongzhi.Person.&lt;init&gt;<span style="color:#f92672">(</span>Person.java:4<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>	at sun.reflect.NativeConstructorAccessorImpl.newInstance0<span style="color:#f92672">(</span>Native Method<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>	at sun.reflect.NativeConstructorAccessorImpl.newInstance<span style="color:#f92672">(</span>NativeConstructorAccessorImpl.java:62<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance<span style="color:#f92672">(</span>DelegatingConstructorAccessorImpl.java:45<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>	at java.lang.reflect.Constructor.newInstance<span style="color:#f92672">(</span>Constructor.java:423<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>	at java.lang.Class.newInstance<span style="color:#f92672">(</span>Class.java:442<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>	at io.dongzhi.App.main<span style="color:#f92672">(</span>App.java:11<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>Caused by: java.lang.ClassNotFoundException: io.dongzhi.Person
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>	at java.net.URLClassLoader.findClass<span style="color:#f92672">(</span>URLClassLoader.java:381<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>	at java.lang.ClassLoader.loadClass<span style="color:#f92672">(</span>ClassLoader.java:424<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>	at sun.misc.Launcher$AppClassLoader.loadClass<span style="color:#f92672">(</span>Launcher.java:335<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>	at java.lang.ClassLoader.loadClass<span style="color:#f92672">(</span>ClassLoader.java:357<span style="color:#f92672">)</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>	... <span style="color:#ae81ff">8</span> more
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>Process finished with exit code <span style="color:#ae81ff">1</span>
-</code></pre></div><p>如果在Person类中引用Student类，则不会报异常：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> io.dongzhi<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>    <span style="color:#66d9ef">private</span> Student student <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Student<span style="color:#f92672">();</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Person</span><span style="color:#f92672">(</span>Student student<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">student</span> <span style="color:#f92672">=</span> student<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Person</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"person constructor invoked!"</span><span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"person class loader:"</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getClassLoader</span><span style="color:#f92672">());</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"Person invoke Student:"</span> <span style="color:#f92672">+</span> Student<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span><span style="color:#75715e">// 引用Student
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#75715e"></span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span style="color:#f92672">}</span>
-</code></pre></div><p>控制台输出：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>Student constructor invoked!
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>Student class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>person constructor invoked!
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>person class loader:io.dongzhi.MyClassLoader@677327b61578065044711
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>Person invoke Student:class io.dongzhi.Student
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>Process finished with exit code <span style="color:#ae81ff">0</span>
-</code></pre></div><p>到这里，本文开头的结论测试完毕。</p>
-<h2 id="自带类加载器的路径">自带类加载器的路径<a arialabel="Anchor" class="hanchor" href="#自带类加载器的路径">⌗</a> </h2>
-<p>通过三个系统参数可以获取：</p>
-<ul>
-<li>sun.boot.class.path 根类加载器路径</li>
-<li>java.ext.dirs 扩展类加载器路径</li>
-<li>java.class.path系统类加载器的路径</li>
-</ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> io.dongzhi<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">import</span> java.util.Arrays<span style="color:#f92672">;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestPath</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"Bootstrap Class Loader加载路径："</span>  <span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>        Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">asList</span><span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">getProperty</span><span style="color:#f92672">(</span><span style="color:#e6db74">"sun.boot.class.path"</span><span style="color:#f92672">).</span><span style="color:#a6e22e">split</span><span style="color:#f92672">(</span><span style="color:#e6db74">";"</span><span style="color:#f92672">)).</span><span style="color:#a6e22e">forEach</span><span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">::</span>println<span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"Ext Class Loader加载路径："</span><span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">asList</span><span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">getProperty</span><span style="color:#f92672">(</span><span style="color:#e6db74">"java.ext.dirs"</span><span style="color:#f92672">).</span><span style="color:#a6e22e">split</span><span style="color:#f92672">(</span><span style="color:#e6db74">";"</span><span style="color:#f92672">)).</span><span style="color:#a6e22e">forEach</span><span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">::</span>println<span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"App ClassLoader加载路径："</span> <span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">asList</span><span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">getProperty</span><span style="color:#f92672">(</span><span style="color:#e6db74">"java.class.path"</span><span style="color:#f92672">).</span><span style="color:#a6e22e">split</span><span style="color:#f92672">(</span><span style="color:#e6db74">";"</span><span style="color:#f92672">)).</span><span style="color:#a6e22e">forEach</span><span style="color:#f92672">(</span>System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">::</span>println<span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>    <span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#f92672">}</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>
-</code></pre></div><p>打印的路径结果：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>Bootstrap Class Loader加载路径：
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\r</span>esources.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\r</span>t.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\s</span>unrsasign.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\j</span>sse.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\j</span>ce.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\c</span>harsets.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\j</span>fr.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\c</span>lasses
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>Ext Class Loader加载路径：
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>C:<span style="color:#ae81ff">\W</span>INDOWS<span style="color:#ae81ff">\S</span>un<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>App ClassLoader加载路径：
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\c</span>harsets.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\d</span>eploy.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\a</span>ccess-bridge-64.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\c</span>ldrdata.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\d</span>nsns.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\j</span>access.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\j</span>fxrt.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\l</span>ocaledata.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\n</span>ashorn.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\s</span>unec.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\s</span>unjce_provider.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\s</span>unmscapi.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\s</span>unpkcs11.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\e</span>xt<span style="color:#ae81ff">\z</span>ipfs.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\j</span>avaws.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\j</span>ce.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\j</span>fr.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\j</span>fxswt.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\j</span>sse.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\m</span>anagement-agent.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\p</span>lugin.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\r</span>esources.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>ava<span style="color:#ae81ff">\j</span>dk1.8.0_131<span style="color:#ae81ff">\j</span>re<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\r</span>t.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>E:<span style="color:#ae81ff">\d</span>evelop<span style="color:#ae81ff">\w</span>orkspace<span style="color:#ae81ff">\I</span>deaProjects<span style="color:#ae81ff">\J</span>VMLearn<span style="color:#ae81ff">\l</span>earn01<span style="color:#ae81ff">\t</span>arget<span style="color:#ae81ff">\c</span>lasses
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>C:<span style="color:#ae81ff">\P</span>rogram Files<span style="color:#ae81ff">\J</span>etBrains<span style="color:#ae81ff">\I</span>ntelliJ IDEA 2019.1.1<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\i</span>dea_rt.jar
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>
-</code></pre></div><p>倒数第二行E:\develop\workspace\IdeaProjects\JVMLearn\learn01\target\classes这个路径是由IDE工具设置进去的。</p>
-<h2 id="双亲委托机制的优势">双亲委托机制的优势<a arialabel="Anchor" class="hanchor" href="#双亲委托机制的优势">⌗</a> </h2>
-<p>双亲委托机制的优势：</p>
-<ol>
-<li>
-<p>保证了java核心类库的类型安全</p>
-<p>java核心类库是由根类加载器加载的，如果没有双亲委托机制，那么用户可以自定义很多不同的类加载器去加载java的核心类库，由于不同类加载的器加载的类是不可见的，所以JVM中对于java.lang.String可能存在不同的版本，核心类库的类型兼容性就无法保证。</p>
-</li>
-<li>
-<p>防止java核心类库被替换</p>
-<p>双亲委托机制确保了核心类库由根类加载器优先加载，防止被用户自定义类同名的类替换了。</p>
-</li>
-<li>
-<p>不同的类加载器为相同名称的类创建了额外的命名空间</p>
-<p>相同名称的类可以并存在java虚拟机中，只需要用不同的类加载分别加载即可。不同的类加载器加载的同名的类是不兼容的，这就为java虚拟机创建了很多相互隔离的类空间，很多java框架使用了这个技术。</p>
-</li>
-</ol>
-</div></div>
-<div class="pagination">
-<div class="pagination__title">
-<span class="pagination__title-h">Read other posts</span>
-<hr/>
-</div>
-<div class="pagination__buttons">
-<span class="button previous">
-<a href="https://dongzhi.me/2020/07/06/jvm-learn-04/">
-<span class="button__icon">←</span>
-<span class="button__text">JVM Learn 04 类加载器(一)</span>
-</a>
-</span>
-<span class="button next">
-<a href="https://dongzhi.me/2020/07/06/jvm-learn-06/">
-<span class="button__text">JVM Learn 06 类加载器(三)</span>
-<span class="button__icon">→</span>
-</a>
-</span>
-</div>
-</div>
-<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
-<aside id="comments" style="
-/* background: rgb(183 168 154 / 26%);
-border: 1px dashed var(--accent); 
-padding: 5px auto;margin: 10px auto;*/
-">
-<div id="hyvor-talk-view"></div>
-<script type="text/javascript">
-		var HYVOR_TALK_WEBSITE = 1505; 
-		var HYVOR_TALK_CONFIG = {
-        url: false,
-        id: false
-		};
-	  </script>
-<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
-</aside>
-</div>
-</div>
-<footer class="footer">
-<div class="footer__inner">
-<div class="copyright">
-<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
-<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
-<span id="busuanzi_container_site_uv">
-                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
-          </span>
-</div>
-</div>
-</footer>
-<script src="https://dongzhi.me/assets/main.js"></script>
-<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
-<script>
-    const players = Plyr.setup('.js-player', {
-        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
-    });
-    </script>
-</div>
-</body>
-</html>
+将Perosn.class和Student.class剪切到D:/dongzhi/Desktop/io/dongzhi/目录，执行结果如下：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>Student constructor invoked!
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>Student class loader:io.dongzhi.MyClassLoader@677327b61578062529660
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>person constructor invoked!
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>person class loader:io.dongzhi.MyClassLoader@677327b61578062529660
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>Process finished with exit code <span style=color:#ae81ff>0</span>
+</code></pre></div><p>这时候，类加载器都是MyClassLoader。删除项目target目录的Person.class,保留Student.class文件。此时的输出结果是:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>Student constructor invoked!
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>Student class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>person constructor invoked!
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>person class loader:io.dongzhi.MyClassLoader@677327b61578062873859
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>Process finished with exit code <span style=color:#ae81ff>0</span>
+</code></pre></div><p>项目类路径没有Person类，所以由自定义类加载器加载，该类加载器接着尝试去加载Student类，它首先委托给父类加载器AppClassLoader加载，显然可以加载成功。所以，Person的类加载器是MyClassLoader，Student的类加载器是AppClassLoader。</p><p>修改Student类，引用Person类：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span style=color:#f92672>package</span> io.dongzhi<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Student</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>    <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Student</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Student constructor invoked!&#34;</span><span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Student class loader:&#34;</span> <span style=color:#f92672>+</span> <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>getClass</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getClassLoader</span><span style=color:#f92672>());</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Student invoke Person:&#34;</span> <span style=color:#f92672>+</span> Person<span style=color:#f92672>.</span><span style=color:#a6e22e>class</span><span style=color:#f92672>);</span><span style=color:#75715e>// 引用Person**
+</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">8</span><span style=color:#75715e></span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">9</span><span style=color:#f92672>}</span>
+</code></pre></div><p>由于Student的类加载器是Person类加载器的父类加载器，高层级类命名空间中类无法访问下一层类加载器空间的类，所以Student引用Person类时会报找不到该类异常。此时输出结果：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>Student constructor invoked!
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>Student class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>Exception in thread <span style=color:#e6db74>&#34;main&#34;</span> java.lang.NoClassDefFoundError: io/dongzhi/Person
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>	at io.dongzhi.Student.&lt;init&gt;<span style=color:#f92672>(</span>Student.java:7<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>	at io.dongzhi.Person.&lt;init&gt;<span style=color:#f92672>(</span>Person.java:4<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>	at sun.reflect.NativeConstructorAccessorImpl.newInstance0<span style=color:#f92672>(</span>Native Method<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>	at sun.reflect.NativeConstructorAccessorImpl.newInstance<span style=color:#f92672>(</span>NativeConstructorAccessorImpl.java:62<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance<span style=color:#f92672>(</span>DelegatingConstructorAccessorImpl.java:45<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>	at java.lang.reflect.Constructor.newInstance<span style=color:#f92672>(</span>Constructor.java:423<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>	at java.lang.Class.newInstance<span style=color:#f92672>(</span>Class.java:442<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>	at io.dongzhi.App.main<span style=color:#f92672>(</span>App.java:11<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>Caused by: java.lang.ClassNotFoundException: io.dongzhi.Person
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>	at java.net.URLClassLoader.findClass<span style=color:#f92672>(</span>URLClassLoader.java:381<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>	at java.lang.ClassLoader.loadClass<span style=color:#f92672>(</span>ClassLoader.java:424<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>	at sun.misc.Launcher$AppClassLoader.loadClass<span style=color:#f92672>(</span>Launcher.java:335<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>	at java.lang.ClassLoader.loadClass<span style=color:#f92672>(</span>ClassLoader.java:357<span style=color:#f92672>)</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>	... <span style=color:#ae81ff>8</span> more
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>Process finished with exit code <span style=color:#ae81ff>1</span>
+</code></pre></div><p>如果在Person类中引用Student类，则不会报异常：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> io.dongzhi<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Person</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>    <span style=color:#66d9ef>private</span> Student student <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Student<span style=color:#f92672>();</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>    <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Person</span><span style=color:#f92672>(</span>Student student<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>        <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>student</span> <span style=color:#f92672>=</span> student<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>    <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Person</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;person constructor invoked!&#34;</span><span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;person class loader:&#34;</span> <span style=color:#f92672>+</span> <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>getClass</span><span style=color:#f92672>().</span><span style=color:#a6e22e>getClassLoader</span><span style=color:#f92672>());</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Person invoke Student:&#34;</span> <span style=color:#f92672>+</span> Student<span style=color:#f92672>.</span><span style=color:#a6e22e>class</span><span style=color:#f92672>);</span><span style=color:#75715e>// 引用Student
+</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span><span style=color:#75715e></span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span><span style=color:#f92672>}</span>
+</code></pre></div><p>控制台输出：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span>Student constructor invoked!
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>Student class loader:sun.misc.Launcher$AppClassLoader@18b4aac2
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>person constructor invoked!
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>person class loader:io.dongzhi.MyClassLoader@677327b61578065044711
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span>Person invoke Student:class io.dongzhi.Student
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span>Process finished with exit code <span style=color:#ae81ff>0</span>
+</code></pre></div><p>到这里，本文开头的结论测试完毕。</p><h2 id=自带类加载器的路径>自带类加载器的路径<a href=#自带类加载器的路径 class=hanchor arialabel=Anchor>&#8983;</a></h2><p>通过三个系统参数可以获取：</p><ul><li>sun.boot.class.path 根类加载器路径</li><li>java.ext.dirs 扩展类加载器路径</li><li>java.class.path系统类加载器的路径</li></ul><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> io.dongzhi<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#f92672>import</span> java.util.Arrays<span style=color:#f92672>;</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TestPath</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Bootstrap Class Loader加载路径：&#34;</span>  <span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>        Arrays<span style=color:#f92672>.</span><span style=color:#a6e22e>asList</span><span style=color:#f92672>(</span>System<span style=color:#f92672>.</span><span style=color:#a6e22e>getProperty</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;sun.boot.class.path&#34;</span><span style=color:#f92672>).</span><span style=color:#a6e22e>split</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;;&#34;</span><span style=color:#f92672>)).</span><span style=color:#a6e22e>forEach</span><span style=color:#f92672>(</span>System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>::</span>println<span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Ext Class Loader加载路径：&#34;</span><span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>        Arrays<span style=color:#f92672>.</span><span style=color:#a6e22e>asList</span><span style=color:#f92672>(</span>System<span style=color:#f92672>.</span><span style=color:#a6e22e>getProperty</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;java.ext.dirs&#34;</span><span style=color:#f92672>).</span><span style=color:#a6e22e>split</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;;&#34;</span><span style=color:#f92672>)).</span><span style=color:#a6e22e>forEach</span><span style=color:#f92672>(</span>System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>::</span>println<span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>        System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;App ClassLoader加载路径：&#34;</span> <span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>        Arrays<span style=color:#f92672>.</span><span style=color:#a6e22e>asList</span><span style=color:#f92672>(</span>System<span style=color:#f92672>.</span><span style=color:#a6e22e>getProperty</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;java.class.path&#34;</span><span style=color:#f92672>).</span><span style=color:#a6e22e>split</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;;&#34;</span><span style=color:#f92672>)).</span><span style=color:#a6e22e>forEach</span><span style=color:#f92672>(</span>System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>::</span>println<span style=color:#f92672>);</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>    <span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span><span style=color:#f92672>}</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>
+</code></pre></div><p>打印的路径结果：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>Bootstrap Class Loader加载路径：
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\r</span>esources.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\r</span>t.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\s</span>unrsasign.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\j</span>sse.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\j</span>ce.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\c</span>harsets.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\j</span>fr.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\c</span>lasses
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>Ext Class Loader加载路径：
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>C:<span style=color:#ae81ff>\W</span>INDOWS<span style=color:#ae81ff>\S</span>un<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>App ClassLoader加载路径：
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\c</span>harsets.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\d</span>eploy.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\a</span>ccess-bridge-64.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\c</span>ldrdata.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">20</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\d</span>nsns.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">21</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\j</span>access.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">22</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\j</span>fxrt.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">23</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\l</span>ocaledata.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">24</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\n</span>ashorn.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">25</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\s</span>unec.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">26</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\s</span>unjce_provider.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\s</span>unmscapi.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\s</span>unpkcs11.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\e</span>xt<span style=color:#ae81ff>\z</span>ipfs.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">30</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\j</span>avaws.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">31</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\j</span>ce.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">32</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\j</span>fr.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">33</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\j</span>fxswt.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">34</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\j</span>sse.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">35</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\m</span>anagement-agent.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">36</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\p</span>lugin.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">37</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\r</span>esources.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">38</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>ava<span style=color:#ae81ff>\j</span>dk1.8.0_131<span style=color:#ae81ff>\j</span>re<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\r</span>t.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">39</span>E:<span style=color:#ae81ff>\d</span>evelop<span style=color:#ae81ff>\w</span>orkspace<span style=color:#ae81ff>\I</span>deaProjects<span style=color:#ae81ff>\J</span>VMLearn<span style=color:#ae81ff>\l</span>earn01<span style=color:#ae81ff>\t</span>arget<span style=color:#ae81ff>\c</span>lasses
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">40</span>C:<span style=color:#ae81ff>\P</span>rogram Files<span style=color:#ae81ff>\J</span>etBrains<span style=color:#ae81ff>\I</span>ntelliJ IDEA 2019.1.1<span style=color:#ae81ff>\l</span>ib<span style=color:#ae81ff>\i</span>dea_rt.jar
+<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">41</span>
+</code></pre></div><p>倒数第二行E:\develop\workspace\IdeaProjects\JVMLearn\learn01\target\classes这个路径是由IDE工具设置进去的。</p><h2 id=双亲委托机制的优势>双亲委托机制的优势<a href=#双亲委托机制的优势 class=hanchor arialabel=Anchor>&#8983;</a></h2><p>双亲委托机制的优势：</p><ol><li><p>保证了java核心类库的类型安全</p><p>java核心类库是由根类加载器加载的，如果没有双亲委托机制，那么用户可以自定义很多不同的类加载器去加载java的核心类库，由于不同类加载的器加载的类是不可见的，所以JVM中对于java.lang.String可能存在不同的版本，核心类库的类型兼容性就无法保证。</p></li><li><p>防止java核心类库被替换</p><p>双亲委托机制确保了核心类库由根类加载器优先加载，防止被用户自定义类同名的类替换了。</p></li><li><p>不同的类加载器为相同名称的类创建了额外的命名空间</p><p>相同名称的类可以并存在java虚拟机中，只需要用不同的类加载分别加载即可。不同的类加载器加载的同名的类是不兼容的，这就为java虚拟机创建了很多相互隔离的类空间，很多java框架使用了这个技术。</p></li></ol></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2020/07/06/jvm-learn-04/><span class=button__icon>←</span>
+<span class=button__text>JVM Learn 04 类加载器(一)</span></a></span>
+<span class="button next"><a href=https://dongzhi.me/2020/07/06/jvm-learn-06/><span class=button__text>JVM Learn 06 类加载器(三)</span>
+<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
+<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
+<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
