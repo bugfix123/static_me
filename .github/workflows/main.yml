@@ -14,4 +14,4 @@ jobs:
         ftp-server: ftp://103.127.81.6:21/public_html/
         ftp-username: dongzhim
         ftp-password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./public/
+        local-dir: public/
