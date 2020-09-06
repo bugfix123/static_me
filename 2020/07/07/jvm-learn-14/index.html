@@ -1,271 +1,477 @@
-<!doctype html><html lang=en><head><title>JVM Learn 14 java堆的转储与Jvisualvm :: DongZhi.ME — A simple, retro blog for latest information technology!</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="本文记录一下java队的转储和JVisualVM的用法。"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://dongzhi.me/2020/07/07/jvm-learn-14/><link rel=stylesheet href=https://dongzhi.me/assets/style.css><link rel=apple-touch-icon sizes=180x180 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png><link rel=manifest href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest><meta name=twitter:card content="summary"><meta name=twitter:creator content="John Doe"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="JVM Learn 14 java堆的转储与Jvisualvm :: DongZhi.ME"><meta property="og:description" content="本文记录一下java队的转储和JVisualVM的用法。"><meta property="og:url" content="https://dongzhi.me/2020/07/07/jvm-learn-14/"><meta property="og:site_name" content="JVM Learn 14 java堆的转储与Jvisualvm"><meta property="og:image" content="https://dongzhi.me/"><meta property="og:image:width" content="2048"><meta property="og:image:height" content="1024"><meta property="article:published_time" content="2020-07-07 00:00:00 +0000 UTC"><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css><link href=https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css rel=stylesheet></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>DongZhi.ME</div></a></div><div class=menu-trigger>menu</div></div><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=/>Home</a></li><li><a href=/archives>Archives</a></li><li><a href=/tags>Tags</a></li><li><a href=/search>Search</a></li><li><a href=/about>About</a></li></ul></nav></header><div class=content><div class=post><h1 class=post-title><a href=https://dongzhi.me/2020/07/07/jvm-learn-14/>JVM Learn 14 java堆的转储与Jvisualvm</a></h1><div class=post-meta><span class=post-date>2020-07-07</span>
-<span class=post-author>::
-John Doe</span></div><span class=post-tags>#<a href=https://dongzhi.me/tags/jvm/>jvm</a>&nbsp;</span><div class=post-content><div><blockquote><p>本文记录一下java队的转储和JVisualVM的用法。</p></blockquote><p>示例代码如下：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span style=color:#f92672>package</span> test.heap<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span style=color:#f92672>import</span> java.util.ArrayList<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span><span style=color:#f92672>import</span> java.util.List<span style=color:#f92672>;</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TestHeap</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>        List<span style=color:#f92672>&lt;</span>TestHeap<span style=color:#f92672>&gt;</span> list <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> ArrayList<span style=color:#f92672>&lt;&gt;();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>        <span style=color:#66d9ef>while</span> <span style=color:#f92672>(</span><span style=color:#66d9ef>true</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>            list<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> TestHeap<span style=color:#f92672>());</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>            System<span style=color:#f92672>.</span><span style=color:#a6e22e>gc</span><span style=color:#f92672>();</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>        <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>    <span style=color:#f92672>}</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span><span style=color:#f92672>}</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>JVM Learn 14 java堆的转储与Jvisualvm :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content=" 本文记录一下java队的转储和JVisualVM的用法。
+" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/07/07/jvm-learn-14/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="John Doe" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="JVM Learn 14 java堆的转储与Jvisualvm :: DongZhi.ME" property="og:title"/>
+<meta content=" 本文记录一下java队的转储和JVisualVM的用法。
+" property="og:description"/>
+<meta content="https://dongzhi.me/2020/07/07/jvm-learn-14/" property="og:url"/>
+<meta content="JVM Learn 14 java堆的转储与Jvisualvm" property="og:site_name"/>
+<meta content="https://dongzhi.me/" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-07-07 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-14/">JVM Learn 14 java堆的转储与Jvisualvm</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-07-07 
+      </span>
+<span class="post-author">::
+      John Doe
+    </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
+    
+  </span>
+<div class="post-content"><div>
+<blockquote>
+<p>本文记录一下java队的转储和JVisualVM的用法。</p>
+</blockquote>
+<p>示例代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> test.heap<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">import</span> java.util.ArrayList<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#f92672">import</span> java.util.List<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestHeap</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>        List<span style="color:#f92672">&lt;</span>TestHeap<span style="color:#f92672">&gt;</span> list <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;&gt;();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">true</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>            list<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> TestHeap<span style="color:#f92672">());</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>            System<span style="color:#f92672">.</span><span style="color:#a6e22e">gc</span><span style="color:#f92672">();</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>    <span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#f92672">}</span>
 </code></pre></div><p>启动参数如下图：
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_14_qidongcanshu.png alt=qidongcanshu>
+<img alt="qidongcanshu" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_14_qidongcanshu.png"/>
 在命令行下执行：jvisualvm，打开这个工具，主界面如下：
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_14_jvm_visual.png alt></p><ul><li>左上：CPU使用率，GC状态</li><li>右上：堆的总大小，已使用的堆大小</li><li>左下：类的监控</li><li>右下：线程的监控</li></ul><p>这个例子中，在一个死循环中新建对象，同时显示调用gc，运行了2个多小时，发现已使用堆的内存在稳步上升，说明有内存泄漏的趋势。</p><p>经测试，如果启动参数-Xmx设置的不管是9m，还是10m，到最后分配的最大堆内存是10m。</p><p>点击线程页签，界面如下：
-<img src=https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_14_visual_02.png alt=20200202164251>
-这里线程有5个状态：</p><ul><li>运行</li><li>休眠</li><li>等待</li><li>驻留</li><li>监视</li></ul><p>参考这篇文章<a href=https://www.jianshu.com/p/31071c405e8d>Java多线程入门不完全指南</a>顺便复习一下线程的状态。
-Thread类定义的线程状态：</p><ul><li><strong>NEW(新建)</strong>：线程创建后未启动。</li></ul><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span> /**
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span> * Thread state for a thread which has not yet started.
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span> */
-</code></pre></div><ul><li><strong>RUNNABLE(可运行)</strong>：等待系统资源运行的线程。</li></ul><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span> /**
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span> * Thread state for a runnable thread.  A thread in the runnable
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span> * state is executing in the Java virtual machine but it may
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span> * be waiting for other resources from the operating system
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span> * such as processor.
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span> */
-</code></pre></div><ul><li><strong>BLOCKED(阻塞)</strong>：当一个线程要进入synchronized语句块/方法时，如果没有获取到锁，会变成BLOCKED。或者在调用Object.wait()后，被notify()唤醒，再次进入synchronized语句块/方法时，如果没有获取到锁，会变成BLOCKED。进入阻塞状态是被动的。</li></ul><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span> /**
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span> * Thread state for a thread blocked waiting for a monitor lock.
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span> * A thread in the blocked state is waiting for a monitor lock
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span> * to enter a synchronized block/method or
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5</span> * reenter a synchronized block/method after calling
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6</span> * {@link Object#wait() Object.wait}.
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7</span> */
-</code></pre></div><ul><li><strong>WAITING(无限等待)</strong>：等待其它线程执行后，显示唤醒。调用锁对象的wait()方法并未设置时间、其它线程调用join()方法并未设置时间、调用LockSupport.park()方法都会使当前线程进入此状态。进入等待状态是主动的。</li></ul><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span> /**
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>  * Thread state for a waiting thread.
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>  * A thread is in the waiting state due to calling one of the
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>  * following methods:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>  * &lt;ul&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>  *   &lt;li&gt;{@link Object#wait() Object.wait} with no timeout&lt;/li&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>  *   &lt;li&gt;{@link #join() Thread.join} with no timeout&lt;/li&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>  *   &lt;li&gt;{@link LockSupport#park() LockSupport.park}&lt;/li&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>  * &lt;/ul&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>  *
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>  * &lt;p&gt;A thread in the waiting state is waiting for another thread to
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>  * perform a particular action.
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">13</span>  *
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">14</span>  * For example, a thread that has called &lt;tt&gt;Object.wait()&lt;/tt&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">15</span>  * on an object is waiting for another thread to call
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">16</span>  * &lt;tt&gt;Object.notify()&lt;/tt&gt; or &lt;tt&gt;Object.notifyAll()&lt;/tt&gt; on
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">17</span>  * that object. A thread that has called &lt;tt&gt;Thread.join()&lt;/tt&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">18</span>  * is waiting for a specified thread to terminate.
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">19</span>  */
-</code></pre></div><ul><li><strong>TIMED_WAITING(限期等待)</strong>：等待一段时间后被系统唤醒，不需要显示被唤醒。调用Thread.sleep()方法、调用锁对象的wait()方法并设置时间、其它线程调用join()方法并设置时间、调用LockSupport.parkNanos()方法、调用LockSupport.parkUntil()方法都会使线程进入此状态。</li></ul><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span>/**
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span>  * Thread state for a waiting thread with a specified waiting time.
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span>  * A thread is in the timed waiting state due to calling one of
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span>  * the following methods with a specified positive waiting time:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5</span>  * &lt;ul&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6</span>  *   &lt;li&gt;{@link #sleep Thread.sleep}&lt;/li&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7</span>  *   &lt;li&gt;{@link Object#wait(long) Object.wait} with timeout&lt;/li&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8</span>  *   &lt;li&gt;{@link #join(long) Thread.join} with timeout&lt;/li&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9</span>  *   &lt;li&gt;{@link LockSupport#parkNanos LockSupport.parkNanos}&lt;/li&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10</span>  *   &lt;li&gt;{@link LockSupport#parkUntil LockSupport.parkUntil}&lt;/li&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">11</span>  * &lt;/ul&gt;
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">12</span>  */
-</code></pre></div><ul><li><strong>TERMINATED(结束)</strong>：线程run()方法执行结束或异常退出后的线程状态。</li></ul><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span> /**
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span>  * Thread state for a terminated thread.
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span>  * The thread has completed execution.
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span>  */
-</code></pre></div><p><strong>Thread类和监控工具中的线程状态的对应关系如下</strong>：</p><table><thead><tr><th>Thread类</th><th>VisualVM</th></tr></thead><tbody><tr><td>RUNNABLE</td><td>运行</td></tr><tr><td>TIMED_WAITING (sleeping)</td><td>休眠</td></tr><tr><td>TIMED_WAITING (on object monitor) WAITING (on object monitor)</td><td>等待</td></tr><tr><td>TIMED_WAITING (parking) WAITING (parking)</td><td>驻留</td></tr><tr><td>BLOCKED (on object monitor)</td><td>监视</td></tr></tbody></table><p>点击线程界面的dump按钮可以查看线程具体的内容：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">  1</span>2020-02-02 17:14:34
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">  2</span>Full thread dump Java HotSpot(TM) Client VM (25.131-b11 mixed mode, sharing):
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">  3</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">  4</span>&#34;RMI TCP Connection(23)-192.168.1.111&#34; #19 daemon prio=5 os_prio=0 tid=0x0536ec00 nid=0x10a0 runnable [0x05c2f000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">  5</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">  6</span>        at java.net.SocketInputStream.socketRead0(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">  7</span>        at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">  8</span>        at java.net.SocketInputStream.read(SocketInputStream.java:171)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">  9</span>        at java.net.SocketInputStream.read(SocketInputStream.java:141)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 10</span>        at java.io.BufferedInputStream.fill(BufferedInputStream.java:246)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 11</span>        at java.io.BufferedInputStream.read(BufferedInputStream.java:265)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 12</span>        - locked &lt;0x0492f500&gt; (a java.io.BufferedInputStream)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 13</span>        at java.io.FilterInputStream.read(FilterInputStream.java:83)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 14</span>        at sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:550)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 15</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:826)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 16</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:683)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 17</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler$$Lambda$3/29995260.run(Unknown Source)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 18</span>        at java.security.AccessController.doPrivileged(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 19</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:682)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 20</span>        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 21</span>        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 22</span>        at java.lang.Thread.run(Thread.java:748)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 23</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 24</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 25</span>        - &lt;0x0492d940&gt; (a java.util.concurrent.ThreadPoolExecutor$Worker)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 26</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 27</span>&#34;RMI TCP Connection(idle)&#34; #18 daemon prio=5 os_prio=0 tid=0x0536dc00 nid=0x1f3c waiting on condition [0x00b3f000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 28</span>   java.lang.Thread.State: TIMED_WAITING (parking)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 29</span>        at sun.misc.Unsafe.park(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 30</span>        - parking to wait for  &lt;0x046609d0&gt; (a java.util.concurrent.SynchronousQueue$TransferStack)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 31</span>        at java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 32</span>        at java.util.concurrent.SynchronousQueue$TransferStack.awaitFulfill(SynchronousQueue.java:460)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 33</span>        at java.util.concurrent.SynchronousQueue$TransferStack.transfer(SynchronousQueue.java:362)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 34</span>        at java.util.concurrent.SynchronousQueue.poll(SynchronousQueue.java:941)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 35</span>        at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1066)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 36</span>        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 37</span>        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 38</span>        at java.lang.Thread.run(Thread.java:748)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 39</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 40</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 41</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 42</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 43</span>&#34;RMI TCP Connection(22)-192.168.1.111&#34; #14 daemon prio=5 os_prio=0 tid=0x05528800 nid=0x334 runnable [0x05b8e000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 44</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 45</span>        at java.net.SocketInputStream.socketRead0(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 46</span>        at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 47</span>        at java.net.SocketInputStream.read(SocketInputStream.java:171)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 48</span>        at java.net.SocketInputStream.read(SocketInputStream.java:141)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 49</span>        at java.io.BufferedInputStream.fill(BufferedInputStream.java:246)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 50</span>        at java.io.BufferedInputStream.read(BufferedInputStream.java:265)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 51</span>        - locked &lt;0x04914ea0&gt; (a java.io.BufferedInputStream)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 52</span>        at java.io.FilterInputStream.read(FilterInputStream.java:83)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 53</span>        at sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:550)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 54</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:826)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 55</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:683)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 56</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler$$Lambda$3/29995260.run(Unknown Source)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 57</span>        at java.security.AccessController.doPrivileged(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 58</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:682)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 59</span>        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 60</span>        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 61</span>        at java.lang.Thread.run(Thread.java:748)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 62</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 63</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 64</span>        - &lt;0x046e4518&gt; (a java.util.concurrent.ThreadPoolExecutor$Worker)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 65</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 66</span>&#34;JMX server connection timeout 13&#34; #13 daemon prio=5 os_prio=0 tid=0x05515800 nid=0xf88 in Object.wait() [0x0573f000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 67</span>   java.lang.Thread.State: TIMED_WAITING (on object monitor)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 68</span>        at java.lang.Object.wait(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 69</span>        - waiting on &lt;0x046d7538&gt; (a [I)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 70</span>        at com.sun.jmx.remote.internal.ServerCommunicatorAdmin$Timeout.run(ServerCommunicatorAdmin.java:168)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 71</span>        - locked &lt;0x046d7538&gt; (a [I)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 72</span>        at java.lang.Thread.run(Thread.java:748)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 73</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 74</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 75</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 76</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 77</span>&#34;RMI Scheduler(0)&#34; #12 daemon prio=5 os_prio=0 tid=0x05513000 nid=0x15a8 waiting on condition [0x056ef000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 78</span>   java.lang.Thread.State: TIMED_WAITING (parking)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 79</span>        at sun.misc.Unsafe.park(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 80</span>        - parking to wait for  &lt;0x046635f8&gt; (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 81</span>        at java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 82</span>        at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2078)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 83</span>        at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1093)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 84</span>        at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:809)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 85</span>        at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1067)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 86</span>        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 87</span>        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 88</span>        at java.lang.Thread.run(Thread.java:748)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 89</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 90</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 91</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 92</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 93</span>&#34;RMI TCP Accept-0&#34; #10 daemon prio=5 os_prio=0 tid=0x054ebc00 nid=0x17cc runnable [0x055ff000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 94</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 95</span>        at java.net.DualStackPlainSocketImpl.accept0(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 96</span>        at java.net.DualStackPlainSocketImpl.socketAccept(DualStackPlainSocketImpl.java:131)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 97</span>        at java.net.AbstractPlainSocketImpl.accept(AbstractPlainSocketImpl.java:409)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 98</span>        at java.net.PlainSocketImpl.accept(PlainSocketImpl.java:199)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 99</span>        - locked &lt;0x046871b8&gt; (a java.net.SocksSocketImpl)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">100</span>        at java.net.ServerSocket.implAccept(ServerSocket.java:545)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">101</span>        at java.net.ServerSocket.accept(ServerSocket.java:513)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">102</span>        at sun.management.jmxremote.LocalRMIServerSocketFactory$1.accept(LocalRMIServerSocketFactory.java:52)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">103</span>        at sun.rmi.transport.tcp.TCPTransport$AcceptLoop.executeAcceptLoop(TCPTransport.java:400)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">104</span>        at sun.rmi.transport.tcp.TCPTransport$AcceptLoop.run(TCPTransport.java:372)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">105</span>        at java.lang.Thread.run(Thread.java:748)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">106</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">107</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">108</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">109</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">110</span>&#34;Service Thread&#34; #8 daemon prio=9 os_prio=0 tid=0x021d5000 nid=0x1e34 runnable [0x00000000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">111</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">112</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">113</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">114</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">115</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">116</span>&#34;C1 CompilerThread0&#34; #7 daemon prio=9 os_prio=2 tid=0x021d0800 nid=0xc6c waiting on condition [0x00000000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">117</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">118</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">119</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">120</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">121</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">122</span>&#34;Monitor Ctrl-Break&#34; #6 daemon prio=5 os_prio=0 tid=0x021d6000 nid=0x1acc runnable [0x0529f000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">123</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">124</span>        at java.net.SocketInputStream.socketRead0(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">125</span>        at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">126</span>        at java.net.SocketInputStream.read(SocketInputStream.java:171)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">127</span>        at java.net.SocketInputStream.read(SocketInputStream.java:141)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">128</span>        at sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:284)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">129</span>        at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:326)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">130</span>        at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">131</span>        - locked &lt;0x045db0d8&gt; (a java.io.InputStreamReader)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">132</span>        at java.io.InputStreamReader.read(InputStreamReader.java:184)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">133</span>        at java.io.BufferedReader.fill(BufferedReader.java:161)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">134</span>        at java.io.BufferedReader.readLine(BufferedReader.java:324)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">135</span>        - locked &lt;0x045db0d8&gt; (a java.io.InputStreamReader)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">136</span>        at java.io.BufferedReader.readLine(BufferedReader.java:389)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">137</span>        at com.intellij.rt.execution.application.AppMainV2$1.run(AppMainV2.java:64)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">138</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">139</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">140</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">141</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">142</span>&#34;Attach Listener&#34; #5 daemon prio=5 os_prio=2 tid=0x0218f000 nid=0x1ecc waiting on condition [0x00000000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">143</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">144</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">145</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">146</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">147</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">148</span>&#34;Signal Dispatcher&#34; #4 daemon prio=9 os_prio=2 tid=0x0218d000 nid=0x10a4 runnable [0x00000000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">149</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">150</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">151</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">152</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">153</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">154</span>&#34;Finalizer&#34; #3 daemon prio=8 os_prio=1 tid=0x02174000 nid=0xa04 in Object.wait() [0x0514f000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">155</span>   java.lang.Thread.State: WAITING (on object monitor)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">156</span>        at java.lang.Object.wait(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">157</span>        - waiting on &lt;0x04557948&gt; (a java.lang.ref.ReferenceQueue$Lock)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">158</span>        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:143)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">159</span>        - locked &lt;0x04557948&gt; (a java.lang.ref.ReferenceQueue$Lock)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">160</span>        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:164)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">161</span>        at java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:209)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">162</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">163</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">164</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">165</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">166</span>&#34;Reference Handler&#34; #2 daemon prio=10 os_prio=2 tid=0x02117000 nid=0x13c8 in Object.wait() [0x050ff000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">167</span>   java.lang.Thread.State: WAITING (on object monitor)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">168</span>        at java.lang.Object.wait(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">169</span>        - waiting on &lt;0x04556380&gt; (a java.lang.ref.Reference$Lock)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">170</span>        at java.lang.Object.wait(Object.java:502)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">171</span>        at java.lang.ref.Reference.tryHandlePending(Reference.java:191)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">172</span>        - locked &lt;0x04556380&gt; (a java.lang.ref.Reference$Lock)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">173</span>        at java.lang.ref.Reference$ReferenceHandler.run(Reference.java:153)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">174</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">175</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">176</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">177</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">178</span>&#34;main&#34; #1 prio=5 os_prio=0 tid=0x00e7c800 nid=0x1d48 runnable [0x00bbf000]
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">179</span>   java.lang.Thread.State: RUNNABLE
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">180</span>        at java.lang.Runtime.gc(Native Method)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">181</span>        at java.lang.System.gc(System.java:993)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">182</span>        at test.heap.TestHeap.main(TestHeap.java:11)
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">183</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">184</span>   Locked ownable synchronizers:
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">185</span>        - None
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">186</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">187</span>&#34;VM Thread&#34; os_prio=2 tid=0x02112c00 nid=0x1d04 runnable 
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">188</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">189</span>&#34;VM Periodic Task Thread&#34; os_prio=2 tid=0x053b3400 nid=0x14f8 waiting on condition 
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">190</span>
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">191</span>JNI global references: 237
-<span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">192</span>
-</code></pre></div></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://dongzhi.me/2020/07/07/jvm-learn-13/><span class=button__icon>←</span>
-<span class=button__text>JVM Learn 13 JVM的内存划分</span></a></span>
-<span class="button next"><a href=https://dongzhi.me/2020/07/07/jvm-learn-15/><span class=button__text>JVM Learn 15 java栈的测试</span>
-<span class=button__icon>→</span></a></span></div></div><h3 style=margin-inline-start:1em;margin-bottom:auto>评论</h3><aside id=comments><div id=hyvor-talk-view></div><script type=text/javascript>var HYVOR_TALK_WEBSITE=1505;var HYVOR_TALK_CONFIG={url:false,id:false};</script><script async type=text/javascript src=https://talk.hyvor.com/web-api/embed></script></aside></div></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2020 Powered by <a href=http://gohugo.io>Hugo</a></span>
-<span style=margin-right:10px>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
-<span id=busuanzi_container_site_uv>:: 您是本站第<span id=busuanzi_value_site_uv></span>位访客</span></div></div></footer><script src=https://dongzhi.me/assets/main.js></script><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><script src=https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js></script><script>const players=Plyr.setup('.js-player',{iconUrl:'/modules/plyr/3.6.2/plyr.svg'});</script></div></body></html>
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_14_jvm_visual.png"/></p>
+<ul>
+<li>左上：CPU使用率，GC状态</li>
+<li>右上：堆的总大小，已使用的堆大小</li>
+<li>左下：类的监控</li>
+<li>右下：线程的监控</li>
+</ul>
+<p>这个例子中，在一个死循环中新建对象，同时显示调用gc，运行了2个多小时，发现已使用堆的内存在稳步上升，说明有内存泄漏的趋势。</p>
+<p>经测试，如果启动参数-Xmx设置的不管是9m，还是10m，到最后分配的最大堆内存是10m。</p>
+<p>点击线程页签，界面如下：
+<img alt="20200202164251" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_14_visual_02.png"/>
+这里线程有5个状态：</p>
+<ul>
+<li>运行</li>
+<li>休眠</li>
+<li>等待</li>
+<li>驻留</li>
+<li>监视</li>
+</ul>
+<p>参考这篇文章<a href="https://www.jianshu.com/p/31071c405e8d">Java多线程入门不完全指南</a>顺便复习一下线程的状态。
+Thread类定义的线程状态：</p>
+<ul>
+<li><strong>NEW(新建)</strong>：线程创建后未启动。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span> /**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span> * Thread state for a thread which has not yet started.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span> */
+</code></pre></div><ul>
+<li><strong>RUNNABLE(可运行)</strong>：等待系统资源运行的线程。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span> /**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span> * Thread state for a runnable thread.  A thread in the runnable
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span> * state is executing in the Java virtual machine but it may
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span> * be waiting for other resources from the operating system
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span> * such as processor.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span> */
+</code></pre></div><ul>
+<li><strong>BLOCKED(阻塞)</strong>：当一个线程要进入synchronized语句块/方法时，如果没有获取到锁，会变成BLOCKED。或者在调用Object.wait()后，被notify()唤醒，再次进入synchronized语句块/方法时，如果没有获取到锁，会变成BLOCKED。进入阻塞状态是被动的。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span> /**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span> * Thread state for a thread blocked waiting for a monitor lock.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span> * A thread in the blocked state is waiting for a monitor lock
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span> * to enter a synchronized block/method or
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span> * reenter a synchronized block/method after calling
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span> * {@link Object#wait() Object.wait}.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span> */
+</code></pre></div><ul>
+<li><strong>WAITING(无限等待)</strong>：等待其它线程执行后，显示唤醒。调用锁对象的wait()方法并未设置时间、其它线程调用join()方法并未设置时间、调用LockSupport.park()方法都会使当前线程进入此状态。进入等待状态是主动的。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span> /**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>  * Thread state for a waiting thread.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>  * A thread is in the waiting state due to calling one of the
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>  * following methods:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>  * &lt;ul&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>  *   &lt;li&gt;{@link Object#wait() Object.wait} with no timeout&lt;/li&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>  *   &lt;li&gt;{@link #join() Thread.join} with no timeout&lt;/li&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  *   &lt;li&gt;{@link LockSupport#park() LockSupport.park}&lt;/li&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>  * &lt;/ul&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  *
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>  * &lt;p&gt;A thread in the waiting state is waiting for another thread to
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  * perform a particular action.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>  *
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>  * For example, a thread that has called &lt;tt&gt;Object.wait()&lt;/tt&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>  * on an object is waiting for another thread to call
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>  * &lt;tt&gt;Object.notify()&lt;/tt&gt; or &lt;tt&gt;Object.notifyAll()&lt;/tt&gt; on
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>  * that object. A thread that has called &lt;tt&gt;Thread.join()&lt;/tt&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>  * is waiting for a specified thread to terminate.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>  */
+</code></pre></div><ul>
+<li><strong>TIMED_WAITING(限期等待)</strong>：等待一段时间后被系统唤醒，不需要显示被唤醒。调用Thread.sleep()方法、调用锁对象的wait()方法并设置时间、其它线程调用join()方法并设置时间、调用LockSupport.parkNanos()方法、调用LockSupport.parkUntil()方法都会使线程进入此状态。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>/**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>  * Thread state for a waiting thread with a specified waiting time.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>  * A thread is in the timed waiting state due to calling one of
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>  * the following methods with a specified positive waiting time:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>  * &lt;ul&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>  *   &lt;li&gt;{@link #sleep Thread.sleep}&lt;/li&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>  *   &lt;li&gt;{@link Object#wait(long) Object.wait} with timeout&lt;/li&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  *   &lt;li&gt;{@link #join(long) Thread.join} with timeout&lt;/li&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>  *   &lt;li&gt;{@link LockSupport#parkNanos LockSupport.parkNanos}&lt;/li&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  *   &lt;li&gt;{@link LockSupport#parkUntil LockSupport.parkUntil}&lt;/li&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>  * &lt;/ul&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  */
+</code></pre></div><ul>
+<li><strong>TERMINATED(结束)</strong>：线程run()方法执行结束或异常退出后的线程状态。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span> /**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>  * Thread state for a terminated thread.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>  * The thread has completed execution.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>  */
+</code></pre></div><p><strong>Thread类和监控工具中的线程状态的对应关系如下</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>Thread类</th>
+<th>VisualVM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RUNNABLE</td>
+<td>运行</td>
+</tr>
+<tr>
+<td>TIMED_WAITING (sleeping)</td>
+<td>休眠</td>
+</tr>
+<tr>
+<td>TIMED_WAITING (on object monitor) WAITING (on object monitor)</td>
+<td>等待</td>
+</tr>
+<tr>
+<td>TIMED_WAITING (parking) WAITING (parking)</td>
+<td>驻留</td>
+</tr>
+<tr>
+<td>BLOCKED (on object monitor)</td>
+<td>监视</td>
+</tr>
+</tbody>
+</table>
+<p>点击线程界面的dump按钮可以查看线程具体的内容：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  1</span>2020-02-02 17:14:34
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  2</span>Full thread dump Java HotSpot(TM) Client VM (25.131-b11 mixed mode, sharing):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  4</span>"RMI TCP Connection(23)-192.168.1.111" #19 daemon prio=5 os_prio=0 tid=0x0536ec00 nid=0x10a0 runnable [0x05c2f000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  5</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  6</span>        at java.net.SocketInputStream.socketRead0(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  7</span>        at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  8</span>        at java.net.SocketInputStream.read(SocketInputStream.java:171)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  9</span>        at java.net.SocketInputStream.read(SocketInputStream.java:141)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 10</span>        at java.io.BufferedInputStream.fill(BufferedInputStream.java:246)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 11</span>        at java.io.BufferedInputStream.read(BufferedInputStream.java:265)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 12</span>        - locked &lt;0x0492f500&gt; (a java.io.BufferedInputStream)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 13</span>        at java.io.FilterInputStream.read(FilterInputStream.java:83)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 14</span>        at sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:550)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 15</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:826)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 16</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:683)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 17</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler$$Lambda$3/29995260.run(Unknown Source)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 18</span>        at java.security.AccessController.doPrivileged(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 19</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:682)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 20</span>        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 21</span>        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 22</span>        at java.lang.Thread.run(Thread.java:748)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 23</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 24</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 25</span>        - &lt;0x0492d940&gt; (a java.util.concurrent.ThreadPoolExecutor$Worker)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 26</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 27</span>"RMI TCP Connection(idle)" #18 daemon prio=5 os_prio=0 tid=0x0536dc00 nid=0x1f3c waiting on condition [0x00b3f000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 28</span>   java.lang.Thread.State: TIMED_WAITING (parking)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 29</span>        at sun.misc.Unsafe.park(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 30</span>        - parking to wait for  &lt;0x046609d0&gt; (a java.util.concurrent.SynchronousQueue$TransferStack)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 31</span>        at java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 32</span>        at java.util.concurrent.SynchronousQueue$TransferStack.awaitFulfill(SynchronousQueue.java:460)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 33</span>        at java.util.concurrent.SynchronousQueue$TransferStack.transfer(SynchronousQueue.java:362)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 34</span>        at java.util.concurrent.SynchronousQueue.poll(SynchronousQueue.java:941)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 35</span>        at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1066)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 36</span>        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 37</span>        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 38</span>        at java.lang.Thread.run(Thread.java:748)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 39</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 40</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 41</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 42</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 43</span>"RMI TCP Connection(22)-192.168.1.111" #14 daemon prio=5 os_prio=0 tid=0x05528800 nid=0x334 runnable [0x05b8e000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 44</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 45</span>        at java.net.SocketInputStream.socketRead0(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 46</span>        at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 47</span>        at java.net.SocketInputStream.read(SocketInputStream.java:171)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 48</span>        at java.net.SocketInputStream.read(SocketInputStream.java:141)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 49</span>        at java.io.BufferedInputStream.fill(BufferedInputStream.java:246)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 50</span>        at java.io.BufferedInputStream.read(BufferedInputStream.java:265)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 51</span>        - locked &lt;0x04914ea0&gt; (a java.io.BufferedInputStream)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 52</span>        at java.io.FilterInputStream.read(FilterInputStream.java:83)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 53</span>        at sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:550)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 54</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:826)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 55</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:683)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 56</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler$$Lambda$3/29995260.run(Unknown Source)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 57</span>        at java.security.AccessController.doPrivileged(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 58</span>        at sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:682)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 59</span>        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 60</span>        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 61</span>        at java.lang.Thread.run(Thread.java:748)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 62</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 63</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 64</span>        - &lt;0x046e4518&gt; (a java.util.concurrent.ThreadPoolExecutor$Worker)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 65</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 66</span>"JMX server connection timeout 13" #13 daemon prio=5 os_prio=0 tid=0x05515800 nid=0xf88 in Object.wait() [0x0573f000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 67</span>   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 68</span>        at java.lang.Object.wait(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 69</span>        - waiting on &lt;0x046d7538&gt; (a [I)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 70</span>        at com.sun.jmx.remote.internal.ServerCommunicatorAdmin$Timeout.run(ServerCommunicatorAdmin.java:168)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 71</span>        - locked &lt;0x046d7538&gt; (a [I)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 72</span>        at java.lang.Thread.run(Thread.java:748)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 73</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 74</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 75</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 76</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 77</span>"RMI Scheduler(0)" #12 daemon prio=5 os_prio=0 tid=0x05513000 nid=0x15a8 waiting on condition [0x056ef000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 78</span>   java.lang.Thread.State: TIMED_WAITING (parking)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 79</span>        at sun.misc.Unsafe.park(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 80</span>        - parking to wait for  &lt;0x046635f8&gt; (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 81</span>        at java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 82</span>        at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2078)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 83</span>        at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1093)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 84</span>        at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:809)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 85</span>        at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1067)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 86</span>        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 87</span>        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 88</span>        at java.lang.Thread.run(Thread.java:748)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 89</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 90</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 91</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 92</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 93</span>"RMI TCP Accept-0" #10 daemon prio=5 os_prio=0 tid=0x054ebc00 nid=0x17cc runnable [0x055ff000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 94</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 95</span>        at java.net.DualStackPlainSocketImpl.accept0(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 96</span>        at java.net.DualStackPlainSocketImpl.socketAccept(DualStackPlainSocketImpl.java:131)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 97</span>        at java.net.AbstractPlainSocketImpl.accept(AbstractPlainSocketImpl.java:409)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 98</span>        at java.net.PlainSocketImpl.accept(PlainSocketImpl.java:199)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 99</span>        - locked &lt;0x046871b8&gt; (a java.net.SocksSocketImpl)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">100</span>        at java.net.ServerSocket.implAccept(ServerSocket.java:545)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">101</span>        at java.net.ServerSocket.accept(ServerSocket.java:513)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">102</span>        at sun.management.jmxremote.LocalRMIServerSocketFactory$1.accept(LocalRMIServerSocketFactory.java:52)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">103</span>        at sun.rmi.transport.tcp.TCPTransport$AcceptLoop.executeAcceptLoop(TCPTransport.java:400)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">104</span>        at sun.rmi.transport.tcp.TCPTransport$AcceptLoop.run(TCPTransport.java:372)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">105</span>        at java.lang.Thread.run(Thread.java:748)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">106</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">107</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">108</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">109</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">110</span>"Service Thread" #8 daemon prio=9 os_prio=0 tid=0x021d5000 nid=0x1e34 runnable [0x00000000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">111</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">112</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">113</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">114</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">115</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">116</span>"C1 CompilerThread0" #7 daemon prio=9 os_prio=2 tid=0x021d0800 nid=0xc6c waiting on condition [0x00000000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">117</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">118</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">119</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">120</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">121</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">122</span>"Monitor Ctrl-Break" #6 daemon prio=5 os_prio=0 tid=0x021d6000 nid=0x1acc runnable [0x0529f000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">123</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">124</span>        at java.net.SocketInputStream.socketRead0(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">125</span>        at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">126</span>        at java.net.SocketInputStream.read(SocketInputStream.java:171)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">127</span>        at java.net.SocketInputStream.read(SocketInputStream.java:141)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">128</span>        at sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:284)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">129</span>        at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:326)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">130</span>        at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">131</span>        - locked &lt;0x045db0d8&gt; (a java.io.InputStreamReader)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">132</span>        at java.io.InputStreamReader.read(InputStreamReader.java:184)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">133</span>        at java.io.BufferedReader.fill(BufferedReader.java:161)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">134</span>        at java.io.BufferedReader.readLine(BufferedReader.java:324)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">135</span>        - locked &lt;0x045db0d8&gt; (a java.io.InputStreamReader)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">136</span>        at java.io.BufferedReader.readLine(BufferedReader.java:389)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">137</span>        at com.intellij.rt.execution.application.AppMainV2$1.run(AppMainV2.java:64)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">138</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">139</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">140</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">141</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">142</span>"Attach Listener" #5 daemon prio=5 os_prio=2 tid=0x0218f000 nid=0x1ecc waiting on condition [0x00000000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">143</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">144</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">145</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">146</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">147</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">148</span>"Signal Dispatcher" #4 daemon prio=9 os_prio=2 tid=0x0218d000 nid=0x10a4 runnable [0x00000000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">149</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">150</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">151</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">152</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">153</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">154</span>"Finalizer" #3 daemon prio=8 os_prio=1 tid=0x02174000 nid=0xa04 in Object.wait() [0x0514f000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">155</span>   java.lang.Thread.State: WAITING (on object monitor)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">156</span>        at java.lang.Object.wait(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">157</span>        - waiting on &lt;0x04557948&gt; (a java.lang.ref.ReferenceQueue$Lock)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">158</span>        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:143)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">159</span>        - locked &lt;0x04557948&gt; (a java.lang.ref.ReferenceQueue$Lock)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">160</span>        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:164)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">161</span>        at java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:209)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">162</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">163</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">164</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">165</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">166</span>"Reference Handler" #2 daemon prio=10 os_prio=2 tid=0x02117000 nid=0x13c8 in Object.wait() [0x050ff000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">167</span>   java.lang.Thread.State: WAITING (on object monitor)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">168</span>        at java.lang.Object.wait(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">169</span>        - waiting on &lt;0x04556380&gt; (a java.lang.ref.Reference$Lock)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">170</span>        at java.lang.Object.wait(Object.java:502)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">171</span>        at java.lang.ref.Reference.tryHandlePending(Reference.java:191)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">172</span>        - locked &lt;0x04556380&gt; (a java.lang.ref.Reference$Lock)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">173</span>        at java.lang.ref.Reference$ReferenceHandler.run(Reference.java:153)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">174</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">175</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">176</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">177</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">178</span>"main" #1 prio=5 os_prio=0 tid=0x00e7c800 nid=0x1d48 runnable [0x00bbf000]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">179</span>   java.lang.Thread.State: RUNNABLE
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">180</span>        at java.lang.Runtime.gc(Native Method)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">181</span>        at java.lang.System.gc(System.java:993)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">182</span>        at test.heap.TestHeap.main(TestHeap.java:11)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">183</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">184</span>   Locked ownable synchronizers:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">185</span>        - None
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">186</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">187</span>"VM Thread" os_prio=2 tid=0x02112c00 nid=0x1d04 runnable 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">188</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">189</span>"VM Periodic Task Thread" os_prio=2 tid=0x053b3400 nid=0x14f8 waiting on condition 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">190</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">191</span>JNI global references: 237
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">192</span>
+</code></pre></div>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-13/">
+<span class="button__icon">←</span>
+<span class="button__text">JVM Learn 13 JVM的内存划分</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://dongzhi.me/2020/07/07/jvm-learn-15/">
+<span class="button__text">JVM Learn 15 java栈的测试</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<div id="hyvor-talk-view"></div>
+<script type="text/javascript">
+		var HYVOR_TALK_WEBSITE = 1505; 
+		var HYVOR_TALK_CONFIG = {
+        url: false,
+        id: false
+		};
+	  </script>
+<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>
