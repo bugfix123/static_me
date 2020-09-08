@@ -3,11 +3,6 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://dongzhi.me/</loc>
-    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://dongzhi.me/tags/hugo/</loc>
     <lastmod>2020-09-08T00:00:00+00:00</lastmod>
   </url>
@@ -34,6 +29,11 @@
   
   <url>
     <loc>https://dongzhi.me/2020/09/08/add-search-for-hugo/</loc>
+    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dongzhi.me/</loc>
     <lastmod>2020-09-08T00:00:00+00:00</lastmod>
   </url>
   

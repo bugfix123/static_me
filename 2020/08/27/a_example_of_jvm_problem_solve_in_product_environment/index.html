@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>记一次公司JVM堆溢出抽丝剥茧定位的过程 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<title>记一次公司JVM堆溢出抽丝剥茧定位的过程 :: 志哥笔记 — 记述码农在家的故事！</title>
 <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta content="背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为" name="description"/>
@@ -9,6 +9,7 @@
 <meta content="noodp" name="robots"/>
 <link href="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" rel="canonical"/>
 <link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://dongzhi.me/assets/blue.css" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
 <link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
@@ -17,7 +18,7 @@
 <meta content="" name="twitter:creator"/>
 <meta content="en" property="og:locale"/>
 <meta content="article" property="og:type"/>
-<meta content="记一次公司JVM堆溢出抽丝剥茧定位的过程 :: DongZhi.ME" property="og:title"/>
+<meta content="记一次公司JVM堆溢出抽丝剥茧定位的过程 :: 志哥笔记" property="og:title"/>
 <meta content="背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为" property="og:description"/>
 <meta content="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" property="og:url"/>
 <meta content="记一次公司JVM堆溢出抽丝剥茧定位的过程" property="og:site_name"/>
@@ -179,8 +180,8 @@ padding: 5px auto;margin: 10px auto;*/
 <footer class="footer">
 <div class="footer__inner">
 <div class="copyright">
-<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
-<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span>© 2020 志哥笔记 由<a href="https://my.laoxuehost.com/aff.php?aff=10457">老薛主机</a>强力驱动</span>
+<span style="margin-right: 10px;">:: Theme <a href="https://themes.gohugo.io/hugo-theme-terminal/">Terminal</a></span>
 <span id="busuanzi_container_site_uv">
                 :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
           </span>
