@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Hugo给文章加密与自动化部署方案 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="本文简单记录一下在使用Hugo过程中，如何给文章添加密码，以及自动化构建和部署的折腾过程。 Hugo在本地调试好了，总得找个静态空间放在网上吧，可以放在vps上用nginx来搞，可是维护太麻烦。据了解，" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/09/08/auto-deploy-for-hugo/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="Hugo给文章加密与自动化部署方案 :: DongZhi.ME" property="og:title"/>
+<meta content="本文简单记录一下在使用Hugo过程中，如何给文章添加密码，以及自动化构建和部署的折腾过程。 Hugo在本地调试好了，总得找个静态空间放在网上吧，可以放在vps上用nginx来搞，可是维护太麻烦。据了解，" property="og:description"/>
+<meta content="https://dongzhi.me/2020/09/08/auto-deploy-for-hugo/" property="og:url"/>
+<meta content="Hugo给文章加密与自动化部署方案" property="og:site_name"/>
+<meta content="https://dongzhi.me/img/favicon/orange.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-09-08 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/09/08/auto-deploy-for-hugo/">Hugo给文章加密与自动化部署方案</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-09-08 
+      </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://dongzhi.me/tags/hugo/">hugo</a> 
+    
+  </span>
+<div class="post-content"><div>
+<blockquote>
+<p>本文简单记录一下在使用Hugo过程中，如何给文章添加密码，以及自动化构建和部署的折腾过程。</p>
+</blockquote>
+<p>Hugo在本地调试好了，总得找个静态空间放在网上吧，可以放在vps上用nginx来搞，可是维护太麻烦。据了解，有现成的gitlab pages可以免费使用，结合gitlab CI，一站式构建部署。
+具体来说，就是在gitlab上fork一下Hugo-demo项目，里面已经自带了gitlab CI配置文件(.gitlab-ci.yml)，然后在fork得到的仓库中开启gitlab pages，可以替换成自己的域名，还支持https。
+按理说，这是最方便的，万事大吉，收工！。</p>
+<p>然而，一个严重的问题来了：gitlab pages访问速度太慢，慢得和github pages有一拼，毕竟是免费的东西嘛，于是继续折腾！了解了一下CDN，国内的速度很快，免费空间额度也很大，可惜需要备案，
+国外的也有很多免费的，比如cloudflare,keyCDN等，速度都不怎么样，体验一般，没什么搞头。</p>
+<p>偶然间发现了vercel（前身是Zeit），vercel可是一个好东西，它可以免费托管静态网站，空间和流量几乎没有限制，支持从gitlab和github导入项目，还有hexo，Hugo等二十多个静态网站模板，
+这都不是重点，重点是速度快，速度上碾压gitlab pages,github pages和cloudflare CDN。据说netilify也不错，不过个人感觉vercel要稍快一些！</p>
+<p>注册vercel账户，导按照页面的提示导入gitlab项目，导入时模板选择Hugo，需要到gitlab那里授权一下。然后配置一下域名，将域名解析到76.76.21.21，就完事了。这样子，整个流程就变成了这样：
+本地写markdown文章–&gt;提交到gitlab仓库–&gt;触发vercel构建Hugo页面。我们只需要关注写文章了，构建和部署全交给vercel了，当然数据是保存在gitlab仓库上的。</p>
+<p>好景不长，随着折腾程度的进一步加深，又产生许多新形势新情况新问题，一是引入的js、css和图片太多了，严重拖慢站点访问速度，另一个是文章加密问题，由于许多文章中的内容是敏感的，需要设置访问
+密码，对文章加密这个功能是刚需了。</p>
+<p>好了，先来解决第一个问题，寻寻觅觅，冷冷清清，凄凄惨惨戚戚，还真的有完美的解决方案!那就是jsDelivr+Github，可以在Github上专门创建一个仓库，专门存放站点的静态资源，然后直接使用jsDelivr CDN
+就行了，不需要注册和配置什么，只需要把url的域名部分改成jsDelivr就行，相当便捷！同时，利用jsDelivr CDN，想象空间是很大的！</p>
+<p>再说第二个问题。加密的工具选项不多，比较好的是staticrypt和Hugo encryptor，前者对整个静态页面加密，后者可以对文章的部分内容加密，我使用的是后者。
+Hugo encryptor是用python写的，需要搭建python3(python3.5)环境，可以参考官方说明一步一步来。先创建一个shortcode，然后在需要加密的文章中插入这个shortcode，然后正常地Hugo building，
+生成了静态页面之后，再对public目录执行Hugo encryptor命令，加密完成。而使用vercel了的话，构建是在vercel中完成的，需要额外干预才行。具体操作就是，在项目根目录新建package.json和verson.json，前者自定义
+Hugo的构建，后者指定Hugo的版本，二者会被vercel自动读取。
+package.json:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>"scripts":
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>	{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>		"build" : "hugo &amp;&amp;git clone https://github.com/bugfix123/hugo_encryptor.git &amp;&amp; cd hugo_encryptor &amp;&amp; pip install -r requirements.txt &amp;&amp;  cd .. &amp;&amp;python3 ./hugo_encryptor/hugo-encryptor.py"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>	}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>}
+</code></pre></div><p>vercel.json:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>  "build": {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>    "env": {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>      "HUGO_VERSION": "0.74.3"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>  }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>}
+</code></pre></div><p>到此，给文章添加密码完成。</p>
+<p>折腾无止境，随后看到老薛主机在搞促销，相关虚拟主机空间一年才几十块，于是果断尝试一下，当然了，比较是香港的机房，速度毋庸置疑了。虚拟主机空间一般都会提供ftp账号和密码，至于虚拟主机空间的部署，首先想到的是ftp方式，
+就是在vercel上构建完之后，把项目public目录通过ftp发送给老薛主机的虚拟空间。OK，开始折腾ftp发送linux脚本了，本以为是很简单的问题，其实不然。linux的ftp发送主要有ftp和lftp，前者功能简陋，不支持发送子目录，所以
+放弃。lftp功能强大，同步数据很方便，但是速度很慢，测试了一下，通过lftp同步完整个站点文件到老薛主机，需要十几分钟，这是绝对不可接受的。接着又查了很多资料，git-ftp，git-lftp-action什么的，还有网上一堆ftp同步脚本，
+他们的底层几乎都是使用lftp传输，所以，传输速度是个瓶颈了，放弃这种方式。</p>
+<p>了解到github action的构建也很方便，和gitlab CI类似的东东，于是尝试一下。思路如下：在Github创建2个仓库，仓库A存放hugo项目文件，仓库B存放仓库A生成的public目录下的静态站点文件。配置仓库A的Github Action，构建hugo
+并将生成的public目录下的文件提交到仓库B，然后配置仓库B的webhook URL，这个URL是请求到虚拟主机空间的，当虚拟主机空间收到仓库B的webhook请求后，触发git clone命令，拉取仓库B的最新内容。由于虚拟主机空间一般支持php，所以
+可以让这个webhook URL请求虚拟主机空间下的php文件，在这个php文件中调用linux命令。</p>
+<p>仓库A的github action配置文件：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>.github/workflows/main.yml
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span># This is a basic workflow to help you get started with Actions
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>name: CI
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span># Controls when the action will run. Triggers the workflow on push or pull request
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span># events but only for the master branch
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>on:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  push:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>    branches: [ master ]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  pull_request:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>    branches: [ master ]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span># A workflow run is made up of one or more jobs that can run sequentially or in parallel
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>jobs:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>  # This workflow contains a single job called "build"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>  build:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>    # The type of runner that the job will run on
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>    runs-on: ubuntu-latest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>    # Steps represent a sequence of tasks that will be executed as part of the job
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>    steps:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>      - uses: actions/checkout@v2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>      # Setup hugo
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>      - name: Setup Hugo
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>        uses: peaceiris/actions-hugo@v2.2.2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>        with:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>          hugo-version: '0.74.3'
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>          extended: true
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>      - name: Build
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>        run: hugo
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>      - name: encrypt
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>        run: docker run -v $(pwd):/blog hly0928/hugo_encryptor:latest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>      - name: push to static_me
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>        run: chmod +x push.sh&amp;&amp;sh push.sh
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>
+</code></pre></div>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://dongzhi.me/2020/09/08/all-issues-for-hugo/">
+<span class="button__icon">←</span>
+<span class="button__text">Hugo使用过程中遇到的坑汇总</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://dongzhi.me/2020/09/08/add-search-for-hugo/">
+<span class="button__text">如何给hugo添加站内搜索功能</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<h3 style="margin-inline-start: 1em;margin-bottom: auto;">评论</h3>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<div id="hyvor-talk-view"></div>
+<script type="text/javascript">
+		var HYVOR_TALK_WEBSITE = 1505; 
+		var HYVOR_TALK_CONFIG = {
+        url: false,
+        id: false
+		};
+	  </script>
+<script async="" src="https://talk.hyvor.com/web-api/embed" type="text/javascript"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 Powered by <a href="http://gohugo.io">Hugo</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>
