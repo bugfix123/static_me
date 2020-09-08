@@ -4,7 +4,7 @@
 <title>如何给hugo添加站内搜索功能 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
 <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="思路 Hugo会默认生成index.xml文件，里面包含全站内容，以此文件进行内容搜索。这种方法不需要引用第三方库，在前端进行搜索，简洁且速度快！ 具体步骤: a.在主题的layouts/_default目" name="description"/>
+<meta content="" name="description"/>
 <meta content="" name="keywords"/>
 <meta content="noodp" name="robots"/>
 <link href="https://dongzhi.me/2020/09/08/add-search-for-hugo/" rel="canonical"/>
@@ -18,7 +18,7 @@
 <meta content="en" property="og:locale"/>
 <meta content="article" property="og:type"/>
 <meta content="如何给hugo添加站内搜索功能 :: DongZhi.ME" property="og:title"/>
-<meta content="思路 Hugo会默认生成index.xml文件，里面包含全站内容，以此文件进行内容搜索。这种方法不需要引用第三方库，在前端进行搜索，简洁且速度快！ 具体步骤: a.在主题的layouts/_default目" property="og:description"/>
+<meta content="" property="og:description"/>
 <meta content="https://dongzhi.me/2020/09/08/add-search-for-hugo/" property="og:url"/>
 <meta content="如何给hugo添加站内搜索功能" property="og:site_name"/>
 <meta content="https://dongzhi.me/img/favicon/orange.png" property="og:image"/>
@@ -75,11 +75,13 @@
 <div class="post-content"><div>
 <h2 id="思路">思路<a arialabel="Anchor" class="hanchor" href="#思路">⌗</a> </h2>
 <p>Hugo会默认生成index.xml文件，里面包含全站内容，以此文件进行内容搜索。这种方法不需要引用第三方库，在前端进行搜索，简洁且速度快！</p>
-<h2 id="具体步骤">具体步骤:<a arialabel="Anchor" class="hanchor" href="#具体步骤">⌗</a> </h2>
-<p>a.在主题的layouts/_default目录下新建search.html模板文件
-b.在站点的content目录新建search.md文章
-c.分别在站点的header中添加css样式，在footer中添加js脚本
-d.搜索页面的url为http://localhost:1313/search/，可以添加到站点菜单中</p>
+<h2 id="步骤">步骤<a arialabel="Anchor" class="hanchor" href="#步骤">⌗</a> </h2>
+<ol>
+<li>在主题的layouts/_default目录下新建search.html模板文件</li>
+<li>在站点的content目录新建search.md文章</li>
+<li>分别在站点的header中添加css样式，在footer中添加js脚本</li>
+<li>搜索页面的url为http://localhost:1313/search/，可以添加到站点菜单中</li>
+</ol>
 <h2 id="实现代码">实现代码<a arialabel="Anchor" class="hanchor" href="#实现代码">⌗</a> </h2>
 <p>js代码：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>  <span style="color:#75715e">// search

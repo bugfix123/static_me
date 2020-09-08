@@ -13,21 +13,23 @@
 <link>https://dongzhi.me/2020/09/08/all-issues-for-hugo/</link>
 <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
 <guid>https://dongzhi.me/2020/09/08/all-issues-for-hugo/</guid>
-<description>版本问题 huo是使用go语言写的，它构建环境搭建相当简单，只需要下载安装程序，其实不需要按装，就是一个二进制文件而已，只需要把它添加到系统的环境变量，就可以开干了。 这里有一个坑，就是一定要下载扩展版本</description>
+<description/>
 </item>
 <item>
 <title>Hugo给文章加密与自动化部署方案</title>
 <link>https://dongzhi.me/2020/09/08/auto-deploy-for-hugo/</link>
 <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
 <guid>https://dongzhi.me/2020/09/08/auto-deploy-for-hugo/</guid>
-<description>本文简单记录一下在使用Hugo过程中，如何给文章添加密码，以及自动化构建和部署的折腾过程。 Hugo在本地调试好了，总得找个静态空间放在网上吧，可以放在vps上用nginx来搞，可是维护太麻烦。据了解，</description>
+<description>&lt;blockquote&gt;
+&lt;p&gt;本文简单记录一下在使用Hugo过程中，如何给文章添加密码，以及自动化构建和部署的折腾过程。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
 </item>
 <item>
 <title>如何给hugo添加站内搜索功能</title>
 <link>https://dongzhi.me/2020/09/08/add-search-for-hugo/</link>
 <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
 <guid>https://dongzhi.me/2020/09/08/add-search-for-hugo/</guid>
-<description>思路 Hugo会默认生成index.xml文件，里面包含全站内容，以此文件进行内容搜索。这种方法不需要引用第三方库，在前端进行搜索，简洁且速度快！ 具体步骤: a.在主题的layouts/_default目</description>
+<description/>
 </item>
 <item>
 <title>记一次公司JVM堆溢出抽丝剥茧定位的过程</title>

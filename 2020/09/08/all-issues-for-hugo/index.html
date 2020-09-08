@@ -4,7 +4,7 @@
 <title>Hugo使用过程中遇到的坑汇总 :: DongZhi.ME — A simple, retro blog for latest information technology!</title>
 <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="版本问题 huo是使用go语言写的，它构建环境搭建相当简单，只需要下载安装程序，其实不需要按装，就是一个二进制文件而已，只需要把它添加到系统的环境变量，就可以开干了。 这里有一个坑，就是一定要下载扩展版本" name="description"/>
+<meta content="" name="description"/>
 <meta content="" name="keywords"/>
 <meta content="noodp" name="robots"/>
 <link href="https://dongzhi.me/2020/09/08/all-issues-for-hugo/" rel="canonical"/>
@@ -18,7 +18,7 @@
 <meta content="en" property="og:locale"/>
 <meta content="article" property="og:type"/>
 <meta content="Hugo使用过程中遇到的坑汇总 :: DongZhi.ME" property="og:title"/>
-<meta content="版本问题 huo是使用go语言写的，它构建环境搭建相当简单，只需要下载安装程序，其实不需要按装，就是一个二进制文件而已，只需要把它添加到系统的环境变量，就可以开干了。 这里有一个坑，就是一定要下载扩展版本" property="og:description"/>
+<meta content="" property="og:description"/>
 <meta content="https://dongzhi.me/2020/09/08/all-issues-for-hugo/" property="og:url"/>
 <meta content="Hugo使用过程中遇到的坑汇总" property="og:site_name"/>
 <meta content="https://dongzhi.me/img/favicon/orange.png" property="og:image"/>
@@ -76,17 +76,25 @@
 <h2 id="版本问题">版本问题<a arialabel="Anchor" class="hanchor" href="#版本问题">⌗</a> </h2>
 <p>huo是使用go语言写的，它构建环境搭建相当简单，只需要下载安装程序，其实不需要按装，就是一个二进制文件而已，只需要把它添加到系统的环境变量，就可以开干了。
 这里有一个坑，就是一定要下载扩展版本(extended version)，否则变异构建scss文件会报错!</p>
-<p>一些简单命令:
-<code>hugo version</code>:查看版本
-<code>hugo new site myBlog</code>:创建一个全新的blog，根目录是myBlog
-<code>hugo new posts/my-first-post.md</code>:在content目录下中的子目录posts下新建一个名为my-first-post的博文
-<code>hugo server</code>:运行hugo，默认情况下，端口是1313</p>
+<p>一些简单命令:</p>
+<ul>
+<li><code>hugo version</code>:查看版本</li>
+<li><code>hugo new site myBlog</code>:创建一个全新的blog，根目录是myBlog</li>
+<li><code>hugo new posts/my-first-post.md</code>:在content目录下中的子目录posts下新建一个名为my-first-post的博文</li>
+<li><code>hugo server</code>:运行hugo，默认情况下，端口是1313</li>
+</ul>
 <p>具体得基本配置请参考官网的quick start,非常简单！</p>
 <h2 id="主题选择">主题选择<a arialabel="Anchor" class="hanchor" href="#主题选择">⌗</a> </h2>
-<p>hugo的主题没有hexo那么多，但是质量都非常不错，选来选去，还是那几款比较好，本人都使用过，推荐一下：hugo-theme-even，hugo-theme-loveit，hugo-theme-mixedpaper，
-hugo-theme-terminal，之前使用的是hugo-theme-mixedpaper，现在使用的是最后一个hugo-theme-terminal。每一款主题都可能不完美，在某些地方不符合自己的口味，没关系，直接修改便是!。</p>
+<p>hugo的主题没有hexo那么多，但是质量都非常不错!当然了，选来选去，还是那几款比较好，本人都使用过。推荐几个不错的主题：</p>
+<ul>
+<li>hugo-theme-even</li>
+<li>hugo-theme-loveit</li>
+<li>hugo-theme-mixedpaper，</li>
+<li>hugo-theme-terminal</li>
+</ul>
+<p>之前使用的是hugo-theme-mixedpaper，现在使用的是最后一个<code>hugo-theme-terminal</code>。每一款主题都可能不完美，在某些地方不符合自己的口味，没关系，直接修改便是!。</p>
 <h2 id="代码高亮和行号问题">代码高亮和行号问题<a arialabel="Anchor" class="hanchor" href="#代码高亮和行号问题">⌗</a> </h2>
-<p>hugo自带markdown代码高亮和行号，还可以选择风格，只需要在config.toml配置文件加入一下配置，不需要引入任何第三方文件。</p>
+<p>hugo自带markdown代码高亮和行号，还可以选择风格，只需要在config.toml配置文件，加入一下配置，不需要引入任何第三方文件。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>[markup]
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>	[markup.highlight]
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>		codeFences = true
@@ -99,9 +107,13 @@ hugo-theme-terminal，之前使用的是hugo-theme-mixedpaper，现在使用的�
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>		style = "monokai"
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>		tabWidth = 4
 </code></pre></div><h2 id="代码块复制功能">代码块复制功能<a arialabel="Anchor" class="hanchor" href="#代码块复制功能">⌗</a> </h2>
-<p>没有代码块复制按钮是很不方便的，很多主题自带了这个功能，就省事多了，而我使用的terminal没有这个，所以我就折腾一下。在网上找了很多资料，发现有2个问题：1.需要引入第三方库，
-2.复制代码时连带行号一起复制了，感觉不理想，参考了网上的资料，简单修改了一下，搞定！
-js代码：</p>
+<p>没有代码块复制按钮是很不方便的，很多主题自带了这个功能，就省事多了，而我使用的terminal没有这个，所以我就折腾一下。</p>
+<p>在网上找了很多资料，发现有2个问题：</p>
+<ol>
+<li>需要引入第三方库，</li>
+<li>复制代码时连带行号一起复制了，感觉不理想，参考了网上的资料，简单修改了一下，搞定！</li>
+</ol>
+<p>js代码：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#75715e">// code copy button
 </span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#75715e"></span><span style="color:#75715e">/***************** clipboard start ***************/</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">addCopyButtons</span>(<span style="color:#a6e22e">clipboard</span>) {
@@ -203,45 +215,44 @@ js代码：</p>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>}
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>
 </code></pre></div><h2 id="站内搜索功能">站内搜索功能<a arialabel="Anchor" class="hanchor" href="#站内搜索功能">⌗</a> </h2>
-<p>这部分本人单独记录在<a href="/post/2020/09/08/auto-deploy-for-hugo">如何给hugo添加站内搜索功能</a>这篇文章中。</p>
+<p>这部分本人单独记录在<code>**[如何给hugo添加站内搜索功能](/2020/09/08/auto-deploy-for-hugo)**</code>这篇文章中。</p>
 <h2 id="文章归档页面">文章归档页面<a arialabel="Anchor" class="hanchor" href="#文章归档页面">⌗</a> </h2>
 <p>如果主题带了archives文章归档页面，就直接使用，如果没带，可以自己写一个，非常简单。只需要在主题的layouts_default目录下新建一个archives.html模板文件，然后
 新建一篇post，在文章的frontmatter中设置layout为archives就行啦。归档页面的url为http://localhost:1313/archives/</p>
 <p>archives.html</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>{{ define "header" }}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>  {{ partial "masthead.html" . }}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>{{ end }}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>{{ define "main" }}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>  &lt;header&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>    &lt;h1&gt;{{ .Title }}&lt;/h1&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  &lt;/header&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  &lt;section&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>    {{ $prev := 3000}}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>    {{range .Site.RegularPages}}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>      {{if .Date}}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>      {{if gt $prev (.Date.Format "2006")}}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>      {{ if ne $prev 3000}}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>        &lt;/table&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>      {{ end }}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>      &lt;h2&gt;{{ .Date.Format "2006" }}&lt;/h2&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>      &lt;table class="all-posts"&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>      {{end}}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>      &lt;tr&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>        &lt;td style="width:35%"&gt;{{.Date.Format "2006-01-02"}}&lt;/td&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>        &lt;td&gt;&lt;a class="no-underline" style="text-decoration: none;" href="{{.Permalink}}"&gt;{{.Title}}&lt;/a&gt;&lt;/td&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>      &lt;/tr&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>      {{ $prev = .Date.Format "2006"}}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>      {{end}}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>    {{end}}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>  &lt;/table&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>  &lt;/section&gt;
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>{{ end }}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>{{ define "footer" }}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>  {{ partial "footer.html" . }}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>{{ end }}
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>{{ define "header" }}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>  {{ partial "masthead.html" . }}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>{{ end }}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>{{ define "main" }}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>  &lt;header&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>    &lt;h1&gt;{{ .Title }}&lt;/h1&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>  &lt;/header&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>  &lt;section&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    {{ $prev := 3000}}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>    {{range .Site.RegularPages}}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>      {{if .Date}}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>      {{if gt $prev (.Date.Format "2006")}}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>      {{ if ne $prev 3000}}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>        &lt;/table&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>      {{ end }}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>      &lt;h2&gt;{{ .Date.Format "2006" }}&lt;/h2&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>      &lt;table class="all-posts"&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>      {{end}}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>      &lt;tr&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>        &lt;td style="width:35%"&gt;{{.Date.Format "2006-01-02"}}&lt;/td&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>        &lt;td&gt;&lt;a class="no-underline" style="text-decoration: none;" href="{{.Permalink}}"&gt;{{.Title}}&lt;/a&gt;&lt;/td&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>      &lt;/tr&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>      {{ $prev = .Date.Format "2006"}}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>      {{end}}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>    {{end}}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>  &lt;/table&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>  &lt;/section&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>{{ end }}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>{{ define "footer" }}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>  {{ partial "footer.html" . }}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>{{ end }}
 </code></pre></div><p>archives.md</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>+++
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>title = "Archives"
@@ -254,7 +265,7 @@ js代码：</p>
 然后在主题内新建一个hugo_encryptor的shortcode，在文章中引用。然后在在hugo生成静态文件后对静态页面进行加密。本地进行加密没有什么难度，麻烦的地方是自动化部署
 的时候进行文章加密，将会在文章加密的部分说明这个问题。</p>
 <h2 id="hugo的自动化部署方案">hugo的自动化部署方案<a arialabel="Anchor" class="hanchor" href="#hugo的自动化部署方案">⌗</a> </h2>
-<p>至于hugo的部署方案，我记录在这边折腾的文章中。<a href="/post/2020/09/08/auto-deploy-for-hugo">hugo给文章加密与自动化部署方案</a></p>
+<p>至于hugo的部署方案，我记录在这边折腾的文章中。<code>**[hugo给文章加密与自动化部署方案](/2020/09/08/auto-deploy-for-hugo)**</code></p>
 </div></div>
 <div class="pagination">
 <div class="pagination__title">
