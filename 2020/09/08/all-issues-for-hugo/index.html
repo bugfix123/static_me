@@ -216,7 +216,19 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>}
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>
 </code></pre></div><h2 id="站内搜索功能">站内搜索功能<a arialabel="Anchor" class="hanchor" href="#站内搜索功能">⌗</a> </h2>
-<p>这部分本人单独记录在<a href="/2020/09/08/auto-deploy-for-hugo">如何给hugo添加站内搜索功能</a>这篇文章中。</p>
+<p>这部分本人单独记录在<a class="shorcode_link" href="/2020/09/08/auto-deploy-for-hugo" target="_blank">如何给hugo添加站内搜索功能</a></p>
+<style>
+
+.shorcode_link,.shorcode_link:before,.shorcode_link:after {
+ text-decoration: none;
+ color: #aaf;
+ font-weight: bold;
+}
+.shorcode_link:active,.shorcode_link:hover {
+	color: var(--accent);
+	text-decoration: underline;
+}
+</style>这篇文章中。
 <h2 id="文章归档页面">文章归档页面<a arialabel="Anchor" class="hanchor" href="#文章归档页面">⌗</a> </h2>
 <p>如果主题带了archives文章归档页面，就直接使用，如果没带，可以自己写一个，非常简单。只需要在主题的layouts_default目录下新建一个archives.html模板文件，然后
 新建一篇post，在文章的frontmatter中设置layout为archives就行啦。归档页面的url为http://localhost:1313/archives/</p>
