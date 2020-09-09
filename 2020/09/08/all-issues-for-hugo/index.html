@@ -76,7 +76,7 @@
 <div class="post-content"><div>
 <h2 id="版本问题">版本问题<a arialabel="Anchor" class="hanchor" href="#版本问题">⌗</a> </h2>
 <p>huo是使用go语言写的，它构建环境搭建相当简单，只需要下载安装程序，其实不需要按装，就是一个二进制文件而已，只需要把它添加到系统的环境变量，就可以开干了。
-这里有一个坑，就是一定要下载扩展版本(extended version)，否则变异构建scss文件会报错!</p>
+这里有一个坑，就是一定要下载扩展版本(extended version)，否则编译构建scss文件会报错!</p>
 <p>一些简单命令:</p>
 <ul>
 <li><code>hugo version</code>:查看版本</li>
@@ -95,7 +95,7 @@
 </ul>
 <p>之前使用的是hugo-theme-mixedpaper，现在使用的是最后一个<code>hugo-theme-terminal</code>。每一款主题都可能不完美，在某些地方不符合自己的口味，没关系，直接修改便是!。</p>
 <h2 id="代码高亮和行号问题">代码高亮和行号问题<a arialabel="Anchor" class="hanchor" href="#代码高亮和行号问题">⌗</a> </h2>
-<p>hugo自带markdown代码高亮和行号，还可以选择风格，只需要在config.toml配置文件，加入一下配置，不需要引入任何第三方文件。</p>
+<p>hugo自带markdown代码高亮和行号，还可以选择风格，只需要在config.toml配置文件，加入一下配置就行了，不需要引入任何第三方文件。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>[markup]
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>	[markup.highlight]
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>		codeFences = true
@@ -230,7 +230,7 @@
 }
 </style>这篇文章中。
 <h2 id="文章归档页面">文章归档页面<a arialabel="Anchor" class="hanchor" href="#文章归档页面">⌗</a> </h2>
-<p>如果主题带了archives文章归档页面，就直接使用，如果没带，可以自己写一个，非常简单。只需要在主题的layouts_default目录下新建一个archives.html模板文件，然后
+<p>如果主题带了archives文章归档页面，就直接使用，如果主题里面没有的话，可以自己写一个，也非常简单！只需要在主题的layouts_default目录下新建一个archives.html模板文件，然后
 新建一篇post，在文章的frontmatter中设置layout为archives就行啦。归档页面的url为http://localhost:1313/archives/</p>
 <p>archives.html</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>{{ define "header" }}
@@ -274,11 +274,24 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>layout = "archives"
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>+++
 </code></pre></div><h2 id="hugo文章添加密码">hugo文章添加密码<a arialabel="Anchor" class="hanchor" href="#hugo文章添加密码">⌗</a> </h2>
-<p>hugo给文章加密，没有hexo那么简单，hexo里面通过安装插件来搞，hugo不行，比较好的方法是使用hugo_encryptor。这个工具是用python写的，需要搭建好python3环境，
-然后在主题内新建一个hugo_encryptor的shortcode，在文章中引用。然后在在hugo生成静态文件后对静态页面进行加密。本地进行加密没有什么难度，麻烦的地方是自动化部署
-的时候进行文章加密，将会在文章加密的部分说明这个问题。</p>
+<p>hugo给文章加密没有hexo那么简单，hexo里面可以通过安装插件来搞，而Hugo不行，比较好的方法是使用hugo_encryptor。这个工具是用python写的，需要搭建好python3环境，
+在主题内新建一个hugo_encryptor的shortcode，在文章中引用。然后在hugo生成静态文件后对静态页面进行加密。本地进行加密没有什么难度，麻烦的地方是自动化部署
+的时候进行文章加密，我将会在文章加密的部分说明这个问题。</p>
 <h2 id="hugo的自动化部署方案">hugo的自动化部署方案<a arialabel="Anchor" class="hanchor" href="#hugo的自动化部署方案">⌗</a> </h2>
-<p>至于hugo的部署方案，我记录在这边折腾的文章中。<a href="/2020/09/08/auto-deploy-for-hugo">hugo给文章加密与自动化部署方案</a></p>
+<p>至于hugo的部署方案，我记录在这边折腾的文章中。<a class="shorcode_link" href="/2020/09/08/auto-deploy-for-hugo" target="_blank">hugo给文章加密与自动化部署方案</a></p>
+<style>
+
+.shorcode_link,.shorcode_link:before,.shorcode_link:after {
+ text-decoration: none;
+ color: #aaf;
+ font-weight: bold;
+}
+.shorcode_link:active,.shorcode_link:hover {
+	color: var(--accent);
+	text-decoration: underline;
+}
+</style><blockquote>
+</blockquote>
 </div></div>
 <div class="pagination">
 <div class="pagination__title">
