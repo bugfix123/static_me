@@ -77,7 +77,7 @@
 <h2 id="版本问题">版本问题<a arialabel="Anchor" class="hanchor" href="#版本问题">⌗</a> </h2>
 <p>huo是使用go语言写的，它构建环境搭建相当简单，只需要下载安装程序，其实不需要按装，就是一个二进制文件而已，只需要把它添加到系统的环境变量，就可以开干了。
 这里有一个坑，就是一定要下载扩展版本(extended version)，否则编译构建scss文件会报错!</p>
-<p>一些简单命令:</p>
+<p><strong>一些简单命令:</strong></p>
 <ul>
 <li><code>hugo version</code>:查看版本</li>
 <li><code>hugo new site myBlog</code>:创建一个全新的blog，根目录是myBlog</li>
@@ -90,12 +90,12 @@
 <ul>
 <li>hugo-theme-even</li>
 <li>hugo-theme-loveit</li>
-<li>hugo-theme-mixedpaper，</li>
+<li>hugo-theme-mixedpaper</li>
 <li>hugo-theme-terminal</li>
 </ul>
-<p>之前使用的是hugo-theme-mixedpaper，现在使用的是最后一个<code>hugo-theme-terminal</code>。每一款主题都可能不完美，在某些地方不符合自己的口味，没关系，直接修改便是!。</p>
+<p>之前使用的是hugo-theme-mixedpaper，现在使用的是最后一个<code>hugo-theme-terminal</code>。每一款主题都可能不完美，某些地方不符合自己的口味，没关系，直接修改便是!</p>
 <h2 id="代码高亮和行号问题">代码高亮和行号问题<a arialabel="Anchor" class="hanchor" href="#代码高亮和行号问题">⌗</a> </h2>
-<p>hugo自带markdown代码高亮和行号，还可以选择风格，只需要在config.toml配置文件，加入一下配置就行了，不需要引入任何第三方文件。</p>
+<p>hugo自带markdown代码高亮和行号，还可以选择风格，只需要在config.toml配置文件中加入一下配置，不需要引入任何第三方文件。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>[markup]
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>	[markup.highlight]
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>		codeFences = true
@@ -108,12 +108,13 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>		style = "monokai"
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>		tabWidth = 4
 </code></pre></div><h2 id="代码块复制功能">代码块复制功能<a arialabel="Anchor" class="hanchor" href="#代码块复制功能">⌗</a> </h2>
-<p>没有代码块复制按钮是很不方便的，很多主题自带了这个功能，就省事多了，而我使用的terminal没有这个，所以我就折腾一下。</p>
-<p>在网上找了很多资料，发现有2个问题：</p>
+<p>没有代码块复制按钮是很不方便的，很多主题自带了这个功能，比较省事，我使用的这个Terminal主题没有此功能，所以我就折腾一下。</p>
+<p><strong>在网上找了很多资料，发现有2个问题：</strong></p>
 <ol>
-<li>需要引入第三方库，</li>
-<li>复制代码时连带行号一起复制了，感觉不理想，参考了网上的资料，简单修改了一下，搞定！</li>
+<li>需要引入第三方库</li>
+<li>复制代码时连带行号一起复制了</li>
 </ol>
+<p>感觉不理想，参考了网上的资料，简单修改了一下，搞定！</p>
 <p>js代码：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#75715e">// code copy button
 </span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#75715e"></span><span style="color:#75715e">/***************** clipboard start ***************/</span>
@@ -274,11 +275,11 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>layout = "archives"
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>+++
 </code></pre></div><h2 id="hugo文章添加密码">hugo文章添加密码<a arialabel="Anchor" class="hanchor" href="#hugo文章添加密码">⌗</a> </h2>
-<p>hugo给文章加密没有hexo那么简单，hexo里面可以通过安装插件来搞，而Hugo不行，比较好的方法是使用hugo_encryptor。这个工具是用python写的，需要搭建好python3环境，
-在主题内新建一个hugo_encryptor的shortcode，在文章中引用。然后在hugo生成静态文件后对静态页面进行加密。本地进行加密没有什么难度，麻烦的地方是自动化部署
-的时候进行文章加密，我将会在文章加密的部分说明这个问题。</p>
+<p>hugo给文章加密没有hexo那么简单，hexo里面可以通过安装插件来搞定，Hugo相对麻烦一些，比较好的方法是使用<code>hugo_encryptor</code>。这个工具是用Python写的，需要搭建好Python3环境，
+然后在主题内新建一个hugo_encryptor的shortcode，在文章中引用。然后在在hugo生成静态文件后对静态页面进行加密。本地进行加密没有什么难度，麻烦的地方是自动化部署
+的时候进行文章加密，将会在文章加密的部分说明这个问题。</p>
 <h2 id="hugo的自动化部署方案">hugo的自动化部署方案<a arialabel="Anchor" class="hanchor" href="#hugo的自动化部署方案">⌗</a> </h2>
-<p>至于hugo的部署方案，我记录在这边折腾的文章中。<a class="shorcode_link" href="/2020/09/08/auto-deploy-for-hugo" target="_blank">hugo给文章加密与自动化部署方案</a></p>
+<p>至于hugo的部署方案，我记录在这边折腾的文章中。请参考 <a class="shorcode_link" href="/2020/09/08/auto-deploy-for-hugo" target="_blank">hugo给文章加密与自动化部署方案</a></p>
 <style>
 
 .shorcode_link,.shorcode_link:before,.shorcode_link:after {
