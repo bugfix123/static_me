@@ -6,10 +6,21 @@
     <description>Recent content in hugo on 志哥笔记</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 08 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 11 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://dongzhi.me/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>CentOS7上部署开源评论系统ISSO</title>
+      <link>https://dongzhi.me/2020/09/11/how-to-deploy-isso-on-centos-7/</link>
+      <pubDate>Fri, 11 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/09/11/how-to-deploy-isso-on-centos-7/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Isso是一款开源的评论系统，小巧功能多，这边文章记录一下部署过程，记录遇到的坑。我的linux是CentOS7.5 64位。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>Hugo使用过程中遇到的坑汇总</title>

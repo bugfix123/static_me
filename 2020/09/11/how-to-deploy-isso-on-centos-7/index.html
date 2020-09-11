@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>CentOS7上部署开源评论系统ISSO :: 志哥笔记 — 记述码农在家的故事！</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content=" Isso是一款开源的评论系统，小巧功能多，这边文章记录一下部署过程，记录遇到的坑。我的linux是CentOS7.5 64位。
+" name="description"/>
+<meta content="" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/09/11/how-to-deploy-isso-on-centos-7/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://dongzhi.me/assets/blue.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/dongzhi.me/favicon_io//site.webmanifest" rel="manifest"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="" name="twitter:creator"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="CentOS7上部署开源评论系统ISSO :: 志哥笔记" property="og:title"/>
+<meta content=" Isso是一款开源的评论系统，小巧功能多，这边文章记录一下部署过程，记录遇到的坑。我的linux是CentOS7.5 64位。
+" property="og:description"/>
+<meta content="https://dongzhi.me/2020/09/11/how-to-deploy-isso-on-centos-7/" property="og:url"/>
+<meta content="CentOS7上部署开源评论系统ISSO" property="og:site_name"/>
+<meta content="https://dongzhi.me/img/favicon/blue.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-09-11 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/09/11/how-to-deploy-isso-on-centos-7/">CentOS7上部署开源评论系统ISSO</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-09-11 
+      </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://dongzhi.me/tags/hugo/">hugo</a> 
+    
+  </span>
+<div class="post-content"><div>
+<blockquote>
+<p>Isso是一款开源的评论系统，小巧功能多，这边文章记录一下部署过程，记录遇到的坑。我的linux是CentOS7.5 64位。</p>
+</blockquote>
+<h1 id="install-pip">Install pip<a arialabel="Anchor" class="hanchor" href="#install-pip">⌗</a> </h1>
+<p>如果你还未安装，则可以使用以下方法来安装：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py   # 下载安装脚本
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>$ sudo python get-pip.py    # 运行安装脚本
+</code></pre></div><h1 id="install-isso">Install isso<a arialabel="Anchor" class="hanchor" href="#install-isso">⌗</a> </h1>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ sudo yum install python-devel sqlite
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>$ sudo yum groupinstall “Development Tools”
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>$ pip install isso
+</code></pre></div><p>如遇遇到这样的错误：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>Successfully built pyparsing
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>Installing collected packages: pyparsing
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>  Found existing installation: pyparsing 2.0.1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>Cannot uninstall 'pyparsing'. It is a distutils installed project and thus we cannot accurately determine which files belong to it which would lead to only a partial uninstall.
+</code></pre></div><p>请执行<code>sudo pip install -I pyparsing==2.2.0</code>这条命令，然后再次执行<code>pip install isso</code>安装。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ sudo pip install -I pyparsing==2.2.0
+</code></pre></div><h1 id="查看isso版本">查看isso版本<a arialabel="Anchor" class="hanchor" href="#查看isso版本">⌗</a> </h1>
+<p>安装后可以查看isso版本，以验证安装成功。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>[root@JoeVPS ~]# isso --version
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>isso 0.12.2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>
+</code></pre></div><p>如果出现这个错误：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span> from flask_spyne import Spyne, SpyneService, SpyneController
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>  File "/usr/local/lib/python2.7/dist-packages/flask_spyne/flask_spyne.py", line 3, in &lt;module&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>          from werkzeug.wsgi import DispatcherMiddleware
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>ImportError: cannot import name DispatcherMiddleware
+</code></pre></div><p>说明要么没有安装werkzeug，要么版本太高，解决办法：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>#卸载
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>python -m pip uninstall werkzeug
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>#安装指定版本
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>python -m pip install werkzeug==0.16.0
+</code></pre></div><h1 id="运行isso">运行isso<a arialabel="Anchor" class="hanchor" href="#运行isso">⌗</a> </h1>
+<p>要在服务端运行isso，需要指定配置文件，配置文件可以放在任意位置，任意名字。假设我的配置文件是/usr/local/isso/isso.conf.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>isso -c /usr/local/isso/isso.conf run
+</code></pre></div><p>初次这样直接运行，肯定会报错，因为目前isso.conf还不存在。</p>
+<h1 id="配置文件">配置文件<a arialabel="Anchor" class="hanchor" href="#配置文件">⌗</a> </h1>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>[root@JoeVPS ~]# vim /usr/local/isso/isso.conf
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>[general]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>dbpath = /usr/local/isso/comments.db
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>host = https://dongzhi.me/
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>log-file = /usr/local/isso/log-isso.log
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>max-age = 0
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>notify = stdout, smtp
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>reply-notifications = true
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>[server]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>listen = http://localhost:8080/
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>reload = off
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>profile = off
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>[moderation]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>enabled = true
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>purge-after = 30d
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>[smtp]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>username = my Gmail user name
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>password = my Gamil password
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>host = smtp.gmail.com
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>port = 465
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>security = ssl
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>to = abc12345@xxx.com
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>from = "ISSO Comment System"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>timeout = 10
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>[guard]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>enabled = true
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>ratelimit = 3
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>direct-reply = 3
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>reply-to-self = true
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>require-author = true
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>require-email = true
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>[admin]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>enabled = true
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span># 管理员密码
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>password = 123456
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>
+</code></pre></div><p>配置说明：</p>
+<ul>
+<li>host: 你的网站域名，要以http或https开头，isso会以该字段进行CORS跨域验证</li>
+<li>listen: 指定isso的端口，以http开头就行，建议值：http://0.0.0.0:port</li>
+<li>password,security)，to设置为你的QQ邮箱，当用户评论后，isso将会从后台登录Gmail邮箱，发送一封邮件给你的QQ邮箱！</li>
+<li>[admin] password: 管理员的密码。管理员界面的路径是<code>/admin</code></li>
+<li>[general] 中dbpath和log-file分别为数据文件和日志文件路径，目录需要提前创建好。</li>
+</ul>
+<p>其他配置可以保持不变，详情参考官网。</p>
+<h1 id="配置nginx">配置nginx<a arialabel="Anchor" class="hanchor" href="#配置nginx">⌗</a> </h1>
+<p>用ip访问isso不方便，可以配置成用域名访问，可以是任意域名。</p>
+<p>安装nginx和certbot：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>yum install nginx certbot -y
+</code></pre></div><p>假设域名是isso.dongzhi.me，需要先进行域名的A记录解析，然后使用Let’s Encrypt证书配置nginx：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>certbot --nginx -d  isso.dongzhi.me
+</code></pre></div><p>此时，nginx的配置文件中会多了isso.dongzhi.me相关的虚拟主机配置。</p>
+<p>修改nginx配置文件，找到<strong>isso.dongzhi.me</strong>部分，修改<code>location /</code>为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>location / {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>      proxy_pass http://localhost:8080;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>      proxy_set_header Host $host;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>      proxy_set_header X-Forwarded-Proto $scheme;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>}
+</code></pre></div><p>重启nginx：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>systemctl restart nginx
+</code></pre></div><p>此时可以访问admin了。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>curl https://isso.dongzhi.me/admin/
+</code></pre></div><h1 id="添加服务">添加服务<a arialabel="Anchor" class="hanchor" href="#添加服务">⌗</a> </h1>
+<p>添加为服务，使用systemctl来管理isso.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>sudo vim /etc/systemd/system/isso.service
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>
+</code></pre></div><p>添加一下内容：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span># /etc/systemd/system/isso.service
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>[Unit]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>Description=Isso Comment Server
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>[Service]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>Type=simple
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>WorkingDirectory=/usr/local/isso
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>ExecStart=/usr/bin/isso -c /usr/local/isso/isso.conf run
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>Restart=on-failure
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>RestartSec=5
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>ExecStop=kill -l SIGQUIT `pgrep isso`
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>[Install]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>WantedBy=multi-user.target
+</code></pre></div><p>注意，本人的isso配置文件路径是/usr/local/isso/isso.conf。</p>
+<p>我们使isso服务开启自启动。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>sudo systemctl daemon-reload
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>sudo systemctl enable isso
+</code></pre></div><p>现在，你可以下面的命令来使启动,停止,重启isso服务，也可以查看isso服务的状态：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>sudo systemctl start isso
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>sudo systemctl stop isso
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>sudo systemctl status isso
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>sudo systemctl restart isso
+</code></pre></div><h1 id="静态网站嵌入">静态网站嵌入<a arialabel="Anchor" class="hanchor" href="#静态网站嵌入">⌗</a> </h1>
+<p>静态网站使用isso非常简单。以Hugo为例。
+在页面的底部插入HTML标签：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>&lt;section id="isso-thread" data-title="{{- .Title|default .Site.Title -}}" data-isso-id="{{- .Permalink|absURL -}}"&gt;&lt;/section&gt;
+</code></pre></div><p>主要参数说明：</p>
+<ul>
+<li>data-title: 文章标题</li>
+<li>data-isso-id: 文章ID，建议设置成文章的url</li>
+</ul>
+<p>然后引入script脚本：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>&lt;script async data-isso-id="thread-id" data-isso="https://isso.dongzhi.me"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>data-isso-css="true"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>data-isso-lang="zh"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>data-isso-reply-notifications="true"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>data-isso-reply-to-self="true"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>data-isso-require-author="true"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>data-isso-require-email="true"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>data-isso-max-comments-top="10"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>data-isso-max-comments-nested="5"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>data-isso-reveal-on-click="5"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>data-isso-avatar="true"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>data-isso-avatar-bg="#f0f0f0"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..."
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>data-isso-vote="false"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>data-isso-vote-levels=""
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>data-isso-feed="false"
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>src="https://isso.dongzhi.me/js/embed.min.js"&gt;&lt;/script&gt;
+</code></pre></div><p>主要参数说明：</p>
+<ul>
+<li>data-isso: isso服务端的API地址，也就是上面nginx部分配置的域名，注意不要有<code>/</code></li>
+<li>src: isso的js地址</li>
+<li>data-isso-css: true表示使用isso的默认样式。如果你觉得isso界面太丑，可以将该字段值设置为false，然后就可以随意修改样式了。</li>
+</ul>
+<h1 id="reference">Reference<a arialabel="Anchor" class="hanchor" href="#reference">⌗</a> </h1>
+<p><a href="https://posativ.org/isso/docs/install/#install-from-pypi">install-from-pypi</a></p>
+<p><a href="https://confluence.jaytaala.com/display/TKB/Installing%2C+configuring%2C+and+integrating+isso+%28commenting+web+app%29+into+Confluence#space-menu-link-content">Installing, configuring, and integrating isso (commenting web app) into Confluence</a></p>
+<p><a href="https://www.cnblogs.com/qq952693358/p/10246375.html">解决 Cannot uninstall ‘pyparsing’ 问题</a></p>
+<p><a href="https://blog.csdn.net/ShiMengRan107/article/details/104395751">ImportError: cannot import name DispatcherMiddleware错误</a></p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button next">
+<a href="https://dongzhi.me/2020/09/08/all-issues-for-hugo/">
+<span class="button__text">Hugo使用过程中遇到的坑汇总</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<section data-isso-id="https://dongzhi.me/2020/09/11/how-to-deploy-isso-on-centos-7/" data-title="CentOS7上部署开源评论系统ISSO" id="isso-thread"></section>
+<script async="" data-isso="https://isso.dongzhi.me" data-isso-avatar="true" data-isso-avatar-bg="#f0f0f0" data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..." data-isso-css="false" data-isso-feed="false" data-isso-id="thread-id" data-isso-lang="zh" data-isso-max-comments-nested="5" data-isso-max-comments-top="10" data-isso-reply-notifications="true" data-isso-reply-to-self="true" data-isso-require-author="true" data-isso-require-email="true" data-isso-reveal-on-click="5" data-isso-vote="false" data-isso-vote-levels="" src="https://isso.dongzhi.me/js/embed.min.js"></script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 <a href="https://dongzhi.me/">志哥笔记</a></span>
+<span style="margin-right: 10px;">:: Theme made by <a href="https://themes.gohugo.io/hugo-theme-terminal/">panr</a></span>
+<span id="busuanzi_container_site_uv">
+                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
+          </span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>
