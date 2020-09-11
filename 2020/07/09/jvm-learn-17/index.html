@@ -73,13 +73,13 @@
 </div>
 <div class="post-content"><div>
 <h1 id="jmap">jmap<a arialabel="Anchor" class="hanchor" href="#jmap">⌗</a> </h1>
-<ol>
-<li>-heap 打印堆的概要信息
+<ul>
+<li><strong>-heap</strong> 打印堆的概要信息
 命令：</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>jmap -heap 7664
-</code></pre></div><p><img alt="heap" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_17_heap.png"/>
-各部分说明如下：</p>
+</code></pre></div><p><img alt="heap" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_17_heap.png"/></p>
+<p>各部分说明如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jmap -heap 7664
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>Attaching to process ID 7664, please wait...
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>Debugger attached successfully.
@@ -131,17 +131,14 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span>   93.15443560320706% used
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>20829 interned Strings occupying 2643456 bytes.
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span>
-</code></pre></div><ol>
-<li>-dump转储heap</li>
-</ol>
-<p>命令：</p>
+</code></pre></div><ul>
+<li><strong>-dump</strong> 转储heap
+命令：</li>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>jmap  -dump:file=D:/a.phrof 7144
 </code></pre></div><h1 id="jstat">jstat<a arialabel="Anchor" class="hanchor" href="#jstat">⌗</a> </h1>
 <p>jstat命令可以查看堆内存各部分的使用量，以及加载类的数量。</p>
-<ol>
-<li>-gc 垃圾回收的大小</li>
-</ol>
+<p><strong>-gc</strong> 垃圾回收的大小</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jstat -gc 7044
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span> S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>1280.0 1280.0 116.9   0.0   10816.0   8653.0   26700.0    19417.7   52096.0 51394.9  0.0    0.0     2906    4.484   4      0.151    4.635
@@ -167,20 +164,20 @@
 </ul>
 <h1 id="jcmd">jcmd<a arialabel="Anchor" class="hanchor" href="#jcmd">⌗</a> </h1>
 <p>JDK7后新增的命令，查看JVM内存的信息，很有用。</p>
-<ol>
+<ul>
 <li><strong>jcmd -l</strong>
 查看所有的java进程，同jps命令。</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd -l
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>5216
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>7044 test.metaspace.TestMetaSpace
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>740 org.jetbrains.idea.maven.server.RemoteMavenServer
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>872 sun.tools.jcmd.JCmd -l
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>4972 org.jetbrains.jps.cmdline.Launcher C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/jgoodies-forms.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/jps-builders-6.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/oromatcher.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/javac2.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/slf4j-api-1.7.10.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/annotations.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/util.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/httpclient-4.5.2.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/snappy-in-java-0.5.1.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/aether-dependency-resolver.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/jdom.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/resources_en.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/lib/protobuf-java-2.5.0.jar;C:/Program Files/JetBrains/IntelliJ IDEA 2017.3.7/
-</code></pre></div><ol start="2">
+</code></pre></div><ul>
 <li><strong>jcmd PID help</strong>
 查看帮助信息</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 7044 help
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>7044:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>The following commands are available:
@@ -208,21 +205,21 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>VM.version
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>help
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>
-</code></pre></div><ol start="3">
+</code></pre></div><ul>
 <li><strong>jcmd  PID  VM.uptime</strong> 运行时间</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 4236 VM.uptime
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>4236:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>17.314 s
-</code></pre></div><ol start="4">
+</code></pre></div><ul>
 <li><strong>jcmd PID VM.flags</strong> 查看你JVM的启动参数</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 4236 VM.flags
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>4236:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>-XX:InitialHeapSize=16777216 -XX:MaxHeapSize=268435456 -XX:MaxMetaspaceSize=314572800 -XX:MaxNewSize=89456640 -XX:MinHeapDeltaBytes=131072 -XX:NewSize=5570560 -XX:OldSize=11206656 -XX:+UseFastUnorderedTimeStamps -XX:-UseLargePagesIndividualAllocation
-</code></pre></div><ol start="5">
+</code></pre></div><ul>
 <li><strong>jcmd pid PerfCounter.print</strong> 查看性能统计</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 4236 PerfCounter.print
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>4236:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>java.ci.totalTime=2222906
@@ -243,9 +240,9 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>java.property.java.vm.specification.version="1.8"
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>java.property.java.vm.vendor="Oracle Corporation"
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>java.property.java.vm.version="25.131-b11"
-</code></pre></div><ol start="6">
+</code></pre></div><ul>
 <li><strong>jcmd PID GC.class_histogram</strong> 查看进程中类的统计信息</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 4236 GC.class_histogram
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>4236:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>
@@ -268,9 +265,9 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>  15:         28446         474960  [Ljava.lang.Class;
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>  16:            34         266336  [Ljava.util.HashMap$Node;
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>  17:             2         262240  [Ljava.lang.ThreadLocal$ThreadLocalMap$Entry;
-</code></pre></div><ol start="7">
+</code></pre></div><ul>
 <li><strong>jcmd PID Thread.print</strong> 查看线程的堆栈信息</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>C:\Users\Administrator&gt;jcmd 4236 Thread.print
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>4236:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>2020-02-03 17:03:02
@@ -346,23 +343,23 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">73</span>"VM Periodic Task Thread" os_prio=2 tid=0x14e73000 nid=0x1198 waiting on condition
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">74</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">75</span>JNI global references: 124
-</code></pre></div><ol start="8">
+</code></pre></div><ul>
 <li><strong>jcmd  PID GC.heap_dump  fileName</strong>  堆的转储</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 4236 GC.heap_dump  d:/aa.hprof
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>4236:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>Heap dump file created
-</code></pre></div><ol start="9">
+</code></pre></div><ul>
 <li><strong>jcmd PID VM.system_properties</strong> 查看JVM的系统属性</li>
 <li><strong>jcmd PID  VM.version</strong> 查看JVM的版本信息</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 2472 VM.version
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>2472:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>Java HotSpot(TM) Client VM version 25.131-b11
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>JDK 8.0_131
-</code></pre></div><ol start="11">
+</code></pre></div><ul>
 <li><strong>jcmd PID VM.command_line</strong> 查看JVM的命令行参数</li>
-</ol>
+</ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>C:\Users\Administrator&gt;jcmd 2472 VM.command_line
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>2472:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>VM Arguments:
