@@ -189,13 +189,29 @@ instructions targeted for the underlying system architecture. In addition,
 through the maturing evolution and continuous engineering of its runtime
 environment and multithreaded garbage collector, the HotSpot JVM yields high
 scalability on even the largest available computer systems.
-<img alt="Slide1" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1.png"/></p>
+<figure>
+<a href="#036523ebf5d878c831a63e7b36e2d125-lightbox"><img alt="Slide1" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1.png"/></a>
+<figcaption>
+<p>Slide1</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="036523ebf5d878c831a63e7b36e2d125-lightbox">
+<img alt="Slide1" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1.png"/>
+</a></p>
 <p>The main components of the JVM include the classloader, the runtime data
 areas, and the execution engine.</p>
 <h4 id="key-hotspot-components">Key Hotspot Components<a arialabel="Anchor" class="hanchor" href="#key-hotspot-components">⌗</a> </h4>
 <p>The key components of the JVM that relate to performance are highlighted in
 the following image.
-<img alt="Slide2" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide2.png"/></p>
+<figure>
+<a href="#8ec71bf78e9e313cc5778895064cd143-lightbox"><img alt="Slide2" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide2.png"/></a>
+<figcaption>
+<p>Slide2</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="8ec71bf78e9e313cc5778895064cd143-lightbox">
+<img alt="Slide2" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide2.png"/>
+</a></p>
 <p>There are three components of the JVM that are focused on when tuning
 performance. The <em>heap</em> is where your object data is stored. This area is then
 managed by the garbage collector selected at startup. Most tuning options
@@ -242,7 +258,15 @@ follows.</p>
 <h4 id="step-1-marking">Step 1: Marking<a arialabel="Anchor" class="hanchor" href="#step-1-marking">⌗</a> </h4>
 <p>The first step in the process is called marking. This is where the garbage
 collector identifies which pieces of memory are in use and which are not.
+<figure>
+<a href="#c8377cd870eedd421eb6232cadbd29ed-lightbox"><img alt="Slide3" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide3.png"/></a>
+<figcaption>
+<p>Slide3</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="c8377cd870eedd421eb6232cadbd29ed-lightbox">
 <img alt="Slide3" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide3.png"/>
+</a>
 Referenced objects are shown in blue. Unreferenced objects are shown in gold.
 All objects are scanned in the marking phase to make this determination. This
 can be a very time consuming process if all objects in a system must be
@@ -250,14 +274,30 @@ scanned.</p>
 <h4 id="step-2-normal-deletion">Step 2: Normal Deletion<a arialabel="Anchor" class="hanchor" href="#step-2-normal-deletion">⌗</a> </h4>
 <p>Normal deletion removes unreferenced objects leaving referenced objects and
 pointers to free space.
+<figure>
+<a href="#4559deb2ba7f86145483f95cb2fd2398-lightbox"><img alt="Slide1b" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1b.png"/></a>
+<figcaption>
+<p>Slide1b</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="4559deb2ba7f86145483f95cb2fd2398-lightbox">
 <img alt="Slide1b" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide1b.png"/>
+</a>
 The memory allocator holds references to blocks of free space where new object
 can be allocated.</p>
 <h4 id="step-2a-deletion-with-compacting">Step 2a: Deletion with Compacting<a arialabel="Anchor" class="hanchor" href="#step-2a-deletion-with-compacting">⌗</a> </h4>
 <p>To further improve performance, in addition to deleting unreferenced objects,
 you can also compact the remaining referenced objects. By moving referenced
 object together, this makes new memory allocation much easier and faster.
-<img alt="Slide4" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide4.png"/></p>
+<figure>
+<a href="#fbeaf42dccc61845eae835c14defa893-lightbox"><img alt="Slide4" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide4.png"/></a>
+<figcaption>
+<p>Slide4</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="fbeaf42dccc61845eae835c14defa893-lightbox">
+<img alt="Slide4" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide4.png"/>
+</a></p>
 <h4 id="why-generational-garbage-collection">Why Generational Garbage Collection?<a arialabel="Anchor" class="hanchor" href="#why-generational-garbage-collection">⌗</a> </h4>
 <p>As stated earlier, having to mark and compact all the objects in a JVM is
 inefficient. As more and more objects are allocated, the list of objects grows
@@ -266,7 +306,15 @@ empirical analysis of applications has shown that most objects are short
 lived.</p>
 <p>Here is an example of such data. The Y axis shows the number of bytes
 allocated and the X access shows the number of bytes allocated over time.
-<img alt="ObjectLifetime" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_ObjectLifetime.gif"/></p>
+<figure>
+<a href="#bfd05c6cc650ee534d08d37bd78a335a-lightbox"><img alt="ObjectLifetime" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_ObjectLifetime.gif"/></a>
+<figcaption>
+<p>ObjectLifetime</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="bfd05c6cc650ee534d08d37bd78a335a-lightbox">
+<img alt="ObjectLifetime" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_ObjectLifetime.gif"/>
+</a></p>
 <p>As you can see, fewer and fewer objects remain allocated over time. In fact
 most objects have a very short life as shown by the higher values on the left
 side of the graph.</p>
@@ -275,7 +323,15 @@ side of the graph.</p>
 enhance the performance of the JVM. Therefore, the heap is broken up into
 smaller parts or generations. The heap parts are: Young Generation, Old or
 Tenured Generation, and Permanent Generation
+<figure>
+<a href="#6ecef25c3d1d0770a5b4c49c72c09963-lightbox"><img alt="Slide5" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide5.png"/></a>
+<figcaption>
+<p>Slide5</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="6ecef25c3d1d0770a5b4c49c72c09963-lightbox">
 <img alt="Slide5" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_20_Slide5.png"/>
+</a>
 The <strong>Young Generation</strong> is where all new objects are allocated and aged. When
 the young generation fills up, this causes a <strong><em>minor garbage collection</em></strong>.
 Minor collections can be optimized assuming a high object mortality rate. A
@@ -311,13 +367,37 @@ follow walks through the object allocation and aging process in the JVM.</p>
 <ol>
 <li>First, any new objects are allocated to the eden space. Both survivor spaces
 start out empty.
-<img alt="Slide13" src="https://note.youdao.com/yws/res/3970/A9656AC46B6D4AC49ACC7A331EA89B51"/></li>
+<figure>
+<a href="#f00074c7842bec94d6dc45cd52c18d57-lightbox"><img alt="Slide13" src="https://note.youdao.com/yws/res/3970/A9656AC46B6D4AC49ACC7A331EA89B51"/></a>
+<figcaption>
+<p>Slide13</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="f00074c7842bec94d6dc45cd52c18d57-lightbox">
+<img alt="Slide13" src="https://note.youdao.com/yws/res/3970/A9656AC46B6D4AC49ACC7A331EA89B51"/>
+</a></li>
 </ol>
 <p>2.When the eden space fills up, a minor garbage collection is triggered.
-<img alt="Slide14" src="82CBACBEBEDC4C2FBCDBCA099CDFAE46"/></p>
+<figure>
+<a href="#8b524f8a648b601972176050c3700dea-lightbox"><img alt="Slide14" src="82CBACBEBEDC4C2FBCDBCA099CDFAE46"/></a>
+<figcaption>
+<p>Slide14</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="8b524f8a648b601972176050c3700dea-lightbox">
+<img alt="Slide14" src="82CBACBEBEDC4C2FBCDBCA099CDFAE46"/>
+</a></p>
 <p>3.Referenced objects are moved to the first survivor space. Unreferenced objects
 are deleted when the eden space is cleared.
-<img alt="Slide6" src="5B549F837D49437280CB017F2742BC80"/></p>
+<figure>
+<a href="#1e76f38017c2b65ae87e23a0f1df17de-lightbox"><img alt="Slide6" src="5B549F837D49437280CB017F2742BC80"/></a>
+<figcaption>
+<p>Slide6</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="1e76f38017c2b65ae87e23a0f1df17de-lightbox">
+<img alt="Slide6" src="5B549F837D49437280CB017F2742BC80"/>
+</a></p>
 <p>4.At the next minor GC, the same thing happens for the eden space. Unreferenced
 objects are deleted and referenced objects are moved to a survivor space.
 However, in this case, they are moved to the second survivor space (S1). In
@@ -325,22 +405,62 @@ addition, objects from the last minor GC on the first survivor space (S0) have
 their age incremented and get moved to S1. Once all surviving objects have
 been moved to S1, both S0 and eden are cleared. Notice we now have differently
 aged object in the survivor space.
-<img alt="Slide8" src="01C2FCC33C914386A39CFBD27BE7165D"/></p>
+<figure>
+<a href="#638ac4a09c9d5bdb2b3d766d698fb6c5-lightbox"><img alt="Slide8" src="01C2FCC33C914386A39CFBD27BE7165D"/></a>
+<figcaption>
+<p>Slide8</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="638ac4a09c9d5bdb2b3d766d698fb6c5-lightbox">
+<img alt="Slide8" src="01C2FCC33C914386A39CFBD27BE7165D"/>
+</a></p>
 <p>5.At the next minor GC, the same process repeats. However this time the survivor
 spaces switch. Referenced objects are moved to S0. Surviving objects are aged.
 Eden and S1 are cleared.
-<img alt="Slide9" src="971404E313C94EC7B91F84A798FC4EDA"/></p>
+<figure>
+<a href="#5296f5e1af8e16e72f84c3a63546fdea-lightbox"><img alt="Slide9" src="971404E313C94EC7B91F84A798FC4EDA"/></a>
+<figcaption>
+<p>Slide9</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="5296f5e1af8e16e72f84c3a63546fdea-lightbox">
+<img alt="Slide9" src="971404E313C94EC7B91F84A798FC4EDA"/>
+</a></p>
 <p>6.This slide demonstrates promotion. After a minor GC, when aged objects reach a
 certain age threshold (8 in this example) they are promoted from young
 generation to old generation.
-<img alt="Slide7" src="8E0D587931D1430D974AE7CE0F4C5271"/></p>
+<figure>
+<a href="#046d970e947d5a7a4166846bbe0c8fd0-lightbox"><img alt="Slide7" src="8E0D587931D1430D974AE7CE0F4C5271"/></a>
+<figcaption>
+<p>Slide7</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="046d970e947d5a7a4166846bbe0c8fd0-lightbox">
+<img alt="Slide7" src="8E0D587931D1430D974AE7CE0F4C5271"/>
+</a></p>
 <p>7.As minor GCs continue to occure objects will continue to be promoted to the
 old generation space.
-<img alt="Slide10" src="5D0F0126A35F4925AFDC009302B08F6F"/></p>
+<figure>
+<a href="#9c50f5e8794270a04edb6eab2827bd87-lightbox"><img alt="Slide10" src="5D0F0126A35F4925AFDC009302B08F6F"/></a>
+<figcaption>
+<p>Slide10</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="9c50f5e8794270a04edb6eab2827bd87-lightbox">
+<img alt="Slide10" src="5D0F0126A35F4925AFDC009302B08F6F"/>
+</a></p>
 <p>8.So that pretty much covers the entire process with the young generation.
 Eventually, a major GC will be performed on the old generation which cleans up
 and compacts that space.
-<img alt="Slide11" src="A33836FB90FD43A991129CC2584C4287"/></p>
+<figure>
+<a href="#b1ae0aacc366514aa9717e69d643f1e9-lightbox"><img alt="Slide11" src="A33836FB90FD43A991129CC2584C4287"/></a>
+<figcaption>
+<p>Slide11</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="b1ae0aacc366514aa9717e69d643f1e9-lightbox">
+<img alt="Slide11" src="A33836FB90FD43A991129CC2584C4287"/>
+</a></p>
 <h2 id="performing-your-own-observations">Performing Your Own Observations<a arialabel="Anchor" class="hanchor" href="#performing-your-own-observations">⌗</a> </h2>
 <h3 id="overview-1">Overview<a arialabel="Anchor" class="hanchor" href="#overview-1">⌗</a> </h3>
 <p>You have seen the garbage collection process using a series of pictures. Now
@@ -361,12 +481,28 @@ in <code>c:\javademos</code>.</p>
 <p>The demo application is a 2D graphics demo. To execute it type: <code>java -Xmx12m -Xms3m -Xmn1m -XX:PermSize=20m -XX:MaxPermSize=20m -XX:+UseSerialGC -jar c:\javademos\demo\jfc\Java2D\Java2demo.jar</code></p>
 <p><strong>Note:</strong> The meaning of these switches are explained later in the OBE.</p>
 <p>The Java 2D Demo should launch and look something like this:
-<img alt="Java2DStartScreen" src="D70B9D73DACA46F48C1343079D03735E"/></p>
+<figure>
+<a href="#845fe179e2c51644db5f1c692da60db2-lightbox"><img alt="Java2DStartScreen" src="D70B9D73DACA46F48C1343079D03735E"/></a>
+<figcaption>
+<p>Java2DStartScreen</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="845fe179e2c51644db5f1c692da60db2-lightbox">
+<img alt="Java2DStartScreen" src="D70B9D73DACA46F48C1343079D03735E"/>
+</a></p>
 <p>You can see a number of different tabs that demonstrate various Java graphics
 features.</p>
 <p>Click on the Transforms tabs. You should see a new screen that looks like
 this:
-<img alt="Java2DTransforms" src="1BDE9E6536CA4447961D97DF2AF3C372"/></p>
+<figure>
+<a href="#665d4a917ae136a94a5805e6b641216c-lightbox"><img alt="Java2DTransforms" src="1BDE9E6536CA4447961D97DF2AF3C372"/></a>
+<figcaption>
+<p>Java2DTransforms</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="665d4a917ae136a94a5805e6b641216c-lightbox">
+<img alt="Java2DTransforms" src="1BDE9E6536CA4447961D97DF2AF3C372"/>
+</a></p>
 <p>This part of the application creates some nice garbage collection behavior
 that we can observe. Leave the application running, we will return to it
 shortly.</p>
@@ -380,11 +516,35 @@ the JDK). Click <strong>Ok</strong> several times and then close the dialog.</p>
 type <code>jvisualvm</code>.</p>
 <p>The first time Visual VM runs, it will do a calibration of your system. You
 will see messages like the following:
-<img alt="visualvm01" src="637855F59D204B31A7D8B31D5F92CB2E"/></p>
+<figure>
+<a href="#e9b34daa2bf2231fee9455a2ab83338b-lightbox"><img alt="visualvm01" src="637855F59D204B31A7D8B31D5F92CB2E"/></a>
+<figcaption>
+<p>visualvm01</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="e9b34daa2bf2231fee9455a2ab83338b-lightbox">
+<img alt="visualvm01" src="637855F59D204B31A7D8B31D5F92CB2E"/>
+</a></p>
 <p>Then a message like this:
-<img alt="visualvm02" src="F6D466F6F903475595CBD62AA94B0E07"/></p>
+<figure>
+<a href="#ad44bc63f207c43910c2906d446b3e1b-lightbox"><img alt="visualvm02" src="F6D466F6F903475595CBD62AA94B0E07"/></a>
+<figcaption>
+<p>visualvm02</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="ad44bc63f207c43910c2906d446b3e1b-lightbox">
+<img alt="visualvm02" src="F6D466F6F903475595CBD62AA94B0E07"/>
+</a></p>
 <p>Finally the main user interface loads.
-<img alt="visualvm03" src="9E9E2E5138E544B68096F35DF14086E6"/></p>
+<figure>
+<a href="#b2eec9c2a83a16e5864801dad67b1a72-lightbox"><img alt="visualvm03" src="9E9E2E5138E544B68096F35DF14086E6"/></a>
+<figcaption>
+<p>visualvm03</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="b2eec9c2a83a16e5864801dad67b1a72-lightbox">
+<img alt="visualvm03" src="9E9E2E5138E544B68096F35DF14086E6"/>
+</a></p>
 <p>From here, we can monitor running JVMs. However, for this activty we need to
 add the VisualGC plugin.</p>
 <h4 id="step-4-install-visual-gc">Step 4: Install Visual GC<a arialabel="Anchor" class="hanchor" href="#step-4-install-visual-gc">⌗</a> </h4>
@@ -393,19 +553,59 @@ garbage collectors activity in the JVM. It is free and can be added to your
 installation by following these steps.</p>
 <pre><code>1. To install Visual GC, from the menu select **Tools --&gt; Plugins**. You should get the following dialog.
 </code></pre>
-<p><img alt="VisualGCIns01" src="0B1F19353BAF41A4A9445EAA4715FC94"/></p>
+<p><figure>
+<a href="#afd2443fd26b530fc57e7043015ede97-lightbox"><img alt="VisualGCIns01" src="0B1F19353BAF41A4A9445EAA4715FC94"/></a>
+<figcaption>
+<p>VisualGCIns01</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="afd2443fd26b530fc57e7043015ede97-lightbox">
+<img alt="VisualGCIns01" src="0B1F19353BAF41A4A9445EAA4715FC94"/>
+</a></p>
 <pre><code>2. Select **Visual GC** and then select the **Install** button.
 </code></pre>
-<p><img alt="VisualGCIns02" src="11957D5A28E44F43A4D93EB97EAAADB3"/></p>
+<p><figure>
+<a href="#ded8e7bf551d3bca47b7dc7d9b1bb88d-lightbox"><img alt="VisualGCIns02" src="11957D5A28E44F43A4D93EB97EAAADB3"/></a>
+<figcaption>
+<p>VisualGCIns02</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="ded8e7bf551d3bca47b7dc7d9b1bb88d-lightbox">
+<img alt="VisualGCIns02" src="11957D5A28E44F43A4D93EB97EAAADB3"/>
+</a></p>
 <pre><code>3. The plugin installer starts. Click **Next**.
 </code></pre>
-<p><img alt="VisualGCIns03" src="B32D7A11E5A44A2DAEBBE3FEBBF7EE10"/></p>
+<p><figure>
+<a href="#d1bb7a37af5b46f202919addb63ad1cf-lightbox"><img alt="VisualGCIns03" src="B32D7A11E5A44A2DAEBBE3FEBBF7EE10"/></a>
+<figcaption>
+<p>VisualGCIns03</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="d1bb7a37af5b46f202919addb63ad1cf-lightbox">
+<img alt="VisualGCIns03" src="B32D7A11E5A44A2DAEBBE3FEBBF7EE10"/>
+</a></p>
 <pre><code>4. Read and accept the license agreement. Click **Install**. The plugin will now be installed.
 </code></pre>
-<p><img alt="VisualGCIns04" src="7D9BEA35C9EE4818BA4088D6ED4F35AD"/></p>
+<p><figure>
+<a href="#aec7c309b7a98d79c76041b8137fd78f-lightbox"><img alt="VisualGCIns04" src="7D9BEA35C9EE4818BA4088D6ED4F35AD"/></a>
+<figcaption>
+<p>VisualGCIns04</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="aec7c309b7a98d79c76041b8137fd78f-lightbox">
+<img alt="VisualGCIns04" src="7D9BEA35C9EE4818BA4088D6ED4F35AD"/>
+</a></p>
 <pre><code>5. The plugin is now installed. Click **Finish** to complete the installation.
 </code></pre>
-<p><img alt="VisualGCIns05" src="35BB6C8957EE4707A9C47FBB758CBBCE"/></p>
+<p><figure>
+<a href="#d60a1ad4e4f2cbeab8ac7925212ab67b-lightbox"><img alt="VisualGCIns05" src="35BB6C8957EE4707A9C47FBB758CBBCE"/></a>
+<figcaption>
+<p>VisualGCIns05</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="d60a1ad4e4f2cbeab8ac7925212ab67b-lightbox">
+<img alt="VisualGCIns05" src="35BB6C8957EE4707A9C47FBB758CBBCE"/>
+</a></p>
 <pre><code>6. Click the **Close** button to close the Plugins dialog.
 </code></pre>
 <p>VisualGC is installed. Now we can examine the Java2Demo to see what sort of
@@ -415,15 +615,39 @@ things are going on.</p>
 <ol>
 <li>
 <p>First, right click the Java2Demo application in the Local applications list of the Applications tab. Select <strong>Open</strong>.
-<img alt="Java2Demo01" src="F63F3931390D45F3A1EFA325B1EAB22A"/></p>
+<figure>
+<a href="#0a4c3f49e4e7a0ecf55656a78f78a517-lightbox"><img alt="Java2Demo01" src="F63F3931390D45F3A1EFA325B1EAB22A"/></a>
+<figcaption>
+<p>Java2Demo01</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="0a4c3f49e4e7a0ecf55656a78f78a517-lightbox">
+<img alt="Java2Demo01" src="F63F3931390D45F3A1EFA325B1EAB22A"/>
+</a></p>
 </li>
 <li>
 <p>The application is loaded into Visual VM. Notice a number of tabs are loaded on the right side of the interface. Click the <strong>Visual GC</strong> tab.
-<img alt="Java2Demo02" src="BE16F6710F194E9A875325E5E9DEF286"/></p>
+<figure>
+<a href="#cca15c8a46ed196a6e18936d2ae9ed33-lightbox"><img alt="Java2Demo02" src="BE16F6710F194E9A875325E5E9DEF286"/></a>
+<figcaption>
+<p>Java2Demo02</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="cca15c8a46ed196a6e18936d2ae9ed33-lightbox">
+<img alt="Java2Demo02" src="BE16F6710F194E9A875325E5E9DEF286"/>
+</a></p>
 </li>
 <li>
 <p>The Visual GC tab shows all the activity going on in the Garbage Collector. You can watch as the Eden space is filled up and data is moved between the two survivor spaces S1 and S0. In addition, graphs and stats of related to the garbage collector are shown at the right.
-<img alt="Java2Demo03" src="5043E36751824EBB9D7746B6D1153B93"/></p>
+<figure>
+<a href="#5cad5b4f96771a9a73db508a45634c14-lightbox"><img alt="Java2Demo03" src="5043E36751824EBB9D7746B6D1153B93"/></a>
+<figcaption>
+<p>Java2Demo03</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="5cad5b4f96771a9a73db508a45634c14-lightbox">
+<img alt="Java2Demo03" src="5043E36751824EBB9D7746B6D1153B93"/>
+</a></p>
 </li>
 </ol>
 <p>Feel free to try the other tabs and see what information is presented about

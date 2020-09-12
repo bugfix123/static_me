@@ -117,7 +117,15 @@
 <p>显然，first thread线程执行testA方法时，获取了A的Class对象锁，睡眠5秒后尝试获取B的Clas对象锁，而second thread执行testB方法时，获取了B的Class对象锁，所以线程first thread睡醒之后获取不到A的Class对象锁，处于Block状态，同样地，该线程睡醒之后也获取不到A的Class对象锁，这两个线程相互永远等待，处于dead block状态！</p>
 <h2 id="visualvm工具排查">VisualVM工具排查<a arialabel="Anchor" class="hanchor" href="#visualvm工具排查">⌗</a> </h2>
 <p>打开Java VisualVM工具，线程页签界面上鲜明地展示，当前应用存在死锁。
-<img alt="deak lock" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/dead_lock.png"/></p>
+<figure>
+<a href="#82ada373faf7c3b9e839a587d41808f6-lightbox"><img alt="deak lock" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/dead_lock.png"/></a>
+<figcaption>
+<p>deak lock</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="82ada373faf7c3b9e839a587d41808f6-lightbox">
+<img alt="deak lock" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/dead_lock.png"/>
+</a></p>
 <p>点击右上角<strong>线程Dump</strong>按钮，进去之后可以看到所有线程的执行状态快照，拖到页面的最后面，会打印出死锁线程的相关信息。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>Found one Java-level deadlock:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>=============================

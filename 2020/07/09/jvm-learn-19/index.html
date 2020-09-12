@@ -78,7 +78,15 @@
 <p>上篇讲了下<a href="http://blog.csdn.net/u011519624/article/details/79156767">垃圾回收算法</a>，今天就来说说垃圾回收算法的具体实现吧–垃圾收集器（本文讨论的是JDK1.7版本的HotSpot虚拟机）。</p>
 <h2 id="垃圾收集器">垃圾收集器<a arialabel="Anchor" class="hanchor" href="#垃圾收集器">⌗</a> </h2>
 <p>HotSpot虚拟机提供的收集器如下图：</p>
-<p><img alt="垃圾收集器" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc04.png"/></p>
+<p><figure>
+<a href="#1d01b45512b13bdea06c22f23273a363-lightbox"><img alt="垃圾收集器" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc04.png"/></a>
+<figcaption>
+<p>垃圾收集器</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="1d01b45512b13bdea06c22f23273a363-lightbox">
+<img alt="垃圾收集器" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc04.png"/>
+</a></p>
 <p><strong>新生代的垃圾收集器有：Serial、ParNew、Parallel Scavenge</strong><br/>
 <strong>老年代的垃圾收集器有：CMS、Serial Old、Parallel Old</strong><br/>
 G1收集器因运用的还不是很广泛，不予讨论，有兴趣的可自行百度。<br/>
@@ -87,12 +95,28 @@ G1收集器因运用的还不是很广泛，不予讨论，有兴趣的可自行
 <p>Serial，翻译成中文的意思是<strong>串行</strong>，顾名思义，这就是个单线程的收集器。仅仅使用一个线程去执行垃圾收集任务，而且收集任务期间，必须停掉其他的工作线程，直到垃圾收集完成。`垃圾回收时停掉其他的线程的现象，就称为<strong>Stop
 The World(STW)</strong>。打个比方，我清扫房间的时候，任何人都不能在家里活动，以免给我捣乱，不然清扫工作怎么也没法做完。STW就是这么个意思，至于暂停应用多久，得看具体垃圾的情况了。</p>
 <p>Serial收集器是收集新生代的收集器，而Serial Old收集器是收集老年代的，上图也看到了它们之间有连线可搭配使用，看如下它们搭配使用的运行图：<br/>
+<figure>
+<a href="#44f610225c4dc5f60eaa523cf8f6869b-lightbox"><img alt="Serial与Serial Old搭配使用" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc05.png"/></a>
+<figcaption>
+<p>Serial与Serial Old搭配使用</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="44f610225c4dc5f60eaa523cf8f6869b-lightbox">
 <img alt="Serial与Serial Old搭配使用" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc05.png"/>
+</a>
 ①：新生代使用Serial收集器，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br/>
 ②：老年代使用Serial Old收集器，采用标记整理算法，会发生STW。</p>
 <h3 id="parnew-收集器">ParNew 收集器<a arialabel="Anchor" class="hanchor" href="#parnew-收集器">⌗</a> </h3>
 <p>ParNew其实就是Serial的多线程版本，在新生代中使用多条线程进行垃圾回收。看如下逻辑图就一目了然了：
+<figure>
+<a href="#919e898d05b66d8f00c2df22c185b708-lightbox"><img alt="ParNew收集器" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc06.png"/></a>
+<figcaption>
+<p>ParNew收集器</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="919e898d05b66d8f00c2df22c185b708-lightbox">
 <img alt="ParNew收集器" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc06.png"/>
+</a>
 ①：新生代使用ParNew收集器，可以看到有多条GC线程在进行垃圾回收，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br/>
 ②：老年代使用Serial Old收集器，采用标记整理算法，会发生STW。</p>
 <h3 id="parallel-scavenge-收集器">Parallel Scavenge 收集器<a arialabel="Anchor" class="hanchor" href="#parallel-scavenge-收集器">⌗</a> </h3>
@@ -108,13 +132,29 @@ The World(STW)</strong>。打个比方，我清扫房间的时候，任何人都
 <p>Parallel Old 是 Parallel
 Scavenge收集器的老年代版本，运用多线程和标记整理算法收集。从最上面的搭配图也可以看到，Parallel Old 只能与Parallel
 Scavenge配对使用。这样的组合，在注重<strong>吞吐量和CPU资源</strong>的场合使用比较合适。如下是逻辑运行图：<br/>
+<figure>
+<a href="#5c2c9657e4c061fa74a2ff93cbdedb69-lightbox"><img alt="Parallel Old收集器" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc07.png"/></a>
+<figcaption>
+<p>Parallel Old收集器</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="5c2c9657e4c061fa74a2ff93cbdedb69-lightbox">
 <img alt="Parallel Old收集器" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc07.png"/>
+</a>
 ①：新生代使用Parallel Scavenge收集器，可以看到有多条GC线程在进行垃圾回收，采用复制算法，会暂停其他用户线程（STW）专心做垃圾回收。<br/>
 ②：老年代使用Parallel Old收集器，使用多线程采用标记整理算法，会发生STW。</p>
 <h3 id="cms-收集器">CMS 收集器<a arialabel="Anchor" class="hanchor" href="#cms-收集器">⌗</a> </h3>
 <p>CMS收集器是一种<strong>以获取最短回收停顿时间为目标</strong>的收集器。在B/S架构模型的网站上，运用CMS收集器十分广泛，因为网站上更希望停顿越短越好，用户体验才能更好。</p>
 <p>CMS收集器是基于标记清除算法实现的，但是其运行过程相对来说更复杂了，整个过程分成下图4个步骤：<br/>
-<img alt="CMS收集过程" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc08.png"/></p>
+<figure>
+<a href="#3d02ba5dab508452ad8a789a9d36be03-lightbox"><img alt="CMS收集过程" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc08.png"/></a>
+<figcaption>
+<p>CMS收集过程</p>
+</figcaption>
+</figure>
+<a class="lightbox" href="#_" id="3d02ba5dab508452ad8a789a9d36be03-lightbox">
+<img alt="CMS收集过程" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_19_gc08.png"/>
+</a></p>
 <ul>
 <li>
 <p>①：初始标记（initial mark）<br/>
