@@ -105,32 +105,23 @@
 1. <strong>效率问题</strong>：标记和清除的效率都不高。需要扫描所有对象，堆越大，GC越慢
 2. <strong>空间问题</strong>：标记清除之后会产生大量不连续的内存碎片，内存碎片太多会导致后续无法找到足够的连续内存而提前触发一次GC。GC次数越多，内存碎片越严重。</p>
 <p><strong>原始</strong>
-<figure>
-<a href="#85cd6fc89592d2e5f788b14b9840cd07-lightbox"><img alt="0011" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_0011.png"/></a>
-<figcaption>
-<p>0011</p>
-</figcaption>
-</figure>
+<a href="#85cd6fc89592d2e5f788b14b9840cd07-lightbox">
+<img alt="0011" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_0011.png"/>
+</a>
 <a class="lightbox" href="#_" id="85cd6fc89592d2e5f788b14b9840cd07-lightbox">
 <img alt="0011" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_0011.png"/>
 </a></p>
 <p><strong>标记</strong>
-<figure>
-<a href="#f62e0138f3c4a88122363a93879ba386-lightbox"><img alt="0012" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_0012.png"/></a>
-<figcaption>
-<p>0012</p>
-</figcaption>
-</figure>
+<a href="#f62e0138f3c4a88122363a93879ba386-lightbox">
+<img alt="0012" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_0012.png"/>
+</a>
 <a class="lightbox" href="#_" id="f62e0138f3c4a88122363a93879ba386-lightbox">
 <img alt="0012" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_0012.png"/>
 </a></p>
 <p><strong>清除</strong>
-<figure>
-<a href="#ecadef6b1d2db94777d980c706ef9552-lightbox"><img alt="0013" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_0013.png"/></a>
-<figcaption>
-<p>0013</p>
-</figcaption>
-</figure>
+<a href="#ecadef6b1d2db94777d980c706ef9552-lightbox">
+<img alt="0013" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_0013.png"/>
+</a>
 <a class="lightbox" href="#_" id="ecadef6b1d2db94777d980c706ef9552-lightbox">
 <img alt="0013" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_0013.png"/>
 </a></p>
@@ -159,22 +150,16 @@
 <li><strong>分代算法(Generational)</strong></li>
 </ol>
 <p>商业虚拟机都是采用分代收集算法，根据对象的存活周期将对象划分为新生代和老年代，各个年代根据自己的特点采用合适的收集算法。比如，新生代大量的对象生命周期很短，存活对象少，只需要付出少量对象的复制空间成本即可。对于老年代可以采用标记清除或标记整理算法回收。
-<figure>
-<a href="#e9dfdde4c8d055789949f1b7518d771b-lightbox"><img alt="gc01" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_gc01.png"/></a>
-<figcaption>
-<p>gc01</p>
-</figcaption>
-</figure>
+<a href="#e9dfdde4c8d055789949f1b7518d771b-lightbox">
+<img alt="gc01" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_gc01.png"/>
+</a>
 <a class="lightbox" href="#_" id="e9dfdde4c8d055789949f1b7518d771b-lightbox">
 <img alt="gc01" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_gc01.png"/>
 </a>
 年轻代包括Eden Space，From Space和To Space这三部分，From Space和To Space又叫Survivor，默认情况下他们的大小比例是8：1：1。
-<figure>
-<a href="#a2b672aafb898ccf7be6c59ee743f625-lightbox"><img alt="gc02" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_gc02.png"/></a>
-<figcaption>
-<p>gc02</p>
-</figcaption>
-</figure>
+<a href="#a2b672aafb898ccf7be6c59ee743f625-lightbox">
+<img alt="gc02" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_gc02.png"/>
+</a>
 <a class="lightbox" href="#_" id="a2b672aafb898ccf7be6c59ee743f625-lightbox">
 <img alt="gc02" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_18_gc02.png"/>
 </a></p>

@@ -86,12 +86,9 @@
 <li>堆(heap)：最大的一块内存，存放对象实例，对象的生命周期由JVM的垃圾收集器统一管理。由于现代垃圾收集器采用的分代回收算法，所以相应地划分为年轻代和老年代两块空间，年轻代包括Eden区和2快大小相等的Suvivor区</li>
 <li>方法区：JDK7以前的概念，它是一块紧挨着堆的连续内存空间，存放类的元信息、静态变量和运行时常量池。在JDK8中，取而代之的是元空间。</li>
 <li>运行时常量池：方法区的一部分
-<figure>
-<a href="#8e573e718340ba0ff40023773780f9a0-lightbox"><img alt="image" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_13_memory.png"/></a>
-<figcaption>
-<p>image</p>
-</figcaption>
-</figure>
+<a href="#8e573e718340ba0ff40023773780f9a0-lightbox">
+<img alt="image" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_13_memory.png"/>
+</a>
 <a class="lightbox" href="#_" id="8e573e718340ba0ff40023773780f9a0-lightbox">
 <img alt="image" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_13_memory.png"/>
 </a></li>
@@ -197,12 +194,9 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>Process finished with exit code 1
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>
 </code></pre></div><p>如果将元空间的最大大小设置为200M，通过Jvisualvm可以看到元空间的变化情况。
-<figure>
-<a href="#3bc33ec41273b34a2ab308a096d53e0f-lightbox"><img alt="20200203120628" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_13_memory_devide.png"/></a>
-<figcaption>
-<p>20200203120628</p>
-</figcaption>
-</figure>
+<a href="#3bc33ec41273b34a2ab308a096d53e0f-lightbox">
+<img alt="20200203120628" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_13_memory_devide.png"/>
+</a>
 <a class="lightbox" href="#_" id="3bc33ec41273b34a2ab308a096d53e0f-lightbox">
 <img alt="20200203120628" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_13_memory_devide.png"/>
 </a></p>

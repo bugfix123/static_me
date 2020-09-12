@@ -79,9 +79,9 @@
 <div class="post-content"><div>
 <h2 id="双亲委托机制的局限性">双亲委托机制的局限性<a arialabel="Anchor" class="hanchor" href="#双亲委托机制的局限性">⌗</a> </h2>
 <p>当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核心类库提供的，JAVA核心类库是由根类加载器来加载的，而这些接口的实现来着不同的jar包，由不同的厂商提供，根类加载不会去加载这些jar包中的类，这样传统的双亲委托机制就无法满足SPI的要求。而通过给当前线程设置线程上下文类加载器，在需要加载厂商实现类的地方，从当前线程获取上下文类加载器去加载，从而满足SPI。</p>
-<p><figure>
-<a href="#8865a7879f6ff91c6bebdaf29e769dd7-lightbox"><img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_08_service_loader.png"/></a>
-</figure>
+<p><a href="#8865a7879f6ff91c6bebdaf29e769dd7-lightbox">
+<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_08_service_loader.png"/>
+</a>
 <a class="lightbox" href="#_" id="8865a7879f6ff91c6bebdaf29e769dd7-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_08_service_loader.png"/>
 </a></p>
@@ -147,12 +147,9 @@
 <p>该案例的疑问是，代码中并没有出现和mysql driver相关的代码，ServiceLoader.load(Driver.class)引用的也是JDK自带的接口，为何能够成功打印出mysql的两个驱动实现类呢？翻阅Service Loader的java doc相关说明和源码得知，在mysql-connector-xx.jar中的<strong>META-INF/services/<strong>目录下有这样一个文件</strong>java.sql.Driver</strong>，其内容为：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>com.mysql.jdbc.Driver
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>com.mysql.fabric.jdbc.FabricMySQLDriver
-</code></pre></div><p><figure>
-<a href="#2b58aecbee3beb3e36b98cc8cf920ba8-lightbox"><img alt="1578152254(1)" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_08_service_loader_driver.png"/></a>
-<figcaption>
-<p>1578152254(1)</p>
-</figcaption>
-</figure>
+</code></pre></div><p><a href="#2b58aecbee3beb3e36b98cc8cf920ba8-lightbox">
+<img alt="1578152254(1)" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_08_service_loader_driver.png"/>
+</a>
 <a class="lightbox" href="#_" id="2b58aecbee3beb3e36b98cc8cf920ba8-lightbox">
 <img alt="1578152254(1)" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_08_service_loader_driver.png"/>
 </a>

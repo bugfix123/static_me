@@ -80,12 +80,9 @@
 <h2 id="父子类加载器的命名空间">父子类加载器的命名空间<a arialabel="Anchor" class="hanchor" href="#父子类加载器的命名空间">⌗</a> </h2>
 <p>类A中引用了类B，那么加载类B时，由类A的类加载器按照双亲委托机制尝试加载。<strong>子类加载器加载的类可以引用父类加载器加载的类，而父类加载器加载的类不能引用子类加载器加载的类。</strong></p>
 <p>测试案例如下：
-<figure>
-<a href="#007620c10ea212129f08a1046ad77b47-lightbox"><img alt="image" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_05_cl02.jpg"/></a>
-<figcaption>
-<p>image</p>
-</figcaption>
-</figure>
+<a href="#007620c10ea212129f08a1046ad77b47-lightbox">
+<img alt="image" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_05_cl02.jpg"/>
+</a>
 <a class="lightbox" href="#_" id="007620c10ea212129f08a1046ad77b47-lightbox">
 <img alt="image" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_05_cl02.jpg"/>
 </a></p>
