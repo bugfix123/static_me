@@ -81,23 +81,23 @@
 </blockquote>
 <h1 id="install-pip">Install pip<a arialabel="Anchor" class="hanchor" href="#install-pip">⌗</a> </h1>
 <p>如果你还未安装，则可以使用以下方法来安装：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py   # 下载安装脚本
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>$ sudo python get-pip.py    # 运行安装脚本
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py   <span style="color:#75715e"># 下载安装脚本</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>$ sudo python get-pip.py    <span style="color:#75715e"># 运行安装脚本</span>
 </code></pre></div><h1 id="install-isso">Install isso<a arialabel="Anchor" class="hanchor" href="#install-isso">⌗</a> </h1>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ sudo yum install python-devel sqlite
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ sudo yum install python-devel sqlite
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>$ sudo yum groupinstall “Development Tools”
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>$ pip install isso
-</code></pre></div><p>如遇遇到这样的错误：</p>
+</code></pre></div><p>如果遇到这样的错误：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>Successfully built pyparsing
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>Installing collected packages: pyparsing
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>  Found existing installation: pyparsing 2.0.1
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>Cannot uninstall 'pyparsing'. It is a distutils installed project and thus we cannot accurately determine 
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>which files belong to it which would lead to only a partial uninstall.
 </code></pre></div><p>请执行<code>sudo pip install -I pyparsing==2.2.0</code>这条命令，然后再次执行<code>pip install isso</code>安装。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ sudo pip install -I pyparsing==2.2.0
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ sudo pip install -I pyparsing<span style="color:#f92672">==</span>2.2.0
 </code></pre></div><h1 id="查看isso版本">查看isso版本<a arialabel="Anchor" class="hanchor" href="#查看isso版本">⌗</a> </h1>
 <p>安装后可以查看isso版本，以验证安装成功。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>[root@JoeVPS ~]# isso --version
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#f92672">[</span>root@JoeVPS ~<span style="color:#f92672">]</span><span style="color:#75715e"># isso --version</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>isso 0.12.2
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>
 </code></pre></div><p>如果出现这个错误：</p>
@@ -107,14 +107,14 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>          from werkzeug.wsgi import DispatcherMiddleware
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>ImportError: cannot import name DispatcherMiddleware
 </code></pre></div><p>说明要么没有安装werkzeug，要么版本太高，解决办法：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>#卸载
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#75715e">#卸载</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>python -m pip uninstall werkzeug
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>#安装指定版本
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>python -m pip install werkzeug==0.16.0
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span style="color:#75715e">#安装指定版本</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>python -m pip install werkzeug<span style="color:#f92672">==</span>0.16.0
 </code></pre></div><h1 id="运行isso">运行isso<a arialabel="Anchor" class="hanchor" href="#运行isso">⌗</a> </h1>
-<p>要在服务端运行isso，需要指定配置文件，配置文件可以放在任意位置，任意名字。假设我的配置文件是/usr/local/isso/isso.conf.</p>
+<p>要在服务端运行isso，需要指定配置文件，配置文件可以放在任意位置，任意名字。假设我的配置文件是<code>/usr/local/isso/isso.conf</code>，运行isso：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>isso -c /usr/local/isso/isso.conf run
-</code></pre></div><p>初次这样直接运行，肯定会报错，因为目前isso.conf还不存在。</p>
+</code></pre></div><p>初次这样直接运行，肯定会报错，因为目前isso.conf还不存在！下面接着看配置文件怎么设置。</p>
 <h1 id="配置文件">配置文件<a arialabel="Anchor" class="hanchor" href="#配置文件">⌗</a> </h1>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>[root@JoeVPS ~]# vim /usr/local/isso/isso.conf
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>[general]
@@ -159,15 +159,26 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>
 </code></pre></div><p>配置说明：</p>
 <ul>
-<li>host: 你的网站域名，要以http或https开头，isso会以该字段进行CORS跨域验证</li>
-<li>listen: 指定isso的端口，以http开头就行，建议值：http://0.0.0.0:port</li>
-<li>password,security)，to设置为你的QQ邮箱，当用户评论后，isso将会从后台登录Gmail邮箱，发送一封邮件给你的QQ邮箱！</li>
-<li>[admin] password: 管理员的密码。管理员界面的路径是<code>/admin</code></li>
-<li>[general] 中dbpath和log-file分别为数据文件和日志文件路径，目录需要提前创建好。</li>
+<li>
+<p>host: 你的网站域名，要以http或https开头，isso会以该字段进行CORS跨域验证</p>
+</li>
+<li>
+<p>listen: 指定isso的端口，以http开头就行，建议值：http://0.0.0.0:port</p>
+</li>
+<li>
+<p>[smtp] 邮件配置。这部分的前5个字段设定的是邮件发送方的smtp配置,<code>to</code>字段是接收方邮箱。假设smtp部分填写了Gmail的smtp信息(host,port,username
+password,security)，to设置为你的QQ邮箱，那么当用户评论后，isso将会从后台登录Gmail邮箱，向你的QQ邮箱发送一封邮件!</p>
+</li>
+<li>
+<p>[admin] password: 管理员的密码。管理员界面的路径是<strong><code>/admin</code></strong></p>
+</li>
+<li>
+<p>[general] 中dbpath和log-file分别为数据文件和日志文件路径，目录需要提前创建好。</p>
+</li>
 </ul>
 <p>其他配置可以保持不变，详情参考官网。</p>
 <h1 id="配置nginx">配置nginx<a arialabel="Anchor" class="hanchor" href="#配置nginx">⌗</a> </h1>
-<p>用ip访问isso不方便，可以配置成用域名访问，可以是任意域名。</p>
+<p>用ip访问isso不方便，可以配置成用域名访问，可以是任意域名。假设我的域名是isso.dongzhi.me.</p>
 <p>安装nginx和certbot：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>yum install nginx certbot -y
 </code></pre></div><p>假设域名是isso.dongzhi.me，需要先进行域名的A记录解析，然后使用Let’s Encrypt证书配置nginx：</p>
@@ -204,10 +215,10 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>WantedBy=multi-user.target
 </code></pre></div><p>注意，本人的isso配置文件路径是/usr/local/isso/isso.conf。</p>
 <p>我们使isso服务开启自启动。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>sudo systemctl daemon-reload
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>sudo systemctl daemon-reload
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>sudo systemctl enable isso
 </code></pre></div><p>现在，你可以下面的命令来使启动,停止,重启isso服务，也可以查看isso服务的状态：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>sudo systemctl start isso
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>sudo systemctl start isso
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>sudo systemctl stop isso
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>sudo systemctl status isso
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>sudo systemctl restart isso
@@ -278,10 +289,7 @@ padding: 5px auto;margin: 10px auto;*/
 <div class="footer__inner">
 <div class="copyright">
 <span>© 2020 <a href="https://dongzhi.me/">志哥笔记</a></span>
-<span style="margin-right: 10px;">:: Theme made by <a href="https://themes.gohugo.io/hugo-theme-terminal/">panr</a></span>
-<span id="busuanzi_container_site_uv">
-                :: 您是本站第<span id="busuanzi_value_site_uv"></span>位访客
-          </span>
+<span style="margin-right: 10px;">:: Theme by <a href="https://themes.gohugo.io/hugo-theme-terminal/">panr</a></span>
 </div>
 </div>
 </footer>
