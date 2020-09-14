@@ -175,6 +175,10 @@ window.onload = function () {
       search();
     }
   };
+
+  document.getElementById('--search-button--').addEventListener('click', function () {
+    search();
+  });
 }; // search
 
 
