@@ -38,7 +38,7 @@
 <link>https://dongzhi.me/2020/09/08/add-search-for-hugo/</link>
 <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
 <guid>https://dongzhi.me/2020/09/08/add-search-for-hugo/</guid>
-<description/>
+<description>&lt;p&gt;Hugo的站内搜索有很多方案，Hugo官网了列出了7种，大家用的应该是hugo-lunr-zh吧，这里我们不引入任何第三方库，另辟蹊径地解决Hugo站内搜索功能。&lt;/p&gt;</description>
 </item>
 <item>
 <title>记一次公司JVM堆溢出抽丝剥茧定位的过程</title>
@@ -64,6 +64,13 @@
 <description>&lt;blockquote&gt;
 &lt;p&gt;Here are some useful licences.&lt;/p&gt;
 &lt;/blockquote&gt;</description>
+</item>
+<item>
+<title>About</title>
+<link>https://dongzhi.me/about/</link>
+<pubDate>Sat, 18 Jul 2020 00:00:00 +0000</pubDate>
+<guid>https://dongzhi.me/about/</guid>
+<description>志哥笔记(DongZhi.ME)，搞个blog简单记录一下日常，不是为了装逼，而是为了时常记录一点东西，回头过来找找资料方便些。毕竟年纪大了，脑子不好使了嘛，哈哈。 相信文字比记忆走得更远一些，但愿不会</description>
 </item>
 <item>
 <title>你相信正义吗</title>
@@ -300,13 +307,6 @@ The Emoji cheat sheet is a useful reference for emoji shorthand codes.
 <pubDate>Tue, 13 Aug 2019 21:51:22 +0800</pubDate>
 <guid>https://dongzhi.me/2019/08/13/inspired_bicycles/</guid>
 <description>一则骑单车飞檐走壁的视频，许多年以前在优酷上偶然间看的，作者Danny MacAskill 真乃神人也！背景音乐也十分赞，十多年前特别喜欢听。</description>
-</item>
-<item>
-<title>About</title>
-<link>https://dongzhi.me/about/</link>
-<pubDate>Thu, 18 Jul 2019 00:00:00 +0000</pubDate>
-<guid>https://dongzhi.me/about/</guid>
-<description>志哥笔记(DongZhi.ME)，搞个blog简单记录一下日常，不是为了装逼，而是为了时常记录一点东西，回头过来找找资料方便些。毕竟年纪大了，脑子不好使了嘛，哈哈。 相信文字比记忆走得更远一些，但愿不会</description>
 </item>
 <item>
 <title>Search</title>

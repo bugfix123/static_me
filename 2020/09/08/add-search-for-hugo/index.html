@@ -4,7 +4,8 @@
 <title>如何给hugo添加站内搜索功能 :: 志哥笔记 — 记述码农在家的故事！</title>
 <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="" name="description"/>
+<meta content="Hugo的站内搜索有很多方案，Hugo官网了列出了7种，大家用的应该是hugo-lunr-zh吧，这里我们不引入任何第三方库，另辟蹊径地解决Hugo站内搜索功能。
+" name="description"/>
 <meta content="" name="keywords"/>
 <meta content="noodp" name="robots"/>
 <link href="https://dongzhi.me/2020/09/08/add-search-for-hugo/" rel="canonical"/>
@@ -19,7 +20,8 @@
 <meta content="en" property="og:locale"/>
 <meta content="article" property="og:type"/>
 <meta content="如何给hugo添加站内搜索功能 :: 志哥笔记" property="og:title"/>
-<meta content="" property="og:description"/>
+<meta content="Hugo的站内搜索有很多方案，Hugo官网了列出了7种，大家用的应该是hugo-lunr-zh吧，这里我们不引入任何第三方库，另辟蹊径地解决Hugo站内搜索功能。
+" property="og:description"/>
 <meta content="https://dongzhi.me/2020/09/08/add-search-for-hugo/" property="og:url"/>
 <meta content="如何给hugo添加站内搜索功能" property="og:site_name"/>
 <meta content="https://dongzhi.me/img/favicon/blue.png" property="og:image"/>
@@ -74,6 +76,7 @@
     
   </span>
 <div class="post-content"><div>
+<p>Hugo的站内搜索有很多方案，Hugo官网了列出了7种，大家用的应该是hugo-lunr-zh吧，这里我们不引入任何第三方库，另辟蹊径地解决Hugo站内搜索功能。</p>
 <h2 id="思路">思路<a arialabel="Anchor" class="hanchor" href="#思路">⌗</a> </h2>
 <p>Hugo会默认生成index.xml文件，里面包含全站内容，以此文件进行内容搜索。这种方法不需要引用第三方库，在前端进行搜索，简洁且速度快！</p>
 <h2 id="步骤">步骤<a arialabel="Anchor" class="hanchor" href="#步骤">⌗</a> </h2>

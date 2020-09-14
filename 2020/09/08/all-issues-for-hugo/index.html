@@ -19,7 +19,7 @@
 <meta content="en" property="og:locale"/>
 <meta content="article" property="og:type"/>
 <meta content="Hugo使用过程中遇到的坑汇总 :: 志哥笔记" property="og:title"/>
-<meta content="" property="og:description"/>
+<meta content="今年6月份开始使用Hugo,Hugo 是一款效率极高的Static Website Generator。记录一下Hugo搭建时遇到的各种问题坑。" property="og:description"/>
 <meta content="https://dongzhi.me/2020/09/08/all-issues-for-hugo/" property="og:url"/>
 <meta content="Hugo使用过程中遇到的坑汇总" property="og:site_name"/>
 <meta content="https://dongzhi.me/img/favicon/blue.png" property="og:image"/>
@@ -261,14 +261,14 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>  {{ partial "footer.html" . }}
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>{{ end }}
 </code></pre></div><p>archives.md</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>+++
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>+++
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>title = "Archives"
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>date = "2019-01-25"
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>author = "Radek"
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>layout = "archives"
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>+++
 </code></pre></div><h2 id="hugo文章添加密码">hugo文章添加密码<a arialabel="Anchor" class="hanchor" href="#hugo文章添加密码">⌗</a> </h2>
-<p>hugo给文章加密没有hexo那么简单，hexo里面可以通过安装插件来搞定，Hugo相对麻烦一些，比较好的方法是使用<code>hugo_encryptor</code>。这个工具是用Python写的，需要搭建好Python3环境，
+<p>Hugo给文章加密没有hexo那么简单，Hexo里面可以通过安装插件来搞定，Hugo相对麻烦一些，比较好的方法是使用<code>hugo_encryptor</code>。这个工具是用Python写的，需要搭建好Python3环境，
 然后在主题内新建一个hugo_encryptor的shortcode，在文章中引用。然后在在hugo生成静态文件后对静态页面进行加密。本地进行加密没有什么难度，麻烦的地方是自动化部署
 的时候进行文章加密，将会在文章加密的部分说明这个问题。</p>
 <h2 id="hugo的自动化部署方案">hugo的自动化部署方案<a arialabel="Anchor" class="hanchor" href="#hugo的自动化部署方案">⌗</a> </h2>

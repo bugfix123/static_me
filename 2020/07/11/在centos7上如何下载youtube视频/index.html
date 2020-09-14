@@ -129,11 +129,11 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>
 </code></pre></div><p>可以看到有很多分辨率的选项，注意上面4个是音频，下面的是视频，youtube的音频和视频是分开的。第一列是格式代码。</p>
 <p>比如要下载最后一行的240p的视频，输入：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>youtube-dl -f 18 https://www.youtube.com/watch?v=gWsOFw9QZN8
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>youtube-dl -f <span style="color:#ae81ff">18</span> https://www.youtube.com/watch?v<span style="color:#f92672">=</span>gWsOFw9QZN8
 </code></pre></div><p>其中，-f 18 表示格式码。</p>
 <p>老夫兴冲冲地输入如上命令下载了视频之后，结果没声音，无语!正确的做法是同时下载视频和音频，youtube会调用ffmpeg把下载的视频和音频合并，所以我们得安装ffmpeg。</p>
 <h3 id="安装ffmpeg">安装ffmpeg<a arialabel="Anchor" class="hanchor" href="#安装ffmpeg">⌗</a> </h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>
@@ -142,7 +142,7 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>ffmpeg -h
 </code></pre></div><h3 id="终极总结">终极总结<a arialabel="Anchor" class="hanchor" href="#终极总结">⌗</a> </h3>
 <p>好了，终极下载命令：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>youtube-dl -f 313+250  --merge-output-format webm  https://www.youtube.com/watch?v=gWsOFw9QZN8&amp;frags=pl%2Cwn
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>youtube-dl -f 313+250  --merge-output-format webm  https://www.youtube.com/watch?v<span style="color:#f92672">=</span>gWsOFw9QZN8&amp;frags<span style="color:#f92672">=</span>pl%2Cwn
 </code></pre></div><p>注意<strong>313</strong>是视频的格式码，<strong>250</strong>是音频的格式码，中间的<strong>加号</strong>是连接符，最后合并后的输出格式是webm。建议音频、视频和输出格式这三者要选择一致，否则合并视频会有问题。</p>
 <p>最后附上下载的视频：</p>
 <div class="shortcode_video">

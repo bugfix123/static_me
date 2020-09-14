@@ -48,7 +48,7 @@
       <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>https://dongzhi.me/2020/09/08/add-search-for-hugo/</guid>
-      <description></description>
+      <description>&lt;p&gt;Hugo的站内搜索有很多方案，Hugo官网了列出了7种，大家用的应该是hugo-lunr-zh吧，这里我们不引入任何第三方库，另辟蹊径地解决Hugo站内搜索功能。&lt;/p&gt;</description>
     </item>
     
     <item>
