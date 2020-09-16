@@ -6,7 +6,7 @@
 <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta content="记述码农在家的故事！" name="description"/>
-<meta content="" name="keywords"/>
+<meta content="前沿技术,IT博客,技术笔记,IT Share" name="keywords"/>
 <meta content="noodp" name="robots"/>
 <link href="https://dongzhi.me/" rel="canonical"/>
 <link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
@@ -59,6 +59,43 @@
 </header>
 <div class="content">
 <div class="posts">
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/09/jvm-learn-17/">JVM Learn 17 JVM内存排查相关命令用法</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-09
+          </span>
+<span class="post-author">::Joe John</span>
+</div>
+<div class="post-content">
+</div>
+<div>
+<a class="read-more button" href="/2020/07/09/jvm-learn-17/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/09/jvm-learn-18/">JVM Learn 18 JVM垃圾回收模型概述</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-09
+          </span>
+<span class="post-author">::Joe John</span>
+</div>
+<div class="post-content">
+          
+          
+          Java虚拟机的垃圾回收主要从三个方面去概括： 垃圾判断算法 GC(垃圾回收)算法 垃圾回收器的实现和选择 垃圾判断算法 垃圾判断算法，用于确定什么是垃圾内存。主要包括引用计数算法和根搜索算法。 引用计数算法 引用
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/09/jvm-learn-18/">Read more →</a>
+</div>
+</div>
 <div class="post on-list">
 <h1 class="post-title">
 <a href="https://dongzhi.me/2020/07/09/jvm-learn-19/">JVM Learn 19 JVM垃圾回收算法总结</a>
@@ -128,82 +165,6 @@
 <a class="read-more button" href="/2020/07/07/jvm-learn-08/">Read more →</a>
 </div>
 </div>
-<div class="post on-list">
-<h1 class="post-title">
-<a href="https://dongzhi.me/2020/07/07/jvm-learn-09/">JVM Learn 09 类的字节码结构</a>
-</h1>
-<div class="post-meta">
-<span class="post-date">
-            2020-07-07
-          </span>
-<span class="post-author">::John Doe</span>
-</div>
-<span class="post-tags">
-            
-            #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
-            
-          </span>
-<div class="post-content">
-          
-          
-          概念 字节码文件(.class)由JVM规范规定，主要包括魔数、JDK版本号(小版本和大版本)、常量池、类的访问标志、类的接口和父类信息、成员变量信息，方法信息等。 对于java中的数据类型，字节码中的对
-          
-          
-        </div>
-<div>
-<a class="read-more button" href="/2020/07/07/jvm-learn-09/">Read more →</a>
-</div>
-</div>
-<div class="post on-list">
-<h1 class="post-title">
-<a href="https://dongzhi.me/2020/07/07/jvm-learn-10/">JVM Learn 10 类的虚方法机制</a>
-</h1>
-<div class="post-meta">
-<span class="post-date">
-            2020-07-07
-          </span>
-<span class="post-author">::John Doe</span>
-</div>
-<span class="post-tags">
-            
-            #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
-            
-          </span>
-<div class="post-content">
-          
-          
-          基本概念总结 符号引用在类的加载阶段或者第一次引用时转换成直接引用，这叫做静态解析。一些符号引用则在每次运行时转换成直接引用，这种转换是动态链接，java的多态正是在此时实现的。 方法调用的几个指令： in
-          
-          
-        </div>
-<div>
-<a class="read-more button" href="/2020/07/07/jvm-learn-10/">Read more →</a>
-</div>
-</div>
-<div class="post on-list">
-<h1 class="post-title">
-<a href="https://dongzhi.me/2020/07/07/jvm-learn-11/">JVM Learn 11 关于栈的指令操作的例子</a>
-</h1>
-<div class="post-meta">
-<span class="post-date">
-            2020-07-07
-          </span>
-<span class="post-author">::John Doe</span>
-</div>
-<span class="post-tags">
-            
-            #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
-            
-          </span>
-<div class="post-content">
-<blockquote>
-<p>本例以一个简单的加减乘除的例子，来熟悉虚拟机的操作数栈的工作流程。</p>
-</blockquote>
-</div>
-<div>
-<a class="read-more button" href="/2020/07/07/jvm-learn-11/">Read more →</a>
-</div>
-</div>
 <div class="pagination">
 <div class="pagination__buttons">
 <span class="button previous">
@@ -232,11 +193,6 @@
 </footer>
 <script src="https://dongzhi.me/assets/main.js"></script>
 <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script src="/vconsole.min.js"></script>
-<script>  
-  var vConsole = new VConsole();
-  console.log('Hello world');
-</script>
 </div>
 </body>
 </html>
