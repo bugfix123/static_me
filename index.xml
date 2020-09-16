@@ -48,21 +48,21 @@
 <description>背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为</description>
 </item>
 <item>
-<title>v2ray客户端配置简易说明</title>
-<link>https://dongzhi.me/2020/08/21/kexueshangwang/</link>
-<pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
-<guid>https://dongzhi.me/2020/08/21/kexueshangwang/</guid>
-<description>&lt;blockquote&gt;
-&lt;p&gt;v2ray安卓客户端和windows客户端的配置简单说明.&lt;/p&gt;
-&lt;/blockquote&gt;</description>
-</item>
-<item>
 <title>Some Useful Licences</title>
 <link>https://dongzhi.me/2020/08/04/some-useful-licences/</link>
 <pubDate>Tue, 04 Aug 2020 00:00:00 +0000</pubDate>
 <guid>https://dongzhi.me/2020/08/04/some-useful-licences/</guid>
 <description>&lt;blockquote&gt;
 &lt;p&gt;Here are some useful licences.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+</item>
+<item>
+<title>v2ray客户端配置简易说明</title>
+<link>https://dongzhi.me/2020/07/21/kexueshangwang/</link>
+<pubDate>Tue, 21 Jul 2020 00:00:00 +0000</pubDate>
+<guid>https://dongzhi.me/2020/07/21/kexueshangwang/</guid>
+<description>&lt;blockquote&gt;
+&lt;p&gt;v2ray安卓客户端和windows客户端的配置简单说明.&lt;/p&gt;
 &lt;/blockquote&gt;</description>
 </item>
 <item>
