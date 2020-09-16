@@ -176,9 +176,13 @@ window.onload = function () {
     }
   };
 
-  document.getElementById('--search-button--').addEventListener('click', function () {
-    search();
-  });
+  var searchButton = document.getElementById('--search-button--');
+
+  if (searchButton != null) {
+    searchButton.addEventListener('click', function () {
+      search();
+    });
+  }
 }; // search
 
 
