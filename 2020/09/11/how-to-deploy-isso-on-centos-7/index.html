@@ -299,6 +299,21 @@ padding: 5px auto;margin: 10px auto;*/
         iconUrl: '/modules/plyr/3.6.2/plyr.svg'
     });
     </script>
+<script>
+<!-- fix isso comment input box cache -->
+var authors = document.getElementsByName('author');
+if (authors != null && authors.length > 0) {
+	authors[0].setAttribute('autocomplete', 'off');
+}
+var emails = document.getElementsByName('email');
+if (emails != null && emails.length > 0) {
+	emails[0].setAttribute('autocomplete', 'off');
+}
+var sites = document.getElementsByName('website');
+if (sites != null && sites.length > 0) {
+	sites[0].setAttribute('autocomplete', 'off');
+}
+</script>
 </div>
 </body>
 </html>
