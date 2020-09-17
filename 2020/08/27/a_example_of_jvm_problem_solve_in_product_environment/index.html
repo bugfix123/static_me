@@ -76,36 +76,36 @@
 <h1 id="背景">背景<a arialabel="Anchor" class="hanchor" href="#背景">⌗</a> </h1>
 <p>公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。因为并发不高，所以线上一共部署了2个tomcat进行负载均衡。这个tomcat刚上生产线，运行挺平稳。大概过了大概1天后，运维同事反映2个tomcat节点均挂了，无法接受新的请求了，CPU 飙升到 100%！</p>
 <h1 id="排查过程一">排查过程一<a arialabel="Anchor" class="hanchor" href="#排查过程一">⌗</a> </h1>
-<p>接手这个问题后，首先大致看了下当时的JVM监控，CPU的确居高不下:
-<a href="#5afe48689bb924d569aea81d3eaca7d5-lightbox">
+<p>接手这个问题后，首先大致看了下当时的JVM监控，CPU的确居高不下:</p>
+<p><a href="#5afe48689bb924d569aea81d3eaca7d5-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png"/>
 </a>
 <a class="lightbox" href="#_" id="5afe48689bb924d569aea81d3eaca7d5-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png"/>
 </a></p>
-<p>FULL GC从大概这个小时的22分开始，就开始频繁的进行FULL GC，一分钟最高能进行10次FULL GC:
-<a href="#538f6c04d5981491bf8bd402ba5cce29-lightbox">
+<p>FULL GC从大概这个小时的22分开始，就开始频繁的进行FULL GC，一分钟最高能进行10次FULL GC:</p>
+<p><a href="#538f6c04d5981491bf8bd402ba5cce29-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_02.png"/>
 </a>
 <a class="lightbox" href="#_" id="538f6c04d5981491bf8bd402ba5cce29-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_02.png"/>
 </a></p>
-<p>minor GC每分钟竟然接近60次，相当于每秒钟都有minor GC。如图：
-<a href="#64dcbbf45dda1dad1a13b1a8fa2788e2-lightbox">
+<p>minor GC每分钟竟然接近60次，相当于每秒钟都有minor GC。如图：</p>
+<p><a href="#64dcbbf45dda1dad1a13b1a8fa2788e2-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_03.png"/>
 </a>
 <a class="lightbox" href="#_" id="64dcbbf45dda1dad1a13b1a8fa2788e2-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_03.png"/>
 </a></p>
-<p>同时，从老年代的使用情况也反映了这一点:
-<a href="#deaa17a1b5277ca71c7f48e275210b17-lightbox">
+<p>同时，从老年代的使用情况也反映了这一点:</p>
+<p><a href="#deaa17a1b5277ca71c7f48e275210b17-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_04.png"/>
 </a>
 <a class="lightbox" href="#_" id="deaa17a1b5277ca71c7f48e275210b17-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_04.png"/>
 </a></p>
-<p>接着，随机对线上应用分析了线程的cpu占用情况，用<code>top -H -p pid</code> 命令:
-<a href="#6275e11d50ef54b58cc405e3819b0fe8-lightbox">
+<p>接着，随机对线上应用分析了线程的cpu占用情况，用<code>top -H -p pid</code> 命令:</p>
+<p><a href="#6275e11d50ef54b58cc405e3819b0fe8-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_05.png"/>
 </a>
 <a class="lightbox" href="#_" id="6275e11d50ef54b58cc405e3819b0fe8-lightbox">
@@ -117,8 +117,8 @@
 <p>分析完了案发现场。要解决的问题变成了：<strong>是什么原因导致老年代被快速的填满？</strong> 拉了下当时的JVM参数:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms2048m -Xmx4096m -Xmn2048m -Xss512k -XX:MetaspaceSize=512m -XX:MaxMetaspaceSize=512m -XX:+DisableExx plicitGC -XX:MaxTenuringThreshold=5 -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseCMSCompactAtFullCollection
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>-XX:+PrintGCDetails -Xloggc:/data/logs/gc.log
-</code></pre></div><p>总共4个G的堆，年轻代单独给了2个G，按照比率算，JVM 内存各个区的分配情况如下：
-<a href="#2200fea659afc9165b0e4372da9ad9f9-lightbox">
+</code></pre></div><p>总共4个G的堆，年轻代单独给了2个G，按照比率算，JVM 内存各个区的分配情况如下：</p>
+<p><a href="#2200fea659afc9165b0e4372da9ad9f9-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_06.png"/>
 </a>
 <a class="lightbox" href="#_" id="2200fea659afc9165b0e4372da9ad9f9-lightbox">
@@ -140,8 +140,8 @@
 <p>程序并发不高，但是在几分钟之内，在Eden区产生了大量的对象，并且这些对象无法被minor GC回收 ，由于太大，触发了大对象直接进老年代机制，老年代会迅速填满，导致FULL GC和后面CPU的飙升，从而导致tomcat的宕机。</p>
 <p>基本判断是，JVM参数应该没有问题，很可能问题出在应用本身不断产生无法被回收的对象上面。但是我暂时定位不到具体的代码位置。</p>
 <h1 id="排查过程二">排查过程二<a arialabel="Anchor" class="hanchor" href="#排查过程二">⌗</a> </h1>
-<p>第二天，又看了下当时的JVM监控，发现有这么一个监控数据当时漏看了:
-<a href="#d9202a7c020ac87b2ecddb2092513a79-lightbox">
+<p>第二天，又看了下当时的JVM监控，发现有这么一个监控数据当时漏看了:</p>
+<p><a href="#d9202a7c020ac87b2ecddb2092513a79-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_08.png"/>
 </a>
 <a class="lightbox" href="#_" id="d9202a7c020ac87b2ecddb2092513a79-lightbox">
@@ -158,15 +158,15 @@
 <a class="lightbox" href="#_" id="466fc74e8d77169778d7182c126c4466-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_09.png"/>
 </a></p>
-<p>发现导致堆溢出，就是这个String对象，和之前Jmap 得出的结果一样，超过了2个G，并且无法被回收。随即看大对象视图，发现这些个String对象都是被<strong>java.util.ArrayList</strong>引用着的，也就是有一个ArrayList里，引用了超过2G的对象：
-<a href="#a14338349de3bce44b1bd48915b03a62-lightbox">
+<p>发现导致堆溢出，就是这个String对象，和之前Jmap 得出的结果一样，超过了2个G，并且无法被回收。随即看大对象视图，发现这些个String对象都是被<strong>java.util.ArrayList</strong>引用着的，也就是有一个ArrayList里，引用了超过2G的对象：</p>
+<p><a href="#a14338349de3bce44b1bd48915b03a62-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_10.png"/>
 </a>
 <a class="lightbox" href="#_" id="a14338349de3bce44b1bd48915b03a62-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_10.png"/>
 </a></p>
-<p>然后查看引用的关系图，往上溯源，源头终于显形：
-<a href="#868010db355db337eb5e341acebaf670-lightbox">
+<p>然后查看引用的关系图，往上溯源，源头终于显形：</p>
+<p><a href="#868010db355db337eb5e341acebaf670-lightbox">
 <img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_11.png"/>
 </a>
 <a class="lightbox" href="#_" id="868010db355db337eb5e341acebaf670-lightbox">
@@ -220,21 +220,22 @@ padding: 5px auto;margin: 10px auto;*/
 ">
 <section data-isso-id="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" data-title="记一次公司JVM堆溢出抽丝剥茧定位的过程" id="isso-thread"></section>
 <script async="" data-isso="https://isso.dongzhi.me" data-isso-avatar="true" data-isso-avatar-bg="#f0f0f0" data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..." data-isso-css="false" data-isso-feed="false" data-isso-id="thread-id" data-isso-lang="zh" data-isso-max-comments-nested="5" data-isso-max-comments-top="10" data-isso-reply-notifications="true" data-isso-reply-to-self="true" data-isso-require-author="true" data-isso-require-email="true" data-isso-reveal-on-click="5" data-isso-vote="false" data-isso-vote-levels="" onload="setAutoCompleteProperty()" src="https://isso.dongzhi.me/js/embed.min.js"></script>
-	
+<script>
 	function setAutoCompleteProperty() {
 		var authors = document.getElementsByName('author');
-		if (authors != null &amp;&amp; authors.length &gt; 0) {
+		if (authors != null && authors.length > 0) {
 			authors[0].setAttribute('autocomplete', 'off');
 		}
 		var emails = document.getElementsByName('email');
-		if (emails != null &amp;&amp; emails.length &gt; 0) {
+		if (emails != null && emails.length > 0) {
 			emails[0].setAttribute('autocomplete', 'off');
 		}
 		var sites = document.getElementsByName('website');
-		if (sites != null &amp;&amp; sites.length &gt; 0) {
+		if (sites != null && sites.length > 0) {
 			sites[0].setAttribute('autocomplete', 'off');
 		}
 	}
+	</script>
 </aside>
 </div>
 </div>

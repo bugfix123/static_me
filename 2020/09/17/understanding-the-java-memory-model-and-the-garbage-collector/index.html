@@ -113,16 +113,16 @@
 </li>
 </ul>
 <p>现在我们来讨论垃圾收集过程(the garbage collection process)。JVM单独使用一个守护线程来进行垃圾收集。正如上文所述，当应用程序创建对象的时候，JVM将尝试从Eden Space(伊甸区)获取所需要的内存。JVM执行GC比如minor GC和major GC。</p>
-<p>我们来理解一下minor GC。
-<a href="#f8d75b996826a1b416c19c18cdb6d0d3-lightbox">
+<p>我们来理解一下minor GC。</p>
+<p><a href="#f8d75b996826a1b416c19c18cdb6d0d3-lightbox">
 <img alt="garbage-collector-02.png" src="/post/images/2020/09/garbage-collector-02.png"/>
 </a>
 <a class="lightbox" href="#_" id="f8d75b996826a1b416c19c18cdb6d0d3-lightbox">
 <img alt="garbage-collector-02.png" src="/post/images/2020/09/garbage-collector-02.png"/>
 </a></p>
 <p>初始时<code>Survivor Space(幸存区)</code>和<code>Tenured Space(老年代)</code>是空的。当JVM不能从Eden Space(伊甸区)获得内存时就会启动minor GC。在minor GC过程中，那些<strong>不可达的</strong>对象被标记为<strong>待回收的</strong>。
-JVM选择Survivor Space(幸存区)中的一块作为"<code>To Space</code>”，可能是S0，也可能是S1。JVM将所有可达的对象复制到"To Space”(假设S0)并将对象年龄增加1，那些无法存放在Survivor Space中的对象将被移动到Tenured Space，这个过程称为"premature promotion”(过早提升)。下图中我故意让“To Space” 比已经分配的空间大，但是请记住，Survivor Space大小不会增长。
-<a href="#88f4db96e0d7ce609ed81d30e5e8ce3f-lightbox">
+JVM选择Survivor Space(幸存区)中的一块作为"<code>To Space</code>”，可能是S0，也可能是S1。JVM将所有可达的对象复制到"<code>To Space</code>”(假设S0)并将对象年龄增加1，那些无法存放在Survivor Space中的对象将被移动到Tenured Space，这个过程称为"premature promotion”(过早提升)。下图中我故意让“<code>To Space</code>” 比已经分配的空间大，但是请记住，Survivor Space大小不会增长。</p>
+<p><a href="#88f4db96e0d7ce609ed81d30e5e8ce3f-lightbox">
 <img alt="garbage-collector-03.png" src="/post/images/2020/09/garbage-collector-03.png"/>
 </a>
 <a class="lightbox" href="#_" id="88f4db96e0d7ce609ed81d30e5e8ce3f-lightbox">
@@ -143,8 +143,8 @@ JVM选择Survivor Space(幸存区)中的一块作为"<code>To Space</code>”，
 <a class="lightbox" href="#_" id="41b444dc8065088cbafe4dd4d6dd6de1-lightbox">
 <img alt="garbage-collector-05.png" src="/post/images/2020/09/garbage-collector-05.png"/>
 </a></p>
-<p>对于每一次minor GC重复上述过程，当对象的年龄到达最大年龄阈值(the max age threshold)就会被复制到Tenured Space。
-<a href="#625d2ec6016acc786c37a7683bf636b5-lightbox">
+<p>对于每一次minor GC重复上述过程，当对象的年龄到达最大年龄阈值(the max age threshold)就会被复制到Tenured Space。</p>
+<p><a href="#625d2ec6016acc786c37a7683bf636b5-lightbox">
 <img alt="garbage-collector-06.png" src="/post/images/2020/09/garbage-collector-06.png"/>
 </a>
 <a class="lightbox" href="#_" id="625d2ec6016acc786c37a7683bf636b5-lightbox">
@@ -161,7 +161,7 @@ JVM选择Survivor Space(幸存区)中的一块作为"<code>To Space</code>”，
 <li>如果设置了JVM参数MaxMetaspaceSize，并且没有足够的空间来加载新的类时，JVM就会触发magor GC</li>
 </ol>
 <blockquote>
-<p>翻译自https://dzone.com/articles/understanding-the-java-memory-model-and-the-garbag
+<p>翻译自https://dzone.com/articles/understanding-the-java-memory-model-and-the-garbag<br/>
 原文作者Siva Prasad Rao Janapati</p>
 </blockquote>
 </div></div>
@@ -186,21 +186,22 @@ padding: 5px auto;margin: 10px auto;*/
 ">
 <section data-isso-id="https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/" data-title="深入浅出理解Java垃圾收集过程" id="isso-thread"></section>
 <script async="" data-isso="https://isso.dongzhi.me" data-isso-avatar="true" data-isso-avatar-bg="#f0f0f0" data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..." data-isso-css="false" data-isso-feed="false" data-isso-id="thread-id" data-isso-lang="zh" data-isso-max-comments-nested="5" data-isso-max-comments-top="10" data-isso-reply-notifications="true" data-isso-reply-to-self="true" data-isso-require-author="true" data-isso-require-email="true" data-isso-reveal-on-click="5" data-isso-vote="false" data-isso-vote-levels="" onload="setAutoCompleteProperty()" src="https://isso.dongzhi.me/js/embed.min.js"></script>
-	
+<script>
 	function setAutoCompleteProperty() {
 		var authors = document.getElementsByName('author');
-		if (authors != null &amp;&amp; authors.length &gt; 0) {
+		if (authors != null && authors.length > 0) {
 			authors[0].setAttribute('autocomplete', 'off');
 		}
 		var emails = document.getElementsByName('email');
-		if (emails != null &amp;&amp; emails.length &gt; 0) {
+		if (emails != null && emails.length > 0) {
 			emails[0].setAttribute('autocomplete', 'off');
 		}
 		var sites = document.getElementsByName('website');
-		if (sites != null &amp;&amp; sites.length &gt; 0) {
+		if (sites != null && sites.length > 0) {
 			sites[0].setAttribute('autocomplete', 'off');
 		}
 	}
+	</script>
 </aside>
 </div>
 </div>
