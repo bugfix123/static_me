@@ -100,9 +100,7 @@
 <img alt="记一次公司JVM堆溢出抽丝剥茧定位的过程" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png"/>
 <div class="post-content">
           
-          
-          背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为
-          
+          公司线上有个tomcat服务，里面合并部署了大概8个微服务，线上一共部署了2个tomcat进行负载均衡。这个tomcat刚上生产线，运行挺平稳。大概过了大概1天后，运维同事反映2个tomcat节点均挂了，无法接受新的请求了，CPU 飙升到 100%！
           
         </div>
 <div>

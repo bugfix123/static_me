@@ -52,7 +52,7 @@
 <link>https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/</link>
 <pubDate>Thu, 27 Aug 2020 20:09:50 +0800</pubDate>
 <guid>https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/</guid>
-<description>背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为</description>
+<description>背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。因为</description>
 </item>
 <item>
 <title>Some Useful Licences</title>
