@@ -3,27 +3,37 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://dongzhi.me/tags/jvm/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dongzhi.me/post/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dongzhi.me/tags/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dongzhi.me/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://dongzhi.me/2020/09/11/how-to-deploy-isso-on-centos-7/</loc>
     <lastmod>2020-09-11T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://dongzhi.me/tags/hugo/</loc>
-    <lastmod>2020-09-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://dongzhi.me/post/</loc>
-    <lastmod>2020-09-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://dongzhi.me/tags/</loc>
-    <lastmod>2020-09-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://dongzhi.me/</loc>
     <lastmod>2020-09-11T00:00:00+00:00</lastmod>
   </url>
   
@@ -40,11 +50,6 @@
   <url>
     <loc>https://dongzhi.me/2020/09/08/add-search-for-hugo/</loc>
     <lastmod>2020-09-08T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://dongzhi.me/tags/jvm/</loc>
-    <lastmod>2020-08-27T20:09:50+08:00</lastmod>
   </url>
   
   <url>

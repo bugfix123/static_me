@@ -61,6 +61,29 @@
 <div class="posts">
 <div class="post on-list">
 <h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/09/jvm-learn-16/">JVM Learn 16 一个线程死锁的例子及问题排查</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-09
+          </span>
+<span class="post-author">::Joe John</span>
+</div>
+<a href="/2020/07/09/jvm-learn-16/">
+<img alt="JVM Learn 16 一个线程死锁的例子及问题排查" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/thread_life_cycle.png"/>
+</a>
+<div class="post-content">
+<h2 id="死锁示例">死锁示例</h2>
+<p>这次记录一个线程死锁的例子。直接上代码：
+          
+          
+        </p></div>
+<div>
+<a class="read-more button" href="/2020/07/09/jvm-learn-16/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
 <a href="https://dongzhi.me/2020/07/09/jvm-learn-17/">JVM Learn 17 JVM内存排查相关命令用法</a>
 </h1>
 <div class="post-meta">
@@ -139,32 +162,6 @@
 <a class="read-more button" href="/2020/07/09/jvm-learn-20/">Read more →</a>
 </div>
 </div>
-<div class="post on-list">
-<h1 class="post-title">
-<a href="https://dongzhi.me/2020/07/07/jvm-learn-08/">JVM Learn 08 线程上下文类加载器和Service Loader</a>
-</h1>
-<div class="post-meta">
-<span class="post-date">
-            2020-07-07
-          </span>
-<span class="post-author">::John Doe</span>
-</div>
-<span class="post-tags">
-            
-            #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
-            
-          </span>
-<div class="post-content">
-          
-          
-          双亲委托机制的局限性 当一个类由类加载器A加载，那么这个类的依赖类也由相同的类加载器加载器，在双亲委托模型下，类的加载是自上而下的，即下层的类加载器会委托上层加载。对于SPI来说，很多接口是由JAVA核
-          
-          
-        </div>
-<div>
-<a class="read-more button" href="/2020/07/07/jvm-learn-08/">Read more →</a>
-</div>
-</div>
 <div class="pagination">
 <div class="pagination__buttons">
 <span class="button previous">
@@ -193,20 +190,10 @@
 </footer>
 <script src="https://dongzhi.me/assets/main.js"></script>
 <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script>
-<!-- fix isso comment input box cache -->
-var authors = document.getElementsByName('author');
-if (authors != null && authors.length > 0) {
-	authors[0].setAttribute('autocomplete', 'off');
-}
-var emails = document.getElementsByName('email');
-if (emails != null && emails.length > 0) {
-	emails[0].setAttribute('autocomplete', 'off');
-}
-var sites = document.getElementsByName('website');
-if (sites != null && sites.length > 0) {
-	sites[0].setAttribute('autocomplete', 'off');
-}
+<script src="/vconsole.min.js"></script>
+<script>  
+  var vConsole = new VConsole();
+  console.log('Hello world');
 </script>
 </div>
 </body>

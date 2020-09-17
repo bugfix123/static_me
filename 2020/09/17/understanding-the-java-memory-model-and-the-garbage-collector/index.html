@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>深入浅出理解Java垃圾收集过程 :: 志哥笔记 — 记述码农在家的故事！</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="在这篇文章中我们将尝试搞清楚Java内存模型以及垃圾收集器是如何工作的。在这篇文章中我使用的是JDK8 Oracle Hot Spot 64 bit版本的JVM。首先我描述 一下Java进程使用的不同内存区域。
+" name="description"/>
+<meta content="前沿技术,IT博客,技术笔记,IT Share" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://dongzhi.me/assets/blue.css" rel="stylesheet"/>
+<link href="/img/favicon/favicon_io/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="/img/favicon/favicon_io/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/img/favicon/favicon_io/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="/img/favicon/favicon_io/site.webmanifest" rel="manifest"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="深入浅出理解Java垃圾收集过程 :: 志哥笔记" property="og:title"/>
+<meta content="在这篇文章中我们将尝试搞清楚Java内存模型以及垃圾收集器是如何工作的。在这篇文章中我使用的是JDK8 Oracle Hot Spot 64 bit版本的JVM。首先我描述 一下Java进程使用的不同内存区域。
+" property="og:description"/>
+<meta content="https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/" property="og:url"/>
+<meta content="深入浅出理解Java垃圾收集过程" property="og:site_name"/>
+<meta content="https://dongzhi.me/img/favicon/blue.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-09-17 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/">深入浅出理解Java垃圾收集过程</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-09-17 
+      </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://dongzhi.me/tags/jvm/">JVM</a> 
+    
+  </span>
+<div class="post-content"><div>
+<p>在这篇文章中我们将尝试搞清楚Java内存模型以及垃圾收集器是如何工作的。在这篇文章中我使用的是JDK8 Oracle Hot Spot 64 bit版本的JVM。首先我描述
+一下Java进程使用的不同内存区域。</p>
+<p><a href="/post/images/2020/09/garbage-collector-01.png">garbage-collector-01.png</a>
+一旦我们启动了JVM，操作系统就会为Java进程分配内存。这里JVM自身就是一个进程，操作系统分配给它的内存包括Heap(堆), Meta Space(元空间), JIT code cache(JIT代码缓存),
+thread stacks(线程栈),shared libraries(共享类库)。我们称这部分内存为<code>Native Memory</code>,<code>Native Memory</code>指的是由操作系统分配给Java进程的内存。
+操作系统给Java进程分配多少内存取决于操作系统本身、处理器和JRE。我们来阐述一下对于JVM可用的各部分内存块。</p>
+<ul>
+<li>
+<p>Heap Memory(堆): JVM使用这部分内存存储对象，这部分内存划分为两块不同的内存区域：<code>Young Generation Space</code>(年轻代)和<code>Tenured Space</code>(老年代).</p>
+</li>
+<li>
+<p>Young Generation(年轻代): Young Generation(或称为the New Space)被划分为两部分:<code>Eden Space</code>和<code>Survivor Space</code>.</p>
+</li>
+<li>
+<p>Eden Space(伊甸区):当创建对象的时候, 内存会分配在Eden Space.</p>
+</li>
+<li>
+<p>Survivor Space(幸存区): 这里容纳从Minor GC(或称为the Young garbage collection)中幸存下来的对象，我们把幸存区划分为两块相同大小的区域：S0和S1.</p>
+</li>
+<li>
+<p>Tenured Space(老年代): 在minor GC或young GC过程中，如对象达到最大年龄阈值(max tenured threshold)，将会被移动到<code>Tenured Space</code>(或称为<code>Old Generation Space</code>).</p>
+</li>
+</ul>
+<p>当我们稍后讨论垃圾收集过程的时候就会知道上述的内存区域是如何使用的。</p>
+<ul>
+<li>
+<p>Meta Space(元空间): 这块内存是堆外内存、本地内存的一部分。根据文档默认情况下Meta Space没有上限。在早期的JDK版本中称为<code>Perm Gen Space</code>，这部分内存用于
+存放由类加载器加载的类，这个设计是防止出现OOM错误的出现。然而，如果占用的内存超过剩余的物理内存，操作系统将会使用虚拟内存。物理内存和虚拟内存之间的数据交换是
+一个巨大的开销，会影响到应用的性能。我们可以设置JVM的参数来限制Meta Space的大小，在这种情况下就可能出现OOM错误。</p>
+</li>
+<li>
+<p>Code Cache(代码缓存): JVM使用解释器来解释字节码，并将其转换为硬件相关的机器码。作为JVM优化的一部分，the Just In Time (JIT) compiler被引入进来。JIT将频繁访问的代码块编译成
+本地代码(native code)，并将其存储在Code Cache中。JIT编译过的代码不会被解释。</p>
+</li>
+</ul>
+<p>现在我们来讨论垃圾收集过程(the garbage collection process)。JVM单独使用一个守护线程来进行垃圾收集。正如上文所述，当应用程序创建对象的时候，JVM将尝试从Eden Space(伊甸区)获取所需要
+的内存。JVM执行GC比如minor GC和major GC。我们来理解一下minor GC。
+<a href="/post/images/2020/09/garbage-collector-02.png">garbage-collector-02.png</a></p>
+<p>初始时Survivor Space(幸存区)和Tenured Space(老年代)是空的。当JVM不能从Eden Space(伊甸区)获得内存时就会启动minor GC。在minor GC过程中，那些<strong>不可达的</strong>对象被标记为<strong>待回收的</strong>。
+JVM选择Survivor Space(幸存区)中的一块作为"To Space”，可能是S0，也可能是S1。JVM将所有可达的对象复制到"To Space”(假设S0)并将对象年龄增加1，那些无法
+存放在Survivor Space中的对象将被移动到Tenured Space，这个过程称为"premature promotion”(过早提升)。下图中我故意让“To Space” 比已经分配的空间大，但是请记住，
+Survivor Space大小不会增长。
+<a href="/post/images/2020/09/garbage-collector-03.png">garbage-collector-03.png</a></p>
+<p>在上图中，被标记为红色的对象表示他们是不可达的。所有可达的对象都是GC roots，垃圾收集器不会移除GC roots，而是移除不可达的对象并清空Eden Space。</p>
+<p>再一次进行minor GC时，垃圾收集器标记Eden Space和To Survivor Space(S0)中不可达的对象，将GC roots复制到另外一块幸存区空间S1，与此同时，可达的对象的年龄
+将增加1。
+<a href="/post/images/2020/09/garbage-collector-04.png">garbage-collector-04.png</a></p>
+<p>在上图中，被标记为红色的对象有资格被GC，Eden Space和survivor spaces空间中其他的对象将被复制到另一块幸存区S1，同时对象年龄加1.
+<a href="/post/images/2020/09/garbage-collector-05.png">garbage-collector-05.png</a></p>
+<p>对于每一次minor GC重复上述过程，当对象的年龄到达最大年龄阈值(the max age threshold)就会被复制到Tenured Space。
+<a href="/post/images/2020/09/garbage-collector-06.png">garbage-collector-06.png</a></p>
+<p>这里有一个叫做<code>MaxTenuringThreshold</code>的JVM选项，它用于指定对象提升到Tenured Space的年龄阈值，默认值是15.</p>
+<p>因此，很清楚地是minor GC从<code>Young Generation Space</code>(年轻代)回收内存，这是一个"stop the world"的过程，有时候应用程序的停顿是可以忽略不计的。
+minor GC根据所使用的收集器可以单线程或多线程执行垃圾收集。</p>
+<p>经过多次minor GC，最终Tenured Space会被填满，这时需要进行更多垃圾收集。此时JVM触发<code>major GC</code>，也称为Full GC。但是作为Full GC的一部分，JVM会从Meta Space中
+回收内存。如果堆中没有对象的话，Meta Space(元空间)中已经加加载的类会被移除。</p>
+<p>现在我们来看看JVM触发minor GC的时机：</p>
+<ol>
+<li>如果开发人员调用System.gc(), 或Runtime.getRunTime().gc()暗示JVM启动GC</li>
+<li>如果JVM判定没有足够的老年代空间了</li>
+<li>在minor GC中，如果JVM不能从Eden Space或Survivor Space中回收足够的内存，就会触发magor GC</li>
+<li>如果设置了JVM参数MaxMetaspaceSize，并且没有足够的空间来加载新的类时，JVM就会触发magor GC</li>
+</ol>
+<blockquote>
+<p>翻译自https://dzone.com/articles/understanding-the-java-memory-model-and-the-garbag，原文作者Siva Prasad Rao Janapati</p>
+</blockquote>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button next">
+<a href="https://dongzhi.me/2020/09/11/how-to-deploy-isso-on-centos-7/">
+<span class="button__text">CentOS7上部署开源评论系统ISSO</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<section data-isso-id="https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/" data-title="深入浅出理解Java垃圾收集过程" id="isso-thread"></section>
+<script async="" data-isso="https://isso.dongzhi.me" data-isso-avatar="true" data-isso-avatar-bg="#f0f0f0" data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..." data-isso-css="false" data-isso-feed="false" data-isso-id="thread-id" data-isso-lang="zh" data-isso-max-comments-nested="5" data-isso-max-comments-top="10" data-isso-reply-notifications="true" data-isso-reply-to-self="true" data-isso-require-author="true" data-isso-require-email="true" data-isso-reveal-on-click="5" data-isso-vote="false" data-isso-vote-levels="" onload="setAutoCompleteProperty()" src="https://isso.dongzhi.me/js/embed.min.js"></script>
+	
+	function setAutoCompleteProperty() {
+		var authors = document.getElementsByName('author');
+		if (authors != null &amp;&amp; authors.length &gt; 0) {
+			authors[0].setAttribute('autocomplete', 'off');
+		}
+		var emails = document.getElementsByName('email');
+		if (emails != null &amp;&amp; emails.length &gt; 0) {
+			emails[0].setAttribute('autocomplete', 'off');
+		}
+		var sites = document.getElementsByName('website');
+		if (sites != null &amp;&amp; sites.length &gt; 0) {
+			sites[0].setAttribute('autocomplete', 'off');
+		}
+	}
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 <a href="https://dongzhi.me/">志哥笔记</a></span>
+<span style="margin-right: 10px;">:: Theme by <a href="https://themes.gohugo.io/hugo-theme-terminal/">panr</a></span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+<script src="/vconsole.min.js"></script>
+<script>  
+  var vConsole = new VConsole();
+  console.log('Hello world');
+</script>
+</div>
+</body>
+</html>

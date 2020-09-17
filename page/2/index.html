@@ -61,6 +61,34 @@
 <div class="posts">
 <div class="post on-list">
 <h1 class="post-title">
+<a href="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/">记一次公司JVM堆溢出抽丝剥茧定位的过程</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-08-27
+          </span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<a href="/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/">
+<img alt="记一次公司JVM堆溢出抽丝剥茧定位的过程" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png"/>
+</a>
+<div class="post-content">
+          
+          
+          背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。 因为
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
 <a href="https://dongzhi.me/2020/08/04/some-useful-licences/">Some Useful Licences</a>
 </h1>
 <div class="post-meta">
@@ -161,29 +189,6 @@
 <a class="read-more button" href="/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/">Read more →</a>
 </div>
 </div>
-<div class="post on-list">
-<h1 class="post-title">
-<a href="https://dongzhi.me/2020/07/09/jvm-learn-16/">JVM Learn 16 一个线程死锁的例子及问题排查</a>
-</h1>
-<div class="post-meta">
-<span class="post-date">
-            2020-07-09
-          </span>
-<span class="post-author">::Joe John</span>
-</div>
-<a href="/2020/07/09/jvm-learn-16/">
-<img alt="JVM Learn 16 一个线程死锁的例子及问题排查" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/thread_life_cycle.png"/>
-</a>
-<div class="post-content">
-<h2 id="死锁示例">死锁示例</h2>
-<p>这次记录一个线程死锁的例子。直接上代码：
-          
-          
-        </p></div>
-<div>
-<a class="read-more button" href="/2020/07/09/jvm-learn-16/">Read more →</a>
-</div>
-</div>
 <div class="pagination">
 <div class="pagination__buttons">
 <span class="button previous">
@@ -212,20 +217,10 @@
 </footer>
 <script src="https://dongzhi.me/assets/main.js"></script>
 <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script>
-<!-- fix isso comment input box cache -->
-var authors = document.getElementsByName('author');
-if (authors != null && authors.length > 0) {
-	authors[0].setAttribute('autocomplete', 'off');
-}
-var emails = document.getElementsByName('email');
-if (emails != null && emails.length > 0) {
-	emails[0].setAttribute('autocomplete', 'off');
-}
-var sites = document.getElementsByName('website');
-if (sites != null && sites.length > 0) {
-	sites[0].setAttribute('autocomplete', 'off');
-}
+<script src="/vconsole.min.js"></script>
+<script>  
+  var vConsole = new VConsole();
+  console.log('Hello world');
 </script>
 </div>
 </body>

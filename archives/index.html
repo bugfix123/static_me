@@ -72,6 +72,10 @@ The theme includes:
 <h2>2020</h2>
 <table class="all-posts">
 <tr>
+<td style="width:35%">2020-09-17</td>
+<td><a class="no-underline" href="https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/" style="text-decoration: none;">深入浅出理解Java垃圾收集过程</a></td>
+</tr>
+<tr>
 <td style="width:35%">2020-09-11</td>
 <td><a class="no-underline" href="https://dongzhi.me/2020/09/11/how-to-deploy-isso-on-centos-7/" style="text-decoration: none;">CentOS7上部署开源评论系统ISSO</a></td>
 </tr>
@@ -278,20 +282,10 @@ The theme includes:
 </footer>
 <script src="https://dongzhi.me/assets/main.js"></script>
 <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script>
-<!-- fix isso comment input box cache -->
-var authors = document.getElementsByName('author');
-if (authors != null && authors.length > 0) {
-	authors[0].setAttribute('autocomplete', 'off');
-}
-var emails = document.getElementsByName('email');
-if (emails != null && emails.length > 0) {
-	emails[0].setAttribute('autocomplete', 'off');
-}
-var sites = document.getElementsByName('website');
-if (sites != null && sites.length > 0) {
-	sites[0].setAttribute('autocomplete', 'off');
-}
+<script src="/vconsole.min.js"></script>
+<script>  
+  var vConsole = new VConsole();
+  console.log('Hello world');
 </script>
 </div>
 </body>

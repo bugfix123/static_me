@@ -60,6 +60,32 @@
 <div class="posts">
 <div class="post on-list">
 <h1 class="post-title">
+<a href="https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/">深入浅出理解Java垃圾收集过程</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-09-17
+          </span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://dongzhi.me/tags/jvm/">JVM</a> 
+            
+          </span>
+<div class="post-content">
+          
+          
+          在这篇文章中我们将尝试搞清楚Java内存模型以及垃圾收集器是如何工作的。在这篇文章中我使用的是JDK8 Oracle Hot Spot 64 bit版本的JVM。首先我描述
+一下Java进程使用的不同内存区域。
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
 <a href="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/">记一次公司JVM堆溢出抽丝剥茧定位的过程</a>
 </h1>
 <div class="post-meta">
@@ -489,20 +515,10 @@
 </footer>
 <script src="https://dongzhi.me/assets/main.js"></script>
 <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script>
-<!-- fix isso comment input box cache -->
-var authors = document.getElementsByName('author');
-if (authors != null && authors.length > 0) {
-	authors[0].setAttribute('autocomplete', 'off');
-}
-var emails = document.getElementsByName('email');
-if (emails != null && emails.length > 0) {
-	emails[0].setAttribute('autocomplete', 'off');
-}
-var sites = document.getElementsByName('website');
-if (sites != null && sites.length > 0) {
-	sites[0].setAttribute('autocomplete', 'off');
-}
+<script src="/vconsole.min.js"></script>
+<script>  
+  var vConsole = new VConsole();
+  console.log('Hello world');
 </script>
 </div>
 </body>
