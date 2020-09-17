@@ -13,8 +13,7 @@
 <link>https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/</link>
 <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
 <guid>https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/</guid>
-<description>&lt;p&gt;在这篇文章中我们将尝试搞清楚Java内存模型以及垃圾收集器是如何工作的。在这篇文章中我使用的是JDK8 Oracle Hot Spot 64 bit版本的JVM。首先我描述
-一下Java进程使用的不同内存区域。&lt;/p&gt;</description>
+<description>&lt;p&gt;在这篇文章中我们将尝试搞清楚Java内存模型以及垃圾收集器是如何工作的。在这篇文章中我使用的是JDK8 Oracle Hot Spot 64 bit版本的JVM。首先我描述一下Java进程使用的不同内存区域。&lt;/p&gt;</description>
 </item>
 <item>
 <title>CentOS7上部署开源评论系统ISSO</title>

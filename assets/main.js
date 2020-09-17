@@ -117,6 +117,7 @@ function addCopyButtons(clipboard) {
           button.innerText = 'Copy';
         }, 2000);
       }, function (error) {
+        console.log(error);
         button.innerText = 'Error';
       });
     });
