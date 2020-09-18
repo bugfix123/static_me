@@ -6,10 +6,19 @@
     <description>Recent content in Posts on 志哥笔记</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 17 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 18 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://dongzhi.me/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>GC日志探究</title>
+      <link>https://dongzhi.me/2020/09/18/gc-log/</link>
+      <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://dongzhi.me/2020/09/18/gc-log/</guid>
+      <description>JVM中新创建的对象在Eden区分配内存，Eden区空间不足时，触发minorGC回收内存，对于一些大对象则直接分配在老年代，那么这里所谓的大对象到底是多大呢？本文将用测试结果回答这个问题！ 验证目标 本</description>
+    </item>
     
     <item>
       <title>深入浅出理解Java垃圾收集过程</title>

@@ -61,6 +61,30 @@
 <div class="posts">
 <div class="post on-list">
 <h1 class="post-title">
+<a href="https://dongzhi.me/2020/07/06/jvm-learn-02/">JVM Learn 02 常量的那点东西</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-07-06
+          </span>
+<span class="post-author">::John Doe</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
+            
+          </span>
+<div class="post-content">
+          
+          常量在编译阶段会存入调用这个常量的方法所在类的常量池中，本质上调用类并没有直接引用定义常量的类，因此并不会出发定义常量类的初始化。如果该常量值时动态生成的，则不会放在常量池中，会导致定义常量的类主动使用并初始化。
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/07/06/jvm-learn-02/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
 <a href="https://dongzhi.me/2020/07/06/jvm-learn-03/">JVM Learn 03 理解类的初始化的一个简单例子</a>
 </h1>
 <div class="post-meta">
@@ -160,30 +184,6 @@
         </div>
 <div>
 <a class="read-more button" href="/2020/07/06/jvm-learn-06/">Read more →</a>
-</div>
-</div>
-<div class="post on-list">
-<h1 class="post-title">
-<a href="https://dongzhi.me/2020/07/06/jvm-learn-07/">JVM Learn 07 Launcher源码解析</a>
-</h1>
-<div class="post-meta">
-<span class="post-date">
-            2020-07-06
-          </span>
-<span class="post-author">::John Doe</span>
-</div>
-<span class="post-tags">
-            
-            #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
-            
-          </span>
-<div class="post-content">
-<blockquote>
-<p>这次重新阅读了一下sun.misc.Launcher这个类的源码，这里总结一下。</p>
-</blockquote>
-</div>
-<div>
-<a class="read-more button" href="/2020/07/06/jvm-learn-07/">Read more →</a>
 </div>
 </div>
 <div class="pagination">
