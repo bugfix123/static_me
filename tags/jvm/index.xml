@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>JVM on 志哥笔记</title>
+    <title>jvm on 志哥笔记</title>
     <link>https://dongzhi.me/tags/jvm/</link>
-    <description>Recent content in JVM on 志哥笔记</description>
+    <description>Recent content in jvm on 志哥笔记</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 18 Sep 2020 00:00:00 +0000</lastBuildDate>
@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>GC日志探究</title>
-      <link>https://dongzhi.me/2020/09/18/gc-log/</link>
+      <title>JVM中晋升到老年代的大对象到底多大</title>
+      <link>https://dongzhi.me/2020/09/18/jvm-log-big-object-alloc/</link>
       <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://dongzhi.me/2020/09/18/gc-log/</guid>
+      <guid>https://dongzhi.me/2020/09/18/jvm-log-big-object-alloc/</guid>
       <description>JVM中新创建的对象在Eden区分配内存，Eden区空间不足时，触发minorGC回收内存，对于一些大对象则直接分配在老年代，那么这里所谓的大对象到底是多大呢？本文将用测试结果回答这个问题！ 验证目标 本</description>
     </item>
     

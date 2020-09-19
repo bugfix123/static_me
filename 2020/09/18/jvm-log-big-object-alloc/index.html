@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>JVM中晋升到老年代的大对象到底多大 :: 志哥笔记 — 记述码农在家的故事！</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="JVM中新创建的对象在Eden区分配内存，Eden区空间不足时，触发minorGC回收内存，对于一些大对象则直接分配在老年代，那么这里所谓的大对象到底是多大呢？本文将用测试结果回答这个问题！ 验证目标 本" name="description"/>
+<meta content="前沿技术,IT博客,技术笔记,IT Share" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://dongzhi.me/2020/09/18/jvm-log-big-object-alloc/" rel="canonical"/>
+<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
+<link href="https://dongzhi.me/assets/blue.css" rel="stylesheet"/>
+<link href="/img/favicon/favicon_io/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="/img/favicon/favicon_io/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/img/favicon/favicon_io/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="/img/favicon/favicon_io/site.webmanifest" rel="manifest"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="JVM中晋升到老年代的大对象到底多大 :: 志哥笔记" property="og:title"/>
+<meta content="JVM中新创建的对象在Eden区分配内存，Eden区空间不足时，触发minorGC回收内存，对于一些大对象则直接分配在老年代，那么这里所谓的大对象到底是多大呢？本文将用测试结果回答这个问题！" property="og:description"/>
+<meta content="https://dongzhi.me/2020/09/18/jvm-log-big-object-alloc/" property="og:url"/>
+<meta content="JVM中晋升到老年代的大对象到底多大" property="og:site_name"/>
+<meta content="https://dongzhi.me/img/favicon/blue.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-09-18 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    DongZhi.ME
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://dongzhi.me/2020/09/18/jvm-log-big-object-alloc/">JVM中晋升到老年代的大对象到底多大</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-09-18 
+      </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://dongzhi.me/tags/jvm/">JVM</a> 
+    
+  </span>
+<div class="post-content"><div>
+<p>JVM中新创建的对象在Eden区分配内存，Eden区空间不足时，触发minorGC回收内存，对于一些大对象则直接分配在老年代，那么这里所谓的大对象到底是多大呢？本文将用测试结果回答这个问题！</p>
+<h1 id="验证目标">验证目标<a arialabel="Anchor" class="hanchor" href="#验证目标">⌗</a> </h1>
+<p>本文通过简单的例子，不断调大对象的大小来观察分配对象的大小如何影响到JVM的GC过程。</p>
+<h1 id="测试案例">测试案例<a arialabel="Anchor" class="hanchor" href="#测试案例">⌗</a> </h1>
+<p>测试例子代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> <span style="color:#a6e22e">messageSenderTest</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#a6e22e">public</span> <span style="color:#a6e22e">class</span> <span style="color:#a6e22e">JVMTest1</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>    <span style="color:#75715e">// java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCCause -XX:+PrintHeapAtGC -XX:SurvivorRatio=3 test.JVMTest
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">private</span> <span style="color:#a6e22e">static</span> <span style="color:#a6e22e">final</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">MB</span> = <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>; <span style="color:#75715e">// 1M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">private</span> <span style="color:#a6e22e">static</span> <span style="color:#a6e22e">final</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">KB</span> = <span style="color:#ae81ff">1024</span>; <span style="color:#75715e">// 1 kb
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">public</span> <span style="color:#a6e22e">static</span> <span style="color:#a6e22e">void</span> <span style="color:#a6e22e">main</span>(<span style="color:#a6e22e">String</span>[] <span style="color:#a6e22e">args</span>) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>        <span style="color:#a6e22e">System</span>.<span style="color:#a6e22e">out</span>.println(<span style="color:#e6db74">"before mark1"</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        <span style="color:#66d9ef">byte</span>[] <span style="color:#a6e22e">arr1</span> = <span style="color:#a6e22e">new</span> <span style="color:#66d9ef">byte</span>[<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">MB</span>];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        <span style="color:#a6e22e">System</span>.<span style="color:#a6e22e">out</span>.println(<span style="color:#e6db74">"before mark2"</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        <span style="color:#75715e">// 1.分配1MB  2.分配2MB  3.分配3071KB 4.分配3MB 5.分配4M 6.分配5M  7.分配6M  8.分配8M  9.分配10M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">byte</span>[] <span style="color:#a6e22e">arr2</span> = <span style="color:#a6e22e">new</span> <span style="color:#66d9ef">byte</span>[<span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">KB</span>];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>        <span style="color:#a6e22e">System</span>.<span style="color:#a6e22e">out</span>.println(<span style="color:#e6db74">"after mark2"</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>        <span style="color:#a6e22e">System</span>.<span style="color:#a6e22e">out</span>.println(<span style="color:#e6db74">"refSize:"</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">arr1</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">arr2</span>.<span style="color:#a6e22e">length</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>}
+</code></pre></div><p>JVM参数：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails  -XX:+PrintHeapAtGC -XX:SurvivorRatio=3 test.JVMTest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>
+</code></pre></div><p>其中，</p>
+<ul>
+<li>-Xms20m：堆的初始大小20m(memory size)</li>
+<li>-Xmx20m:堆的最大大小(memory max size)</li>
+<li>-Xmn10m:堆的新生代大小(memory new)</li>
+<li>-verbose:gc:打印GC日志，标准参数</li>
+<li>-XX:+PrintGCDetails: 打印GC日志，非标准参数</li>
+<li>-XX:+PrintHeapAtGC: 打印GC前后堆的信息</li>
+<li>-XX:SurvivorRatio=3： 新生代中Eden Space和From Space比例为3：1</li>
+</ul>
+<p>也是就说，堆的总大小20MB，新生代10MB，老年代10MB，其中，Eden区6MB，S0和S1各2MB。上面代码中先后创建2个字节数组arr1和arr2，arr1大小4MB，</p>
+<h1 id="基本内存消耗">基本内存消耗<a arialabel="Anchor" class="hanchor" href="#基本内存消耗">⌗</a> </h1>
+<p>注释main方法的所有内容，执行程序，发现堆空间自身占用了大约1MB左右的内存。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java <span style="color:#f92672">-</span>Xms20m <span style="color:#f92672">-</span>Xmx20m <span style="color:#f92672">-</span>Xmn10m <span style="color:#f92672">-</span>verbose<span style="color:#f92672">:</span>gc <span style="color:#f92672">-</span>XX<span style="color:#f92672">:+</span>PrintGCDetails  <span style="color:#f92672">-</span>XX<span style="color:#f92672">:+</span>PrintHeapAtGC <span style="color:#f92672">-</span>XX<span style="color:#f92672">:</span>SurvivorRatio<span style="color:#f92672">=</span>3 test<span style="color:#f92672">.</span><span style="color:#a6e22e">JVMTest</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span> PSYoungGen      total 8192K<span style="color:#f92672">,</span> used 1048K <span style="color:#f92672">[</span>0x00000000ff600000<span style="color:#f92672">,</span> 0x0000000100000000<span style="color:#f92672">,</span> 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>  eden space 6144K<span style="color:#f92672">,</span> 17<span style="color:#f92672">%</span> used <span style="color:#f92672">[</span>0x00000000ff600000<span style="color:#f92672">,</span>0x00000000ff706180<span style="color:#f92672">,</span>0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>  from space 2048K<span style="color:#f92672">,</span> 0<span style="color:#f92672">%</span> used <span style="color:#f92672">[</span>0x00000000ffe00000<span style="color:#f92672">,</span>0x00000000ffe00000<span style="color:#f92672">,</span>0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>  to   space 2048K<span style="color:#f92672">,</span> 0<span style="color:#f92672">%</span> used <span style="color:#f92672">[</span>0x00000000ffc00000<span style="color:#f92672">,</span>0x00000000ffc00000<span style="color:#f92672">,</span>0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span> ParOldGen       total 10240K<span style="color:#f92672">,</span> used 0K <span style="color:#f92672">[</span>0x00000000fec00000<span style="color:#f92672">,</span> 0x00000000ff600000<span style="color:#f92672">,</span> 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  object space 10240K<span style="color:#f92672">,</span> 0<span style="color:#f92672">%</span> used <span style="color:#f92672">[</span>0x00000000fec00000<span style="color:#f92672">,</span>0x00000000fec00000<span style="color:#f92672">,</span>0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span> Metaspace       used 2575K<span style="color:#f92672">,</span> capacity 4486K<span style="color:#f92672">,</span> committed 4864K<span style="color:#f92672">,</span> reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">space</span>    used 282K<span style="color:#f92672">,</span> capacity 386K<span style="color:#f92672">,</span> committed 512K<span style="color:#f92672">,</span> reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>
+</code></pre></div><p><code>PSYoungGen      total 8192K</code>表示新生代的大小是8M，为啥不是10M？Eden区大小6M，而S0和S1的大小分别2M，但是二者总有一个是空的，所以加起来8M！</p>
+<h1 id="分配1m大小的对象">分配1M大小的对象<a arialabel="Anchor" class="hanchor" href="#分配1m大小的对象">⌗</a> </h1>
+<p>字节数组arr1大小4MB，字节数组arr2大小1MB。代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark1"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>4 <span style="color:#f92672">*</span> MB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        <span style="color:#75715e">// 1.分配1MB  2.分配2MB  3.分配3071KB 4.分配3MB 5.分配4M 6.分配5M  7.分配6M  8.分配8M  9.分配10M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"after mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"refSize:"</span> <span style="color:#f92672">+</span> arr1<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">" "</span> <span style="color:#f92672">+</span> arr2<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>运行的结果为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails  -XX:+PrintHeapAtGC -XX:SurvivorRatio<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> test.JVMTest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>before mark1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>before mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>after mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>refSize:4194304 <span style="color:#ae81ff">1048576</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span> PSYoungGen      total 8192K, used 6144K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  eden space 6144K, 100% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ffc00000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span> ParOldGen       total 10240K, used 0K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  object space 10240K, 0% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000fec00000,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span> Metaspace       used 2577K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>  class space    used 282K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>
+</code></pre></div><p>字节数组arr1大小4M，自身1M左右，分配字节数组arr2的大小也是1M，没有执行GC说明Eden区刚好容纳得下。如果将arr2的大小改为2M为怎么样？</p>
+<h1 id="分配2m大小的对象">分配2M大小的对象<a arialabel="Anchor" class="hanchor" href="#分配2m大小的对象">⌗</a> </h1>
+<p>字节数组arr1的大小不变，字节数组arr2的大小修改为2048KB，代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark1"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>4 <span style="color:#f92672">*</span> MB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        <span style="color:#75715e">// 1.分配1MB  2.分配2MB  3.分配3071KB 4.分配3MB 5.分配4M 6.分配5M  7.分配6M  8.分配8M  9.分配10M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>2048 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"after mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"refSize:"</span> <span style="color:#f92672">+</span> arr1<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">" "</span> <span style="color:#f92672">+</span> arr2<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>执行结果为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails  -XX:+PrintHeapAtGC -XX:SurvivorRatio<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> test.JVMTest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>before mark1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>before mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#f92672">{</span>Heap before GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>full 0<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span> PSYoungGen      total 8192K, used 5021K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>  eden space 6144K, 81% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ffae7498,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span> ParOldGen       total 10240K, used 0K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  object space 10240K, 0% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000fec00000,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 5021K-&gt;680K<span style="color:#f92672">(</span>8192K<span style="color:#f92672">)]</span> 5021K-&gt;4784K<span style="color:#f92672">(</span>18432K<span style="color:#f92672">)</span>, 0.0027871 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>Heap after GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>full 0<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span> PSYoungGen      total 8192K, used 680K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>  from space 2048K, 33% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffcaa020,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span> ParOldGen       total 10240K, used 4104K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>  object space 10240K, 40% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff002010,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>after mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>refSize:4194304 <span style="color:#ae81ff">2097152</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span> PSYoungGen      total 8192K, used 2909K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>  eden space 6144K, 36% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff82d6c8,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>  from space 2048K, 33% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffcaa020,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span> ParOldGen       total 10240K, used 4104K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>  object space 10240K, 40% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff002010,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span> Metaspace       used 2577K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>  class space    used 282K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>
+</code></pre></div><p>以上说明，在分配大小为2M的字节数组arr2时触发了minorGC，执行前新生代大小5021K，全部集中在Eden区，这刚好是字节数组arr1的大小加上基础消耗内存的1M。此时老年代是空的，目前新生代空间富余。执行GC后新生代的大小变为680K，全部集中在from space区，老年代的大小是4104K。这说明本次minorGC时，数组arr1的4M对象直接从新生代晋升到老年代，同时Eden区中基础消耗对象有680K进入了幸存区，其余部分被GC回收掉了。</p>
+<p>执行GC后Eden区是空的，分配2M大小给arr2对象，此时Eden区的使用率为36%，如上面日志的最下面部分所示：<code>eden space 6144K, 36% used</code>。</p>
+<h1 id="分配3m大小的对象">分配3M大小的对象<a arialabel="Anchor" class="hanchor" href="#分配3m大小的对象">⌗</a> </h1>
+<p>如果将字节数组arr2的大小修改为3M会怎样？</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark1"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>4 <span style="color:#f92672">*</span> MB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        <span style="color:#75715e">// 1.分配1MB  2.分配2MB  3.分配3071KB 4.分配3MB 5.分配4M 6.分配5M  7.分配6M  8.分配8M  9.分配10M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>3072 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"after mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"refSize:"</span> <span style="color:#f92672">+</span> arr1<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">" "</span> <span style="color:#f92672">+</span> arr2<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>运行的结果为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails  -XX:+PrintHeapAtGC -XX:SurvivorRatio<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> test.JVMTest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>before mark1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>before mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>after mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>refSize:4194304 <span style="color:#ae81ff">3145728</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span> PSYoungGen      total 8192K, used 5144K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  eden space 6144K, 83% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ffb06190,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span> ParOldGen       total 10240K, used 3072K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  object space 10240K, 30% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000fef00010,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span> Metaspace       used 2577K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>  class space    used 282K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>
+</code></pre></div><p>居然没有执行GC的相关日志，什么情况？分析上面的日志，新生代使用了5144K，全部在Eden区，断定为字节数组arr1的4M内存加上基础消耗内存。老年代使用了3072K，这不刚好就是字节数组对象arr2的大小嘛！说明JVM为数组arr2对象分配内存时，Eden区内存不足，本该触发minorGC的，但是大小为3M数组arr2为大对象，所以直接晋升到老年代分配内存，不涉及GC。那么问题来了，多大的对象被认定大对象呢直接晋升到老年代呢？于是我将arr2的大小修改为3071K，</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark1"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>4 <span style="color:#f92672">*</span> MB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        <span style="color:#75715e">// 1.分配1MB  2.分配2MB  3.分配3071KB 4.分配3MB 5.分配4M 6.分配5M  7.分配6M  8.分配8M  9.分配10M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>3071 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"after mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"refSize:"</span> <span style="color:#f92672">+</span> arr1<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">" "</span> <span style="color:#f92672">+</span> arr2<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>执行的结果为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails  -XX:+PrintHeapAtGC -XX:SurvivorRatio<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> test.JVMTest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>before mark1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>before mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#f92672">{</span>Heap before GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>full 0<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span> PSYoungGen      total 8192K, used 5021K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>  eden space 6144K, 81% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ffae7498,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span> ParOldGen       total 10240K, used 0K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  object space 10240K, 0% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000fec00000,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 5021K-&gt;680K<span style="color:#f92672">(</span>8192K<span style="color:#f92672">)]</span> 5021K-&gt;4784K<span style="color:#f92672">(</span>18432K<span style="color:#f92672">)</span>, 0.0025586 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>Heap after GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>full 0<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span> PSYoungGen      total 8192K, used 680K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>  from space 2048K, 33% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffcaa020,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span> ParOldGen       total 10240K, used 4104K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>  object space 10240K, 40% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff002010,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>after mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>refSize:4194304 <span style="color:#ae81ff">3144704</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span> PSYoungGen      total 8192K, used 3932K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>  eden space 6144K, 52% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff92d2c8,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>  from space 2048K, 33% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffcaa020,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span> ParOldGen       total 10240K, used 4104K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>  object space 10240K, 40% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff002010,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span> Metaspace       used 2577K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>  class space    used 282K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>
+</code></pre></div><p>不看具日志体内容也能猜出此时触发了minorGC，这说明对象的大小3071K没有被认定为大对象直接在老年代分配内存，而是尝试GC，只相差1K结果就完全不一样，而3M刚好是Eden区大小的一般，于是我断定分配的对象内存大于或等于Eden区空间的一般时，被JVM认定为大对象进而直接在老年代分配内存，同时不触发minorGC。</p>
+<h1 id="分配4m大小的对象">分配4M大小的对象<a arialabel="Anchor" class="hanchor" href="#分配4m大小的对象">⌗</a> </h1>
+<p>接着上面的结论，既然3M为大对象，4M的对象更是了，应该不会触发GC把，于是将第二个字节数组对象arr2的大小修改为4M，然后观察结果。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> MB <span style="color:#f92672">=</span> 1024 <span style="color:#f92672">*</span> 1024<span style="color:#f92672">;</span> <span style="color:#75715e">// 1M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> KB <span style="color:#f92672">=</span> 1024<span style="color:#f92672">;</span> <span style="color:#75715e">// 1 kb
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark1"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>4 <span style="color:#f92672">*</span> MB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>        <span style="color:#75715e">// 1.分配1MB  2.分配2MB  3.分配3071KB 4.分配3MB 5.分配4M 6.分配5M  7.分配6M  8.分配8M  9.分配10M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>4096 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"after mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"refSize:"</span> <span style="color:#f92672">+</span> arr1<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">" "</span> <span style="color:#f92672">+</span> arr2<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>运行结果和预期一样，数组arr2作为大对象直接在老年代分配内存，没有GC。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails  -XX:+PrintHeapAtGC -XX:SurvivorRatio<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> test.JVMTest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>before mark1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>before mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>after mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>refSize:4194304 <span style="color:#ae81ff">4194304</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span> PSYoungGen      total 8192K, used 5144K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  eden space 6144K, 83% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ffb06190,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span> ParOldGen       total 10240K, used 4096K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  object space 10240K, 40% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff000010,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span> Metaspace       used 2577K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>  class space    used 282K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>
+</code></pre></div><h1 id="分配5m6m7m8m9m大小的对象">分配5M,6M,7M,8M,9M大小的对象<a arialabel="Anchor" class="hanchor" href="#分配5m6m7m8m9m大小的对象">⌗</a> </h1>
+<p>分配大于4M的对象，测试结果和4M一样，都是直接分配到老年代而已。
+代码和运行结果如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark1"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>4 <span style="color:#f92672">*</span> MB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        <span style="color:#75715e">// 1.分配1MB  2.分配2MB  3.分配3071KB 4.分配3MB 5.分配4M 6.分配5M  7.分配6M  8.分配8M  9.分配10M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>8000 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"after mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"refSize:"</span> <span style="color:#f92672">+</span> arr1<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">" "</span> <span style="color:#f92672">+</span> arr2<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>运行结果：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails  -XX:+PrintHeapAtGC -XX:SurvivorRatio=3 test.JVMTest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>before mark1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>before mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>after mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>refSize:4194304 8192000
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span> PSYoungGen      total 8192K, used 5144K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  eden space 6144K, 83% used [0x00000000ff600000,0x00000000ffb06190,0x00000000ffc00000)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>  from space 2048K, 0% used [0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  to   space 2048K, 0% used [0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span> ParOldGen       total 10240K, used 8000K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  object space 10240K, 78% used [0x00000000fec00000,0x00000000ff3d0010,0x00000000ff600000)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span> Metaspace       used 2577K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>  class space    used 282K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>
+</code></pre></div><h1 id="分配10m大小的对象">分配10M大小的对象<a arialabel="Anchor" class="hanchor" href="#分配10m大小的对象">⌗</a> </h1>
+<p>老年代的大小是10M，本人尝试分配10239K的对象，程序正常，不会发生OOM，当刚好分配10M的对象时，发生OOM。测试代码为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark1"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>4 <span style="color:#f92672">*</span> MB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        <span style="color:#75715e">// 1.分配1MB  2.分配2MB  3.分配3071KB 4.分配3MB 5.分配4M 6.分配5M  7.分配6M  8.分配8M  9.分配10M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>10240 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"after mark2"</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"refSize:"</span> <span style="color:#f92672">+</span> arr1<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">" "</span> <span style="color:#f92672">+</span> arr2<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">);</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span>    <span style="color:#f92672">}</span>
+</code></pre></div><p>运行的输出结果如下，日志好长，说明进行了多次GC：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails  -XX:+PrintHeapAtGC -XX:SurvivorRatio<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> test.JVMTest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  2</span>before mark1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  3</span>before mark2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  4</span><span style="color:#f92672">{</span>Heap before GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>full 0<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  5</span> PSYoungGen      total 8192K, used 5021K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  6</span>  eden space 6144K, 81% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ffae7498,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  7</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  8</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  9</span> ParOldGen       total 10240K, used 0K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 10</span>  object space 10240K, 0% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000fec00000,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 11</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 12</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 13</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 5021K-&gt;648K<span style="color:#f92672">(</span>8192K<span style="color:#f92672">)]</span> 5021K-&gt;4752K<span style="color:#f92672">(</span>18432K<span style="color:#f92672">)</span>, 0.0028166 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.05 sys<span style="color:#f92672">=</span>0.02, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 14</span>Heap after GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>full 0<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 15</span> PSYoungGen      total 8192K, used 648K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 16</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 17</span>  from space 2048K, 31% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffca2020,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 18</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 19</span> ParOldGen       total 10240K, used 4104K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 20</span>  object space 10240K, 40% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff002010,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 21</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 22</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 23</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 24</span><span style="color:#f92672">{</span>Heap before GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">(</span>full 0<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 25</span> PSYoungGen      total 8192K, used 648K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 26</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 27</span>  from space 2048K, 31% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffca2020,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 28</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 29</span> ParOldGen       total 10240K, used 4104K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 30</span>  object space 10240K, 40% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff002010,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 31</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 32</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 33</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 648K-&gt;640K<span style="color:#f92672">(</span>8192K<span style="color:#f92672">)]</span> 4752K-&gt;4744K<span style="color:#f92672">(</span>18432K<span style="color:#f92672">)</span>, 0.0007924 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 34</span>Heap after GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">(</span>full 0<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 35</span> PSYoungGen      total 8192K, used 640K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 36</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 37</span>  from space 2048K, 31% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffea0030,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 38</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 39</span> ParOldGen       total 10240K, used 4104K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 40</span>  object space 10240K, 40% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff002010,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 41</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 42</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 43</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 44</span><span style="color:#f92672">{</span>Heap before GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">(</span>full 1<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 45</span> PSYoungGen      total 8192K, used 640K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 46</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 47</span>  from space 2048K, 31% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffea0030,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 48</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 49</span> ParOldGen       total 10240K, used 4104K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 50</span>  object space 10240K, 40% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff002010,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 51</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 52</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 53</span><span style="color:#f92672">[</span>Full GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 640K-&gt;0K<span style="color:#f92672">(</span>8192K<span style="color:#f92672">)]</span> <span style="color:#f92672">[</span>ParOldGen: 4104K-&gt;4615K<span style="color:#f92672">(</span>10240K<span style="color:#f92672">)]</span> 4744K-&gt;4615K<span style="color:#f92672">(</span>18432K<span style="color:#f92672">)</span>, <span style="color:#f92672">[</span>Metaspace: 2571K-&gt;2571K<span style="color:#f92672">(</span>1056768K<span style="color:#f92672">)]</span>, 0.0048151 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.01 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 54</span>Heap after GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">(</span>full 1<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 55</span> PSYoungGen      total 8192K, used 0K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 56</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 57</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 58</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 59</span> ParOldGen       total 10240K, used 4615K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 60</span>  object space 10240K, 45% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff081ef0,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 61</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 62</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 63</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 64</span><span style="color:#f92672">{</span>Heap before GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> <span style="color:#f92672">(</span>full 1<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 65</span> PSYoungGen      total 8192K, used 0K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 66</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 67</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 68</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 69</span> ParOldGen       total 10240K, used 4615K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 70</span>  object space 10240K, 45% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff081ef0,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 71</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 72</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 73</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 0K-&gt;0K<span style="color:#f92672">(</span>8192K<span style="color:#f92672">)]</span> 4615K-&gt;4615K<span style="color:#f92672">(</span>18432K<span style="color:#f92672">)</span>, 0.0002409 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 74</span>Heap after GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> <span style="color:#f92672">(</span>full 1<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 75</span> PSYoungGen      total 8192K, used 0K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 76</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 77</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 78</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 79</span> ParOldGen       total 10240K, used 4615K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 80</span>  object space 10240K, 45% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff081ef0,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 81</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 82</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 83</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 84</span><span style="color:#f92672">{</span>Heap before GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span> <span style="color:#f92672">(</span>full 2<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 85</span> PSYoungGen      total 8192K, used 0K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 86</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 87</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 88</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 89</span> ParOldGen       total 10240K, used 4615K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 90</span>  object space 10240K, 45% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff081ef0,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 91</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 92</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 93</span><span style="color:#f92672">[</span>Full GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 0K-&gt;0K<span style="color:#f92672">(</span>8192K<span style="color:#f92672">)]</span> <span style="color:#f92672">[</span>ParOldGen: 4615K-&gt;4603K<span style="color:#f92672">(</span>10240K<span style="color:#f92672">)]</span> 4615K-&gt;4603K<span style="color:#f92672">(</span>18432K<span style="color:#f92672">)</span>, <span style="color:#f92672">[</span>Metaspace: 2571K-&gt;2571K<span style="color:#f92672">(</span>1056768K<span style="color:#f92672">)]</span>, 0.0050322 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.01 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 94</span>Heap after GC invocations<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span> <span style="color:#f92672">(</span>full 2<span style="color:#f92672">)</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 95</span> PSYoungGen      total 8192K, used 0K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 96</span>  eden space 6144K, 0% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff600000,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 97</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 98</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 99</span> ParOldGen       total 10240K, used 4603K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">100</span>  object space 10240K, 44% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff07ef70,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">101</span> Metaspace       used 2571K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">102</span>  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">103</span><span style="color:#f92672">}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">104</span>Exception in thread <span style="color:#e6db74">"main"</span> java.lang.OutOfMemoryError: Java heap space
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">105</span>        at test.JVMTest.main<span style="color:#f92672">(</span>JVMTest.java:12<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">106</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">107</span> PSYoungGen      total 8192K, used 181K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">108</span>  eden space 6144K, 2% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff62d6b8,0x00000000ffc00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">109</span>  from space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffc00000,0x00000000ffc00000,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">110</span>  to   space 2048K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">111</span> ParOldGen       total 10240K, used 4603K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">112</span>  object space 10240K, 44% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff07ef70,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">113</span> Metaspace       used 2601K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">114</span>  class space    used 285K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">115</span>
+</code></pre></div><p>从日志上可以看到，当分配了10M这样一个和老年代空间大小一样大的对象时，发生内存溢出，先进行了2次minorG，然后进行了3次FullGC，接着就报发生OOM了。有趣的是，这个OOM发生时其实只是老年代的空间满了，新生代只使用了2%而已。</p>
+<h1 id="本文结论">本文结论<a arialabel="Anchor" class="hanchor" href="#本文结论">⌗</a> </h1>
+<p>根据上面的测试验证，可以看出，一般情况下，JVM在Eden区给新创建的对象分配内存，当Eden区空间不足时触发minorG腾出空间，但是当该对象的大小大于或等于Eden区空间的一般时，将直接在老年代分配内存，不涉及minorGC，如果老年代也容纳不下了就会发生OOM异常。</p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button next">
+<a href="https://dongzhi.me/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/">
+<span class="button__text">深入浅出理解Java垃圾收集过程</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<section data-isso-id="https://dongzhi.me/2020/09/18/jvm-log-big-object-alloc/" data-title="JVM中晋升到老年代的大对象到底多大" id="isso-thread"></section>
+<script async="" data-isso="https://isso.dongzhi.me" data-isso-avatar="true" data-isso-avatar-bg="#f0f0f0" data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..." data-isso-css="false" data-isso-feed="false" data-isso-id="thread-id" data-isso-lang="zh" data-isso-max-comments-nested="5" data-isso-max-comments-top="10" data-isso-reply-notifications="true" data-isso-reply-to-self="true" data-isso-require-author="true" data-isso-require-email="true" data-isso-reveal-on-click="5" data-isso-vote="false" data-isso-vote-levels="" onload="setAutoCompleteProperty()" src="https://isso.dongzhi.me/js/embed.min.js"></script>
+<script>
+	function setAutoCompleteProperty() {
+		var authors = document.getElementsByName('author');
+		if (authors != null && authors.length > 0) {
+			authors[0].setAttribute('autocomplete', 'off');
+		}
+		var emails = document.getElementsByName('email');
+		if (emails != null && emails.length > 0) {
+			emails[0].setAttribute('autocomplete', 'off');
+		}
+		var sites = document.getElementsByName('website');
+		if (sites != null && sites.length > 0) {
+			sites[0].setAttribute('autocomplete', 'off');
+		}
+	}
+	</script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 <a href="https://dongzhi.me/">志哥笔记</a></span>
+<span style="margin-right: 10px;">:: Theme by <a href="https://themes.gohugo.io/hugo-theme-terminal/">panr</a></span>
+</div>
+</div>
+</footer>
+<script src="https://dongzhi.me/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+<script src="/vconsole.min.js"></script>
+<script>  
+  var vConsole = new VConsole();
+  console.log('Hello world');
+</script>
+</div>
+</body>
+</html>
