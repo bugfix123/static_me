@@ -65,6 +65,9 @@
 <span class="post-date">
         2020-09-18 
       </span>
+<span class="post-author">::
+      Zhige
+    </span>
 </div>
 <span class="post-tags">
     
@@ -74,7 +77,7 @@
 <div class="post-content"><div>
 <p>JVM中新创建的对象在Eden区分配内存，Eden区空间不足时，触发minorGC回收内存，对于一些大对象则直接分配在老年代，那么这里所谓的大对象到底是多大呢？本文将用测试结果回答这个问题！</p>
 <h1 id="验证目标">验证目标<a arialabel="Anchor" class="hanchor" href="#验证目标">⌗</a> </h1>
-<p>本文通过简单的例子，不断调大对象的大小来观察分配对象的大小如何影响到JVM的GC过程。</p>
+<p>本文通过简单的例子，不断调大对象的大小来观察该对象在堆的哪一部分内存区域分配、相关的大对象边界值，以及对GC的影响。</p>
 <h1 id="测试案例">测试案例<a arialabel="Anchor" class="hanchor" href="#测试案例">⌗</a> </h1>
 <p>测试例子代码如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> <span style="color:#a6e22e">messageSenderTest</span>;
@@ -98,15 +101,15 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>
 </code></pre></div><p>其中，</p>
 <ul>
-<li>-Xms20m：堆的初始大小20m(memory size)</li>
-<li>-Xmx20m:堆的最大大小(memory max size)</li>
-<li>-Xmn10m:堆的新生代大小(memory new)</li>
-<li>-verbose:gc:打印GC日志，标准参数</li>
-<li>-XX:+PrintGCDetails: 打印GC日志，非标准参数</li>
-<li>-XX:+PrintHeapAtGC: 打印GC前后堆的信息</li>
-<li>-XX:SurvivorRatio=3： 新生代中Eden Space和From Space比例为3：1</li>
+<li><strong>-Xms20m</strong>：堆的初始大小20m(memory size)</li>
+<li><strong>-Xmx20m</strong>:堆的最大大小(memory max size)</li>
+<li><strong>-Xmn10m</strong>:堆的新生代大小(memory new)</li>
+<li><strong>-verbose:gc</strong>:打印GC日志，标准参数</li>
+<li><strong>-XX:+PrintGCDetails</strong>: 打印GC日志，非标准参数</li>
+<li><strong>-XX:+PrintHeapAtGC</strong>: 打印GC前后堆的信息</li>
+<li><strong>-XX:SurvivorRatio=3</strong>： 新生代中Eden Space和From Space比例为3：1</li>
 </ul>
-<p>也是就说，堆的总大小20MB，新生代10MB，老年代10MB，其中，Eden区6MB，S0和S1各2MB。上面代码中先后创建2个字节数组arr1和arr2，arr1大小4MB，</p>
+<p>也是就说，堆的总大小20M，新生代10M，老年代10M，其中，Eden区6M，S0和S1各2M。上面代码中先后创建2个字节数组arr1和arr2，arr1大小4M保持不变，下面的例子围绕着修改对象arr2的大小来展开。</p>
 <h1 id="基本内存消耗">基本内存消耗<a arialabel="Anchor" class="hanchor" href="#基本内存消耗">⌗</a> </h1>
 <p>注释main方法的所有内容，执行程序，发现堆空间自身占用了大约1MB左右的内存。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java <span style="color:#f92672">-</span>Xms20m <span style="color:#f92672">-</span>Xmx20m <span style="color:#f92672">-</span>Xmn10m <span style="color:#f92672">-</span>verbose<span style="color:#f92672">:</span>gc <span style="color:#f92672">-</span>XX<span style="color:#f92672">:+</span>PrintGCDetails  <span style="color:#f92672">-</span>XX<span style="color:#f92672">:+</span>PrintHeapAtGC <span style="color:#f92672">-</span>XX<span style="color:#f92672">:</span>SurvivorRatio<span style="color:#f92672">=</span>3 test<span style="color:#f92672">.</span><span style="color:#a6e22e">JVMTest</span>
@@ -122,12 +125,12 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>
 </code></pre></div><p><code>PSYoungGen      total 8192K</code>表示新生代的大小是8M，为啥不是10M？Eden区大小6M，而S0和S1的大小分别2M，但是二者总有一个是空的，所以加起来8M！</p>
 <h1 id="分配1m大小的对象">分配1M大小的对象<a arialabel="Anchor" class="hanchor" href="#分配1m大小的对象">⌗</a> </h1>
-<p>字节数组arr1大小4MB，字节数组arr2大小1MB。代码如下：</p>
+<p>假设字节数组arr1大小4MB，字节数组arr2大小1MB。代码如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark1"</span><span style="color:#f92672">);</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>4 <span style="color:#f92672">*</span> MB<span style="color:#f92672">];</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark2"</span><span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        <span style="color:#75715e">// 1.分配1MB  2.分配2MB  3.分配3071KB 4.分配3MB 5.分配4M 6.分配5M  7.分配6M  8.分配8M  9.分配10M
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        <span style="color:#75715e">// 1.分配1MB  
 </span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"after mark2"</span><span style="color:#f92672">);</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"refSize:"</span> <span style="color:#f92672">+</span> arr1<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">" "</span> <span style="color:#f92672">+</span> arr2<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">);</span>
@@ -150,12 +153,12 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>
 </code></pre></div><p>字节数组arr1大小4M，自身1M左右，分配字节数组arr2的大小也是1M，没有执行GC说明Eden区刚好容纳得下。如果将arr2的大小改为2M为怎么样？</p>
 <h1 id="分配2m大小的对象">分配2M大小的对象<a arialabel="Anchor" class="hanchor" href="#分配2m大小的对象">⌗</a> </h1>
-<p>字节数组arr1的大小不变，字节数组arr2的大小修改为2048KB，代码如下：</p>
+<p>如果让字节数组arr1的大小不变，字节数组arr2的大小修改为2048KB，代码如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark1"</span><span style="color:#f92672">);</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>4 <span style="color:#f92672">*</span> MB<span style="color:#f92672">];</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"before mark2"</span><span style="color:#f92672">);</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        <span style="color:#75715e">// 1.分配1MB  2.分配2MB  3.分配3071KB 4.分配3MB 5.分配4M 6.分配5M  7.分配6M  8.分配8M  9.分配10M
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>        <span style="color:#75715e">//2.分配2MB  
 </span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>2048 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"after mark2"</span><span style="color:#f92672">);</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">"refSize:"</span> <span style="color:#f92672">+</span> arr1<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">" "</span> <span style="color:#f92672">+</span> arr2<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">);</span>
@@ -271,7 +274,7 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span> Metaspace       used 2577K, capacity 4486K, committed 4864K, reserved 1056768K
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>  class space    used 282K, capacity 386K, committed 512K, reserved 1048576K
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>
-</code></pre></div><p>不看具日志体内容也能猜出此时触发了minorGC，这说明对象的大小3071K没有被认定为大对象直接在老年代分配内存，而是尝试GC，只相差1K结果就完全不一样，而3M刚好是Eden区大小的一般，于是我断定分配的对象内存大于或等于Eden区空间的一般时，被JVM认定为大对象进而直接在老年代分配内存，同时不触发minorGC。</p>
+</code></pre></div><p>不看具日志体内容也能猜出此时触发了minorGC，这说明对象的大小3071K没有被认定为大对象直接在老年代分配内存，而是尝试GC，只相差1K结果就完全不一样，而3M刚好是Eden区大小的一般，<strong>于是我断定分配的对象内存大于或等于Eden区空间的1/2时，被JVM认定为大对象进而直接在老年代分配内存，同时不触发minorGC。</strong></p>
 <h1 id="分配4m大小的对象">分配4M大小的对象<a arialabel="Anchor" class="hanchor" href="#分配4m大小的对象">⌗</a> </h1>
 <p>接着上面的结论，既然3M为大对象，4M的对象更是了，应该不会触发GC把，于是将第二个字节数组对象arr2的大小修改为4M，然后观察结果。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> MB <span style="color:#f92672">=</span> 1024 <span style="color:#f92672">*</span> 1024<span style="color:#f92672">;</span> <span style="color:#75715e">// 1M
@@ -458,7 +461,7 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">115</span>
 </code></pre></div><p>从日志上可以看到，当分配了10M这样一个和老年代空间大小一样大的对象时，发生内存溢出，先进行了2次minorG，然后进行了3次FullGC，接着就报发生OOM了。有趣的是，这个OOM发生时其实只是老年代的空间满了，新生代只使用了2%而已。</p>
 <h1 id="本文结论">本文结论<a arialabel="Anchor" class="hanchor" href="#本文结论">⌗</a> </h1>
-<p>根据上面的测试验证，可以看出，一般情况下，JVM在Eden区给新创建的对象分配内存，当Eden区空间不足时触发minorG腾出空间，但是当该对象的大小大于或等于Eden区空间的一般时，将直接在老年代分配内存，不涉及minorGC，如果老年代也容纳不下了就会发生OOM异常。</p>
+<p>根据上面的测试验证，可以看出，<code>一般情况下，JVM在Eden区给新创建的对象分配内存，当Eden区空间不足时触发minorG腾出空间，但是当该对象的大小大于或等于Eden区空间的一般时，将直接在老年代分配内存，不涉及minorGC，如果老年代也容纳不下了就会发生OOM异常。</code></p>
 </div></div>
 <div class="pagination">
 <div class="pagination__title">
