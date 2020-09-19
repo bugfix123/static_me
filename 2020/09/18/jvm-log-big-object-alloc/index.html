@@ -102,15 +102,15 @@
 </code></pre></div><p>其中，</p>
 <ul>
 <li><strong>-Xms20m</strong>：堆的初始大小20m(memory size)</li>
-<li><strong>-Xmx20m</strong>:堆的最大大小(memory max size)</li>
-<li><strong>-Xmn10m</strong>:堆的新生代大小(memory new)</li>
-<li><strong>-verbose:gc</strong>:打印GC日志，标准参数</li>
-<li><strong>-XX:+PrintGCDetails</strong>: 打印GC日志，非标准参数</li>
-<li><strong>-XX:+PrintHeapAtGC</strong>: 打印GC前后堆的信息</li>
-<li><strong>-XX:SurvivorRatio=3</strong>： 新生代中Eden Space和From Space比例为3：1</li>
+<li><strong>-Xmx20m</strong>：堆的最大大小(memory max size)</li>
+<li><strong>-Xmn10m</strong>：堆的新生代大小(memory new)</li>
+<li><strong>-verbose:gc</strong>：打印GC日志，标准参数</li>
+<li><strong>-XX:+PrintGCDetails</strong>：打印GC日志，非标准参数</li>
+<li><strong>-XX:+PrintHeapAtGC</strong>：打印GC前后堆的信息</li>
+<li><strong>-XX:SurvivorRatio=3</strong>：新生代中Eden Space和From Space比例为3:1</li>
 </ul>
 <p>也是就说，堆的总大小20M，新生代10M，老年代10M，其中，Eden区6M，S0和S1各2M。上面代码中先后创建2个字节数组arr1和arr2，arr1大小4M保持不变，下面的例子围绕着修改对象arr2的大小来展开。</p>
-<h1 id="基本内存消耗">基本内存消耗<a arialabel="Anchor" class="hanchor" href="#基本内存消耗">⌗</a> </h1>
+<h1 id="基础内存消耗">基础内存消耗<a arialabel="Anchor" class="hanchor" href="#基础内存消耗">⌗</a> </h1>
 <p>注释main方法的所有内容，执行程序，发现堆空间自身占用了大约1MB左右的内存。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java <span style="color:#f92672">-</span>Xms20m <span style="color:#f92672">-</span>Xmx20m <span style="color:#f92672">-</span>Xmn10m <span style="color:#f92672">-</span>verbose<span style="color:#f92672">:</span>gc <span style="color:#f92672">-</span>XX<span style="color:#f92672">:+</span>PrintGCDetails  <span style="color:#f92672">-</span>XX<span style="color:#f92672">:+</span>PrintHeapAtGC <span style="color:#f92672">-</span>XX<span style="color:#f92672">:</span>SurvivorRatio<span style="color:#f92672">=</span>3 test<span style="color:#f92672">.</span><span style="color:#a6e22e">JVMTest</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>Heap
@@ -461,7 +461,7 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">115</span>
 </code></pre></div><p>从日志上可以看到，当分配了10M这样一个和老年代空间大小一样大的对象时，发生内存溢出，先进行了2次minorG，然后进行了3次FullGC，接着就报发生OOM了。有趣的是，这个OOM发生时其实只是老年代的空间满了，新生代只使用了2%而已。</p>
 <h1 id="本文结论">本文结论<a arialabel="Anchor" class="hanchor" href="#本文结论">⌗</a> </h1>
-<p>根据上面的测试验证，可以看出，<code>一般情况下，JVM在Eden区给新创建的对象分配内存，当Eden区空间不足时触发minorG腾出空间，但是当该对象的大小大于或等于Eden区空间的一般时，将直接在老年代分配内存，不涉及minorGC，如果老年代也容纳不下了就会发生OOM异常。</code></p>
+<p>根据上面的测试验证，<strong>可以看出，一般情况下，JVM在Eden区给新创建的对象分配内存，当Eden区空间不足时触发minorG腾出空间，但是当该对象的大小大于或等于Eden区空间的一般时，将直接在老年代分配内存，不涉及minorGC，如果老年代也容纳不下了就会发生OOM异常。</strong></p>
 </div></div>
 <div class="pagination">
 <div class="pagination__title">
@@ -507,7 +507,8 @@ padding: 5px auto;margin: 10px auto;*/
 <div class="footer__inner">
 <div class="copyright">
 <span>© 2020 <a href="https://dongzhi.me/">志哥笔记</a></span>
-<span style="margin-right: 10px;">:: Theme by <a href="https://themes.gohugo.io/hugo-theme-terminal/">panr</a></span>
+<span>:: <a href="https://themes.gohugo.io/hugo-theme-terminal/">Terminal</a></span>
+<span>:: <a href="https://my.laoxuehost.com/aff.php?aff=10457">老薛主机</a></span>
 </div>
 </div>
 </footer>
@@ -519,11 +520,6 @@ padding: 5px auto;margin: 10px auto;*/
         iconUrl: '/modules/plyr/3.6.2/plyr.svg'
     });
     </script>
-<script src="/vconsole.min.js"></script>
-<script>  
-  var vConsole = new VConsole();
-  console.log('Hello world');
-</script>
 </div>
 </body>
 </html>
