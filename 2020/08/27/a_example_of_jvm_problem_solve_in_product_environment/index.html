@@ -7,9 +7,9 @@
 <meta content="背景 公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。因为" name="description"/>
 <meta content="前沿技术,IT博客,技术笔记,IT Share" name="keywords"/>
 <meta content="noodp" name="robots"/>
-<link href="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" rel="canonical"/>
-<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
-<link href="https://dongzhi.me/assets/blue.css" rel="stylesheet"/>
+<link href="https://zhige.io/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" rel="canonical"/>
+<link href="https://zhige.io/assets/style.css" rel="stylesheet"/>
+<link href="https://zhige.io/assets/blue.css" rel="stylesheet"/>
 <link href="/img/favicon/favicon_io/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
 <link href="/img/favicon/favicon_io/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="/img/favicon/favicon_io/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
@@ -18,7 +18,7 @@
 <meta content="article" property="og:type"/>
 <meta content="记一次公司JVM堆溢出抽丝剥茧定位的过程 :: 志哥笔记" property="og:title"/>
 <meta content="公司线上有个tomcat服务，里面合并部署了大概8个微服务，线上一共部署了2个tomcat进行负载均衡。这个tomcat刚上生产线，运行挺平稳。大概过了大概1天后，运维同事反映2个tomcat节点均挂了，无法接受新的请求了，CPU 飙升到 100%！" property="og:description"/>
-<meta content="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" property="og:url"/>
+<meta content="https://zhige.io/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" property="og:url"/>
 <meta content="记一次公司JVM堆溢出抽丝剥茧定位的过程" property="og:site_name"/>
 <meta content="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png" property="og:image"/>
 <meta content="2048" property="og:image:width"/>
@@ -34,7 +34,7 @@
 <div class="header__logo">
 <a href="/">
 <div class="logo">
-    DongZhi.ME
+    Zhige.io
   </div>
 </a>
 </div>
@@ -60,7 +60,7 @@
 <div class="content">
 <div class="post">
 <h1 class="post-title">
-<a href="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/">记一次公司JVM堆溢出抽丝剥茧定位的过程</a></h1>
+<a href="https://zhige.io/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/">记一次公司JVM堆溢出抽丝剥茧定位的过程</a></h1>
 <div class="post-meta">
 <span class="post-date">
         2020-08-27 
@@ -68,7 +68,7 @@
 </div>
 <span class="post-tags">
     
-    #<a href="https://dongzhi.me/tags/jvm/">jvm</a> 
+    #<a href="https://zhige.io/tags/jvm/">jvm</a> 
     
   </span>
 <img alt="记一次公司JVM堆溢出抽丝剥茧定位的过程" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png"/>
@@ -200,13 +200,13 @@
 </div>
 <div class="pagination__buttons">
 <span class="button previous">
-<a href="https://dongzhi.me/2020/09/08/add-search-for-hugo/">
+<a href="https://zhige.io/2020/09/08/add-search-for-hugo/">
 <span class="button__icon">←</span>
 <span class="button__text">如何给hugo添加站内搜索功能</span>
 </a>
 </span>
 <span class="button next">
-<a href="https://dongzhi.me/2020/08/04/some-useful-licences/">
+<a href="https://zhige.io/2020/08/04/some-useful-licences/">
 <span class="button__text">Some Useful Licences</span>
 <span class="button__icon">→</span>
 </a>
@@ -218,7 +218,7 @@
 border: 1px dashed var(--accent); 
 padding: 5px auto;margin: 10px auto;*/
 ">
-<section data-isso-id="https://dongzhi.me/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" data-title="记一次公司JVM堆溢出抽丝剥茧定位的过程" id="isso-thread"></section>
+<section data-isso-id="https://zhige.io/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" data-title="记一次公司JVM堆溢出抽丝剥茧定位的过程" id="isso-thread"></section>
 <script async="" data-isso="https://isso.dongzhi.me" data-isso-avatar="true" data-isso-avatar-bg="#f0f0f0" data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..." data-isso-css="false" data-isso-feed="false" data-isso-id="thread-id" data-isso-lang="zh" data-isso-max-comments-nested="5" data-isso-max-comments-top="10" data-isso-reply-notifications="true" data-isso-reply-to-self="true" data-isso-require-author="true" data-isso-require-email="true" data-isso-reveal-on-click="5" data-isso-vote="false" data-isso-vote-levels="" onload="setAutoCompleteProperty()" src="https://isso.dongzhi.me/js/embed.min.js"></script>
 <script>
 	function setAutoCompleteProperty() {
@@ -242,13 +242,13 @@ padding: 5px auto;margin: 10px auto;*/
 <footer class="footer">
 <div class="footer__inner">
 <div class="copyright">
-<span>© 2020 <a href="https://dongzhi.me/">志哥笔记</a></span>
+<span>© 2020 <a href="https://zhige.io/">志哥笔记</a></span>
 <span>:: <a href="https://themes.gohugo.io/hugo-theme-terminal/">Terminal</a></span>
 <span>:: <a href="https://my.laoxuehost.com/aff.php?aff=10457">老薛主机</a></span>
 </div>
 </div>
 </footer>
-<script src="https://dongzhi.me/assets/main.js"></script>
+<script src="https://zhige.io/assets/main.js"></script>
 <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
 <script>

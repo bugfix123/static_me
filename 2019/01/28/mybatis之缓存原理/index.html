@@ -7,9 +7,9 @@
 <meta content="本篇文章记录MyBatis的缓存原理学习笔记。掌握缓存机制对于学习和使用MyBatis框架是十分有好处的。这是以前学习mybatis时记录的笔记，晚上翻了出来，就贴在这里。 缓存机制 MyBatis默认定" name="description"/>
 <meta content="前沿技术,IT博客,技术笔记,IT Share" name="keywords"/>
 <meta content="noodp" name="robots"/>
-<link href="https://dongzhi.me/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/" rel="canonical"/>
-<link href="https://dongzhi.me/assets/style.css" rel="stylesheet"/>
-<link href="https://dongzhi.me/assets/blue.css" rel="stylesheet"/>
+<link href="https://zhige.io/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/" rel="canonical"/>
+<link href="https://zhige.io/assets/style.css" rel="stylesheet"/>
+<link href="https://zhige.io/assets/blue.css" rel="stylesheet"/>
 <link href="/img/favicon/favicon_io/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
 <link href="/img/favicon/favicon_io/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="/img/favicon/favicon_io/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
@@ -18,7 +18,7 @@
 <meta content="article" property="og:type"/>
 <meta content="MyBatis之缓存原理 :: 志哥笔记" property="og:title"/>
 <meta content="本篇文章记录MyBatis的缓存原理学习笔记。掌握缓存机制对于学习和使用MyBatis框架是十分有好处的。这是以前学习mybatis时记录的笔记，晚上翻了出来，就贴在这里。 缓存机制 MyBatis默认定" property="og:description"/>
-<meta content="https://dongzhi.me/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/" property="og:url"/>
+<meta content="https://zhige.io/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/" property="og:url"/>
 <meta content="MyBatis之缓存原理" property="og:site_name"/>
 <meta content="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2019/mybatis.jpeg" property="og:image"/>
 <meta content="2048" property="og:image:width"/>
@@ -35,7 +35,7 @@
 <div class="header__logo">
 <a href="/">
 <div class="logo">
-    DongZhi.ME
+    Zhige.io
   </div>
 </a>
 </div>
@@ -61,7 +61,7 @@
 <div class="content">
 <div class="post">
 <h1 class="post-title">
-<a href="https://dongzhi.me/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/">MyBatis之缓存原理</a></h1>
+<a href="https://zhige.io/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/">MyBatis之缓存原理</a></h1>
 <div class="post-meta">
 <span class="post-date">
         2019-01-28 
@@ -587,13 +587,13 @@ ehcache.xml：</p>
 </div>
 <div class="pagination__buttons">
 <span class="button previous">
-<a href="https://dongzhi.me/2019/01/29/%E6%83%8A%E8%89%B3%E7%9A%84danny-macaskill/">
+<a href="https://zhige.io/2019/01/29/%E6%83%8A%E8%89%B3%E7%9A%84danny-macaskill/">
 <span class="button__icon">←</span>
 <span class="button__text">惊艳的danny MacAskill</span>
 </a>
 </span>
 <span class="button next">
-<a href="https://dongzhi.me/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/">
+<a href="https://zhige.io/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/">
 <span class="button__text">Centos7下科学上网的方法</span>
 <span class="button__icon">→</span>
 </a>
@@ -605,7 +605,7 @@ ehcache.xml：</p>
 border: 1px dashed var(--accent); 
 padding: 5px auto;margin: 10px auto;*/
 ">
-<section data-isso-id="https://dongzhi.me/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/" data-title="MyBatis之缓存原理" id="isso-thread"></section>
+<section data-isso-id="https://zhige.io/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/" data-title="MyBatis之缓存原理" id="isso-thread"></section>
 <script async="" data-isso="https://isso.dongzhi.me" data-isso-avatar="true" data-isso-avatar-bg="#f0f0f0" data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..." data-isso-css="false" data-isso-feed="false" data-isso-id="thread-id" data-isso-lang="zh" data-isso-max-comments-nested="5" data-isso-max-comments-top="10" data-isso-reply-notifications="true" data-isso-reply-to-self="true" data-isso-require-author="true" data-isso-require-email="true" data-isso-reveal-on-click="5" data-isso-vote="false" data-isso-vote-levels="" onload="setAutoCompleteProperty()" src="https://isso.dongzhi.me/js/embed.min.js"></script>
 <script>
 	function setAutoCompleteProperty() {
@@ -629,13 +629,13 @@ padding: 5px auto;margin: 10px auto;*/
 <footer class="footer">
 <div class="footer__inner">
 <div class="copyright">
-<span>© 2020 <a href="https://dongzhi.me/">志哥笔记</a></span>
+<span>© 2020 <a href="https://zhige.io/">志哥笔记</a></span>
 <span>:: <a href="https://themes.gohugo.io/hugo-theme-terminal/">Terminal</a></span>
 <span>:: <a href="https://my.laoxuehost.com/aff.php?aff=10457">老薛主机</a></span>
 </div>
 </div>
 </footer>
-<script src="https://dongzhi.me/assets/main.js"></script>
+<script src="https://zhige.io/assets/main.js"></script>
 <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
 <script>

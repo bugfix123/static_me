@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>markdown on 志哥笔记</title>
-    <link>https://dongzhi.me/tags/markdown/</link>
+    <link>https://zhige.io/tags/markdown/</link>
     <description>Recent content in markdown on 志哥笔记</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 30 Apr 2020 16:01:23 +0800</lastBuildDate>
     
-	<atom:link href="https://dongzhi.me/tags/markdown/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://zhige.io/tags/markdown/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Syntax Highlighting</title>
-      <link>https://dongzhi.me/2020/04/30/syntax-highlighting/</link>
+      <link>https://zhige.io/2020/04/30/syntax-highlighting/</link>
       <pubDate>Thu, 30 Apr 2020 16:01:23 +0800</pubDate>
       
-      <guid>https://dongzhi.me/2020/04/30/syntax-highlighting/</guid>
+      <guid>https://zhige.io/2020/04/30/syntax-highlighting/</guid>
       <description>&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;helloWorld&lt;/span&gt; () {
 &lt;span style=&#34;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2&lt;/span&gt;  &lt;span style=&#34;color:#a6e22e&#34;&gt;alert&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Hello, World!&amp;#34;&lt;/span&gt;)
 &lt;span style=&#34;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3&lt;/span&gt;}
@@ -25,28 +25,28 @@
     
     <item>
       <title>Markdown Syntax</title>
-      <link>https://dongzhi.me/2020/01/24/markdown-syntax/</link>
+      <link>https://zhige.io/2020/01/24/markdown-syntax/</link>
       <pubDate>Fri, 24 Jan 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://dongzhi.me/2020/01/24/markdown-syntax/</guid>
+      <guid>https://zhige.io/2020/01/24/markdown-syntax/</guid>
       <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Placeholder Text</title>
-      <link>https://dongzhi.me/2019/12/17/placeholder-text/</link>
+      <link>https://zhige.io/2019/12/17/placeholder-text/</link>
       <pubDate>Tue, 17 Dec 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://dongzhi.me/2019/12/17/placeholder-text/</guid>
+      <guid>https://zhige.io/2019/12/17/placeholder-text/</guid>
       <description>&lt;p&gt;Lorem est tota propiore conpellat pectoribus de pectora summo.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Emoji Support</title>
-      <link>https://dongzhi.me/2019/12/03/emoji-support/</link>
+      <link>https://zhige.io/2019/12/03/emoji-support/</link>
       <pubDate>Tue, 03 Dec 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://dongzhi.me/2019/12/03/emoji-support/</guid>
+      <guid>https://zhige.io/2019/12/03/emoji-support/</guid>
       <description>Emoji can be enabled in a Hugo project in a number of ways.
 The emojify function can be called directly in templates or Inline Shortcodes.
 To enable emoji globally, set enableEmoji to true in your site’s configuration and then you can type emoji shorthand codes directly in content files; e.g.
