@@ -2,84 +2,84 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on 志哥笔记</title>
-    <link>https://zhige.io/tags/</link>
+    <link>http://zhige.io/tags/</link>
     <description>Recent content in Tags on 志哥笔记</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 18 Sep 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://zhige.io/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://zhige.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>jvm</title>
-      <link>https://zhige.io/tags/jvm/</link>
+      <link>http://zhige.io/tags/jvm/</link>
       <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://zhige.io/tags/jvm/</guid>
+      <guid>http://zhige.io/tags/jvm/</guid>
       <description></description>
     </item>
     
     <item>
       <title>hugo</title>
-      <link>https://zhige.io/tags/hugo/</link>
+      <link>http://zhige.io/tags/hugo/</link>
       <pubDate>Fri, 11 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://zhige.io/tags/hugo/</guid>
+      <guid>http://zhige.io/tags/hugo/</guid>
       <description></description>
     </item>
     
     <item>
       <title>jihuoma</title>
-      <link>https://zhige.io/tags/jihuoma/</link>
+      <link>http://zhige.io/tags/jihuoma/</link>
       <pubDate>Tue, 04 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://zhige.io/tags/jihuoma/</guid>
+      <guid>http://zhige.io/tags/jihuoma/</guid>
       <description></description>
     </item>
     
     <item>
       <title>life</title>
-      <link>https://zhige.io/tags/life/</link>
+      <link>http://zhige.io/tags/life/</link>
       <pubDate>Sat, 18 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://zhige.io/tags/life/</guid>
+      <guid>http://zhige.io/tags/life/</guid>
       <description></description>
     </item>
     
     <item>
       <title>linux</title>
-      <link>https://zhige.io/tags/linux/</link>
+      <link>http://zhige.io/tags/linux/</link>
       <pubDate>Sat, 11 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://zhige.io/tags/linux/</guid>
+      <guid>http://zhige.io/tags/linux/</guid>
       <description></description>
     </item>
     
     <item>
       <title>other</title>
-      <link>https://zhige.io/tags/other/</link>
+      <link>http://zhige.io/tags/other/</link>
       <pubDate>Sat, 04 Jul 2020 15:12:59 +0800</pubDate>
       
-      <guid>https://zhige.io/tags/other/</guid>
+      <guid>http://zhige.io/tags/other/</guid>
       <description></description>
     </item>
     
     <item>
       <title>markdown</title>
-      <link>https://zhige.io/tags/markdown/</link>
+      <link>http://zhige.io/tags/markdown/</link>
       <pubDate>Thu, 30 Apr 2020 16:01:23 +0800</pubDate>
       
-      <guid>https://zhige.io/tags/markdown/</guid>
+      <guid>http://zhige.io/tags/markdown/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Danny MacAskill</title>
-      <link>https://zhige.io/tags/danny-macaskill/</link>
+      <link>http://zhige.io/tags/danny-macaskill/</link>
       <pubDate>Tue, 13 Aug 2019 22:06:46 +0800</pubDate>
       
-      <guid>https://zhige.io/tags/danny-macaskill/</guid>
+      <guid>http://zhige.io/tags/danny-macaskill/</guid>
       <description></description>
     </item>
     

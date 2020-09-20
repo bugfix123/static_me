@@ -3,317 +3,317 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://zhige.io/tags/jvm/</loc>
+    <loc>http://zhige.io/tags/jvm/</loc>
     <lastmod>2020-09-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/09/18/jvm-log-big-object-alloc/</loc>
+    <loc>http://zhige.io/2020/09/18/jvm-log-big-object-alloc/</loc>
     <lastmod>2020-09-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/post/</loc>
+    <loc>http://zhige.io/post/</loc>
     <lastmod>2020-09-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/tags/</loc>
+    <loc>http://zhige.io/tags/</loc>
     <lastmod>2020-09-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/</loc>
+    <loc>http://zhige.io/</loc>
     <lastmod>2020-09-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/</loc>
+    <loc>http://zhige.io/2020/09/17/understanding-the-java-memory-model-and-the-garbage-collector/</loc>
     <lastmod>2020-09-17T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/09/11/how-to-deploy-isso-on-centos-7/</loc>
+    <loc>http://zhige.io/2020/09/11/how-to-deploy-isso-on-centos-7/</loc>
     <lastmod>2020-09-11T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/tags/hugo/</loc>
+    <loc>http://zhige.io/tags/hugo/</loc>
     <lastmod>2020-09-11T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/09/08/all-issues-for-hugo/</loc>
+    <loc>http://zhige.io/2020/09/08/all-issues-for-hugo/</loc>
     <lastmod>2020-09-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/09/08/auto-deploy-for-hugo/</loc>
+    <loc>http://zhige.io/2020/09/08/auto-deploy-for-hugo/</loc>
     <lastmod>2020-09-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/09/08/add-search-for-hugo/</loc>
+    <loc>http://zhige.io/2020/09/08/add-search-for-hugo/</loc>
     <lastmod>2020-09-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/</loc>
+    <loc>http://zhige.io/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/</loc>
     <lastmod>2020-08-27T20:09:50+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/tags/jihuoma/</loc>
+    <loc>http://zhige.io/tags/jihuoma/</loc>
     <lastmod>2020-08-04T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/08/04/some-useful-licences/</loc>
+    <loc>http://zhige.io/2020/08/04/some-useful-licences/</loc>
     <lastmod>2020-08-04T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/21/kexueshangwang/</loc>
+    <loc>http://zhige.io/2020/07/21/kexueshangwang/</loc>
     <lastmod>2020-07-21T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/about/</loc>
+    <loc>http://zhige.io/about/</loc>
     <lastmod>2020-07-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/tags/life/</loc>
+    <loc>http://zhige.io/tags/life/</loc>
     <lastmod>2020-07-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/18/do-you-believe-justice/</loc>
+    <loc>http://zhige.io/2020/07/18/do-you-believe-justice/</loc>
     <lastmod>2020-07-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/tags/linux/</loc>
+    <loc>http://zhige.io/tags/linux/</loc>
     <lastmod>2020-07-11T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/</loc>
+    <loc>http://zhige.io/2020/07/11/%E5%9C%A8centos7%E4%B8%8A%E5%A6%82%E4%BD%95%E4%B8%8B%E8%BD%BDyoutube%E8%A7%86%E9%A2%91/</loc>
     <lastmod>2020-07-11T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/09/jvm-learn-16/</loc>
+    <loc>http://zhige.io/2020/07/09/jvm-learn-16/</loc>
     <lastmod>2020-07-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/09/jvm-learn-17/</loc>
+    <loc>http://zhige.io/2020/07/09/jvm-learn-17/</loc>
     <lastmod>2020-07-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/09/jvm-learn-18/</loc>
+    <loc>http://zhige.io/2020/07/09/jvm-learn-18/</loc>
     <lastmod>2020-07-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/09/jvm-learn-19/</loc>
+    <loc>http://zhige.io/2020/07/09/jvm-learn-19/</loc>
     <lastmod>2020-07-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/09/jvm-learn-20/</loc>
+    <loc>http://zhige.io/2020/07/09/jvm-learn-20/</loc>
     <lastmod>2020-07-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/07/jvm-learn-08/</loc>
+    <loc>http://zhige.io/2020/07/07/jvm-learn-08/</loc>
     <lastmod>2020-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/07/jvm-learn-09/</loc>
+    <loc>http://zhige.io/2020/07/07/jvm-learn-09/</loc>
     <lastmod>2020-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/07/jvm-learn-10/</loc>
+    <loc>http://zhige.io/2020/07/07/jvm-learn-10/</loc>
     <lastmod>2020-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/07/jvm-learn-11/</loc>
+    <loc>http://zhige.io/2020/07/07/jvm-learn-11/</loc>
     <lastmod>2020-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/07/jvm-learn-12/</loc>
+    <loc>http://zhige.io/2020/07/07/jvm-learn-12/</loc>
     <lastmod>2020-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/07/jvm-learn-13/</loc>
+    <loc>http://zhige.io/2020/07/07/jvm-learn-13/</loc>
     <lastmod>2020-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/07/jvm-learn-14/</loc>
+    <loc>http://zhige.io/2020/07/07/jvm-learn-14/</loc>
     <lastmod>2020-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/07/jvm-learn-15/</loc>
+    <loc>http://zhige.io/2020/07/07/jvm-learn-15/</loc>
     <lastmod>2020-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/06/jvm-learn-01/</loc>
+    <loc>http://zhige.io/2020/07/06/jvm-learn-01/</loc>
     <lastmod>2020-07-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/06/jvm-learn-02/</loc>
+    <loc>http://zhige.io/2020/07/06/jvm-learn-02/</loc>
     <lastmod>2020-07-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/06/jvm-learn-03/</loc>
+    <loc>http://zhige.io/2020/07/06/jvm-learn-03/</loc>
     <lastmod>2020-07-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/06/jvm-learn-04/</loc>
+    <loc>http://zhige.io/2020/07/06/jvm-learn-04/</loc>
     <lastmod>2020-07-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/06/jvm-learn-05/</loc>
+    <loc>http://zhige.io/2020/07/06/jvm-learn-05/</loc>
     <lastmod>2020-07-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/06/jvm-learn-06/</loc>
+    <loc>http://zhige.io/2020/07/06/jvm-learn-06/</loc>
     <lastmod>2020-07-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/06/jvm-learn-07/</loc>
+    <loc>http://zhige.io/2020/07/06/jvm-learn-07/</loc>
     <lastmod>2020-07-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/05/shortcode%E7%94%A8%E6%B3%95/</loc>
+    <loc>http://zhige.io/2020/07/05/shortcode%E7%94%A8%E6%B3%95/</loc>
     <lastmod>2020-07-05T15:38:00+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/07/04/git-init-repo/</loc>
+    <loc>http://zhige.io/2020/07/04/git-init-repo/</loc>
     <lastmod>2020-07-04T15:12:59+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/tags/other/</loc>
+    <loc>http://zhige.io/tags/other/</loc>
     <lastmod>2020-07-04T15:12:59+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/tags/markdown/</loc>
+    <loc>http://zhige.io/tags/markdown/</loc>
     <lastmod>2020-04-30T16:01:23+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/04/30/syntax-highlighting/</loc>
+    <loc>http://zhige.io/2020/04/30/syntax-highlighting/</loc>
     <lastmod>2020-04-30T16:01:23+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2020/01/24/markdown-syntax/</loc>
+    <loc>http://zhige.io/2020/01/24/markdown-syntax/</loc>
     <lastmod>2020-01-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2019/12/17/placeholder-text/</loc>
+    <loc>http://zhige.io/2019/12/17/placeholder-text/</loc>
     <lastmod>2019-12-17T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2019/12/03/emoji-support/</loc>
+    <loc>http://zhige.io/2019/12/03/emoji-support/</loc>
     <lastmod>2019-12-03T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/tags/danny-macaskill/</loc>
+    <loc>http://zhige.io/tags/danny-macaskill/</loc>
     <lastmod>2019-08-13T22:06:46+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2019/08/13/awesome_danny_macaskill_01/</loc>
+    <loc>http://zhige.io/2019/08/13/awesome_danny_macaskill_01/</loc>
     <lastmod>2019-08-13T22:06:46+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2019/08/13/inspired_bicycles/</loc>
+    <loc>http://zhige.io/2019/08/13/inspired_bicycles/</loc>
     <lastmod>2019-08-13T21:51:22+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/search/</loc>
+    <loc>http://zhige.io/search/</loc>
     <lastmod>2019-07-10T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/categories/</loc>
+    <loc>http://zhige.io/categories/</loc>
     <lastmod>2019-01-29T00:24:49+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2019/01/29/%E6%83%8A%E8%89%B3%E7%9A%84danny-macaskill/</loc>
+    <loc>http://zhige.io/2019/01/29/%E6%83%8A%E8%89%B3%E7%9A%84danny-macaskill/</loc>
     <lastmod>2019-01-29T00:24:49+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/categories/%E6%9D%82%E6%96%87/</loc>
+    <loc>http://zhige.io/categories/%E6%9D%82%E6%96%87/</loc>
     <lastmod>2019-01-29T00:24:49+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/</loc>
+    <loc>http://zhige.io/2019/01/28/mybatis%E4%B9%8B%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86/</loc>
     <lastmod>2019-01-28T23:03:51+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/categories/%E6%8A%80%E6%9C%AF/</loc>
+    <loc>http://zhige.io/categories/%E6%8A%80%E6%9C%AF/</loc>
     <lastmod>2019-01-28T23:03:51+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/archives/</loc>
+    <loc>http://zhige.io/archives/</loc>
     <lastmod>2019-01-25T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/</loc>
+    <loc>http://zhige.io/2019/01/11/centos7%E4%B8%8B%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E6%B3%95/</loc>
     <lastmod>2019-01-11T09:00:52+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/</loc>
+    <loc>http://zhige.io/2019/01/09/%E7%A0%81%E5%86%9C%E4%BD%BF%E7%94%A8%E7%94%B5%E8%84%91%E7%9A%84%E6%97%A5%E5%B8%B8/</loc>
     <lastmod>2019-01-09T18:43:07+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/</loc>
+    <loc>http://zhige.io/2018/12/16/centos%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%B8%B8%E7%94%A8%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/</loc>
     <lastmod>2018-12-16T23:41:20+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/</loc>
+    <loc>http://zhige.io/2018/12/16/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%92%8C%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E7%90%86%E8%A7%A3/</loc>
     <lastmod>2018-12-16T20:58:22+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/showcase/</loc>
+    <loc>http://zhige.io/showcase/</loc>
     <lastmod>2018-07-18T00:00:00+00:00</lastmod>
   </url>
   

@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>hugo on 志哥笔记</title>
-    <link>https://zhige.io/tags/hugo/</link>
+    <link>http://zhige.io/tags/hugo/</link>
     <description>Recent content in hugo on 志哥笔记</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 11 Sep 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://zhige.io/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://zhige.io/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>CentOS7上部署开源评论系统ISSO</title>
-      <link>https://zhige.io/2020/09/11/how-to-deploy-isso-on-centos-7/</link>
+      <link>http://zhige.io/2020/09/11/how-to-deploy-isso-on-centos-7/</link>
       <pubDate>Fri, 11 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://zhige.io/2020/09/11/how-to-deploy-isso-on-centos-7/</guid>
+      <guid>http://zhige.io/2020/09/11/how-to-deploy-isso-on-centos-7/</guid>
       <description>&lt;blockquote&gt;
 &lt;p&gt;Isso是一款开源的评论系统，小巧功能多，这边文章记录一下部署过程，记录遇到的坑。我的linux是CentOS7.5 64位。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
@@ -24,19 +24,19 @@
     
     <item>
       <title>Hugo使用过程中遇到的坑汇总</title>
-      <link>https://zhige.io/2020/09/08/all-issues-for-hugo/</link>
+      <link>http://zhige.io/2020/09/08/all-issues-for-hugo/</link>
       <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://zhige.io/2020/09/08/all-issues-for-hugo/</guid>
+      <guid>http://zhige.io/2020/09/08/all-issues-for-hugo/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Hugo给文章加密与自动化部署方案</title>
-      <link>https://zhige.io/2020/09/08/auto-deploy-for-hugo/</link>
+      <link>http://zhige.io/2020/09/08/auto-deploy-for-hugo/</link>
       <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://zhige.io/2020/09/08/auto-deploy-for-hugo/</guid>
+      <guid>http://zhige.io/2020/09/08/auto-deploy-for-hugo/</guid>
       <description>&lt;blockquote&gt;
 &lt;p&gt;本文简单记录一下在使用Hugo过程中，如何给文章添加密码，以及自动化构建和部署的折腾过程。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
@@ -44,19 +44,19 @@
     
     <item>
       <title>如何给hugo添加站内搜索功能</title>
-      <link>https://zhige.io/2020/09/08/add-search-for-hugo/</link>
+      <link>http://zhige.io/2020/09/08/add-search-for-hugo/</link>
       <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://zhige.io/2020/09/08/add-search-for-hugo/</guid>
+      <guid>http://zhige.io/2020/09/08/add-search-for-hugo/</guid>
       <description>&lt;p&gt;Hugo的站内搜索有很多方案，Hugo官网了列出了7种，大家用的应该是hugo-lunr-zh吧，这里我们不引入任何第三方库，另辟蹊径地解决Hugo站内搜索功能。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Shortcode用法</title>
-      <link>https://zhige.io/2020/07/05/shortcode%E7%94%A8%E6%B3%95/</link>
+      <link>http://zhige.io/2020/07/05/shortcode%E7%94%A8%E6%B3%95/</link>
       <pubDate>Sun, 05 Jul 2020 15:38:00 +0800</pubDate>
       
-      <guid>https://zhige.io/2020/07/05/shortcode%E7%94%A8%E6%B3%95/</guid>
+      <guid>http://zhige.io/2020/07/05/shortcode%E7%94%A8%E6%B3%95/</guid>
       <description>&lt;blockquote&gt;
 &lt;p&gt;本文汇总一下hugo常用的shortcode。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
