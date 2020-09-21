@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>GC日志中的人体工程学(Ergonomics) :: 志哥笔记 — 记述码农在家的故事！</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="最近在看GC日志相关的东西，我们知道，当Eden区空间不足时触发minor GC，当老年代空间不足时触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC。
+" name="description"/>
+<meta content="前沿技术,IT博客,技术笔记,IT Share" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/" rel="canonical"/>
+<link href="https://zhige.io/assets/style.css" rel="stylesheet"/>
+<link href="https://zhige.io/assets/blue.css" rel="stylesheet"/>
+<link href="/img/favicon/favicon_io/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="/img/favicon/favicon_io/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/img/favicon/favicon_io/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="/img/favicon/favicon_io/site.webmanifest" rel="manifest"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="GC日志中的人体工程学(Ergonomics) :: 志哥笔记" property="og:title"/>
+<meta content="最近在看GC日志相关的东西，我们知道，当Eden区空间不足时触发minor GC，当老年代空间不足时触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC。
+" property="og:description"/>
+<meta content="https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/" property="og:url"/>
+<meta content="GC日志中的人体工程学(Ergonomics)" property="og:site_name"/>
+<meta content="https://zhige.io/img/favicon/blue.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-09-21 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    Zhige.io
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/">GC日志中的人体工程学(Ergonomics)</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-09-21 
+      </span>
+<span class="post-author">::
+      Zhige
+    </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://zhige.io/tags/jvm/">JVM</a> 
+    
+  </span>
+<div class="post-content"><div>
+<p>最近在看GC日志相关的东西，我们知道，当Eden区空间不足时触发minor GC，当老年代空间不足时触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC。</p>
+<p>例子代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> test<span style="color:#f92672">;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">JVMTest2</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>    <span style="color:#75715e">// java -Xms18m -Xmx18m -Xmn10m -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCCause -XX:+PrintHeapAtGC -XX:SurvivorRatio=8 test.JVMTest2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> MB <span style="color:#f92672">=</span> 1024 <span style="color:#f92672">*</span> 1024<span style="color:#f92672">;</span> <span style="color:#75715e">// 1M
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> KB <span style="color:#f92672">=</span> 1024<span style="color:#f92672">;</span> <span style="color:#75715e">// 1 kb
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span style="color:#75715e"></span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>		<span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>2048 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>2048 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>		<span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr3 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>2048 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> arr4 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>2048 <span style="color:#f92672">*</span> KB<span style="color:#f92672">];</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>    <span style="color:#f92672">}</span>	
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#f92672">}</span>
+</code></pre></div><p>堆的内存分配为：总大小20m，新生代和老年代各10m。Eden区8m，Survivor区的S0和S1分别是1m。我加上打印GC日志相关的命令行参数运行程序：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>java -Xms22m -Xmx22m -Xmn10m -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCCause -XX:SurvivorRatio<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span> test.JVMTest2
+</code></pre></div><p>输出的结果为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms22m -Xmx22m -Xmn10m -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCCause -XX:SurvivorRatio<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span> test.JVMTest2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 7129K-&gt;648K<span style="color:#f92672">(</span>9216K<span style="color:#f92672">)]</span> 7129K-&gt;6800K<span style="color:#f92672">(</span>21504K<span style="color:#f92672">)</span>, 0.0034548 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.06 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">[</span>Full GC <span style="color:#f92672">(</span>Ergonomics<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 648K-&gt;0K<span style="color:#f92672">(</span>9216K<span style="color:#f92672">)]</span> <span style="color:#f92672">[</span>ParOldGen: 6152K-&gt;6663K<span style="color:#f92672">(</span>12288K<span style="color:#f92672">)]</span> 6800K-&gt;6663K<span style="color:#f92672">(</span>21504K<span style="color:#f92672">)</span>, <span style="color:#f92672">[</span>Metaspace: 2569K-&gt;2569K<span style="color:#f92672">(</span>1056768K<span style="color:#f92672">)]</span>, 0.0053348 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span> PSYoungGen      total 9216K, used 2130K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>  eden space 8192K, 26% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff814930,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>  from space 1024K, 0% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe00000,0x00000000fff00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  to   space 1024K, 0% used <span style="color:#f92672">[</span>0x00000000fff00000,0x00000000fff00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span> ParOldGen       total 12288K, used 6663K <span style="color:#f92672">[</span>0x00000000fea00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>  object space 12288K, 54% used <span style="color:#f92672">[</span>0x00000000fea00000,0x00000000ff081d20,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span> Metaspace       used 2576K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  class space    used 282K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>
+</code></pre></div><p>从代码上看，前面3个数组加起来一共是6m，再加上JVM在Eden区自带的内存(简称“基础内存消耗”)大概1m多，所以Eden区占用的空间7m多，当<code>new</code>字节数组arr4时，空间不够了，自然会触发minorGC！根据空间担保机制，数组对象arr1、arr2和arr3都会直接晋升到老年代，所以执行GC后老年代应该有6m多。日志显示：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>[GC (Allocation Failure) [PSYoungGen: 7129K-&gt;648K(9216K)] 7129K-&gt;6800K(21504K), 0.0034548 secs]
+</code></pre></div><p>执行minorGC，新生代的存活对象由7129K减少到680K，堆的总使用大小由7129K减少到6800K，因此，新生代晋升到老年代的大小为6800K-648K=6152K，基本上就是前面3个字节数组对象的总和再加上少许附加占用内存。那么问题来了：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#f92672">[</span>Full GC <span style="color:#f92672">(</span>Ergonomics<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 648K-&gt;0K<span style="color:#f92672">(</span>9216K<span style="color:#f92672">)]</span> <span style="color:#f92672">[</span>ParOldGen: 6152K-&gt;6663K<span style="color:#f92672">(</span>12288K<span style="color:#f92672">)]</span> 6800K-&gt;6663K<span style="color:#f92672">(</span>21504K<span style="color:#f92672">)</span>, <span style="color:#f92672">[</span>Metaspace: 2569K-&gt;2569K<span style="color:#f92672">(</span>1056768K<span style="color:#f92672">)]</span>, 0.0053348 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
+</code></pre></div><p>这行日志显示执行了fullGC，为什么会执行fullGC呢，老年代的空间明明还没有满，还剩下3900K左右！Full GC日志中的<code>Ergonomics</code>又表示什么意思呢，带着这些疑问我开始Google相关的资料。</p>
+<p><code>Ergonomics</code>的字面意思是<code>人体工程学</code>，它是产生Full GC的原因之一，<code>GC Ergonomics</code>是JVM GC的一种自适应自动化调优策略，JVM根据新生代晋升到老年代的历史数据推测老年代空间，将会不足以容纳下一次GC时由新生代晋升过来的对象总大小，所以提前触发Full GC。那么GC Ergonomics的算法是什么，有什么规律吗？</p>
+<p>接着上面的例子，我把老年代的空间增大2m，结果没有变化，我再增加2m，也就是14m，结果发生了变化：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span> java -Xms24m -Xmx24m -Xmn10m -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCCause -XX:SurvivorRatio<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span> test.JVMTest2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 7129K-&gt;616K<span style="color:#f92672">(</span>9216K<span style="color:#f92672">)]</span> 7129K-&gt;6768K<span style="color:#f92672">(</span>23552K<span style="color:#f92672">)</span>, 0.0035058 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.01 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.01 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span> PSYoungGen      total 9216K, used 2746K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>  eden space 8192K, 26% used <span style="color:#f92672">[</span>0x00000000ff600000,0x00000000ff814930,0x00000000ffe00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>  from space 1024K, 60% used <span style="color:#f92672">[</span>0x00000000ffe00000,0x00000000ffe9a020,0x00000000fff00000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>  to   space 1024K, 0% used <span style="color:#f92672">[</span>0x00000000fff00000,0x00000000fff00000,0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span> ParOldGen       total 14336K, used 6152K <span style="color:#f92672">[</span>0x00000000fe800000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>  object space 14336K, 42% used <span style="color:#f92672">[</span>0x00000000fe800000,0x00000000fee02030,0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span> Metaspace       used 2576K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>  class space    used 282K, capacity 386K, committed 512K, reserved 1048576K
+</code></pre></div><p>于是我粗浅的认为，当前一次新生代晋升到老年代的对象大小大于老年代的剩余空间时，Full GC (Ergonomics)发生了，对应起来就是，<strong>新生代晋升大小6152K &lt; 老年代的剩余空间8284K</strong>。</p>
+<p>距离真相甚远，我认真参考了这3篇文章：</p>
+<ul>
+<li>
+<p><a class="shorcode_link" href="https://blog.csdn.net/zz133110/article/details/104454819" target="_blank">Full GC(Ergonomics)原因和实验</a></p>
+</li>
+<li>
+<p><a class="shorcode_link" href="https://cloud.tencent.com/developer/article/1082687" target="_blank">读懂一行Full GC日志</a></p>
+</li>
+<li>
+<p><a class="shorcode_link" href="https://blog.csdn.net/iteye_7742/article/details/82141049" target="_blank">GC悲观策略之Parallel GC篇</a></p>
+</li>
+</ul>
+<p>总结起来就是：</p>
+<ol>
+<li>如果晋升到老生代的平均大小大于老生代的剩余大小，则会返回true，认为需要一次full gc</li>
+<li>目前新生代已经使用的大小和之前晋升到老年代的平均大小，如果这2个值中的任意一个值都比当前老年代的剩余空间还大，直接执行full GC，否则执行minor GC。</li>
+<li>在YGC执行后，平均晋升到老年代的大小 &gt; 老年代剩余空间大小 ? 触发Full GC ： 什么都不做。</li>
+</ol>
+<p>针对这3个原因，我查阅了大量资料，也做过了大量的测试模拟，第一条是正确的，但是第二条和第三条经过测试很容易被推翻掉，根据这几天反复的实验大概可以认为，<strong>当Eden区空间不足而触发minor GC时，JVM会去看老年代剩余空间大小，如果小于之前由新生代晋升到老年代的大小，则会先触发一次minor GC，紧跟着一次Full GC(Ergonomics)，如果老年代的剩余空间明显过小时，则直接执行Full GC(Ergonomics)，根本不去执行minor GC了。如果老年代的剩余空间接近满了或已经满了，Full GC的原因不再是Ergonomics，而是Allocation Failure。</strong></p>
+<p>关于GC Ergonomics，就研究到这里，有空再继续琢磨，看能不能得到更精确的结论。</p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button next">
+<a href="https://zhige.io/2020/09/21/print-jvm-default-flags/">
+<span class="button__text">打印JVM默认参数</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<section data-isso-id="/2020/09/21/gc-log-fullgc-ergonomics/" data-title="GC日志中的人体工程学(Ergonomics)" id="isso-thread"></section>
+<script async="" data-isso="https://isso.dongzhi.me" data-isso-avatar="true" data-isso-avatar-bg="#f0f0f0" data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..." data-isso-css="false" data-isso-feed="false" data-isso-id="thread-id" data-isso-lang="zh" data-isso-max-comments-nested="5" data-isso-max-comments-top="10" data-isso-reply-notifications="true" data-isso-reply-to-self="true" data-isso-require-author="true" data-isso-require-email="true" data-isso-reveal-on-click="5" data-isso-vote="false" data-isso-vote-levels="" onload="setAutoCompleteProperty()" src="https://isso.dongzhi.me/js/embed.min.js"></script>
+<script>
+	function setAutoCompleteProperty() {
+		var authors = document.getElementsByName('author');
+		if (authors != null && authors.length > 0) {
+			authors[0].setAttribute('autocomplete', 'off');
+		}
+		var emails = document.getElementsByName('email');
+		if (emails != null && emails.length > 0) {
+			emails[0].setAttribute('autocomplete', 'off');
+		}
+		var sites = document.getElementsByName('website');
+		if (sites != null && sites.length > 0) {
+			sites[0].setAttribute('autocomplete', 'off');
+		}
+	}
+	</script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 <a href="https://zhige.io/">志哥笔记</a></span>
+<span>:: <a href="https://themes.gohugo.io/hugo-theme-terminal/">Terminal</a></span>
+<span>:: <a href="https://my.laoxuehost.com/aff.php?aff=10457">老薛主机</a></span>
+</div>
+</div>
+</footer>
+<script src="https://zhige.io/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>

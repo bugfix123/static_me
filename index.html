@@ -61,7 +61,7 @@
 <div class="posts">
 <div class="post on-list">
 <h1 class="post-title">
-<a href="https://zhige.io/2020/09/21/print-jvm-default-flags/">打印JVM默认参数</a>
+<a href="https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/">GC日志中的人体工程学(Ergonomics)</a>
 </h1>
 <div class="post-meta">
 <span class="post-date">
@@ -77,10 +77,34 @@
 <div class="post-content">
           
           
-          运行java程序时加入<code>-XX:+PrintFlagsFinal</code>可以打印出JVM启动时所设置的所有的默认flags的值！
+          最近在看GC日志相关的东西，我们知道，当Eden区空间不足时触发minor GC，当老年代空间不足时触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC。
           
           
         </div>
+<div>
+<a class="read-more button" href="/2020/09/21/gc-log-fullgc-ergonomics/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://zhige.io/2020/09/21/print-jvm-default-flags/">打印JVM默认参数</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-09-21
+          </span>
+<span class="post-author">::Zhige</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://zhige.io/tags/jvm/">JVM</a> 
+            
+          </span>
+<div class="post-content">
+<blockquote>
+<p>运行java程序时加入<code>-XX:+PrintFlagsFinal</code>可以打印出JVM启动时所设置的所有的默认flags的值！</p>
+</blockquote>
+</div>
 <div>
 <a class="read-more button" href="/2020/09/21/print-jvm-default-flags/">Read more →</a>
 </div>
@@ -155,29 +179,6 @@
 </div>
 <div>
 <a class="read-more button" href="/2020/09/11/how-to-deploy-isso-on-centos-7/">Read more →</a>
-</div>
-</div>
-<div class="post on-list">
-<h1 class="post-title">
-<a href="https://zhige.io/2020/09/08/all-issues-for-hugo/">Hugo使用过程中遇到的坑汇总</a>
-</h1>
-<div class="post-meta">
-<span class="post-date">
-            2020-09-08
-          </span>
-</div>
-<span class="post-tags">
-            
-            #<a href="https://zhige.io/tags/hugo/">hugo</a> 
-            
-          </span>
-<div class="post-content">
-          
-          今年6月份开始使用Hugo,Hugo 是一款效率极高的Static Website Generator。记录一下Hugo搭建时遇到的各种问题坑。
-          
-        </div>
-<div>
-<a class="read-more button" href="/2020/09/08/all-issues-for-hugo/">Read more →</a>
 </div>
 </div>
 <div class="pagination">

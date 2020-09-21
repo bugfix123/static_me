@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>jvm :: 志哥笔记 — 记述码农在家的故事！</title>
+<title>JVM :: 志哥笔记 — 记述码农在家的故事！</title>
 <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta content="" name="description"/>
@@ -16,10 +16,10 @@
 <link href="/img/favicon/favicon_io/site.webmanifest" rel="manifest"/>
 <meta content="en" property="og:locale"/>
 <meta content="website" property="og:type"/>
-<meta content="jvm :: 志哥笔记" property="og:title"/>
+<meta content="JVM :: 志哥笔记" property="og:title"/>
 <meta content="" property="og:description"/>
 <meta content="https://zhige.io/tags/jvm/" property="og:url"/>
-<meta content="jvm" property="og:site_name"/>
+<meta content="JVM" property="og:site_name"/>
 <meta content="https://zhige.io/img/favicon/blue.png" property="og:image"/>
 <meta content="2048" property="og:image:width"/>
 <meta content="1024" property="og:image:height"/>
@@ -60,7 +60,7 @@
 <div class="posts">
 <div class="post on-list">
 <h1 class="post-title">
-<a href="https://zhige.io/2020/09/21/print-jvm-default-flags/">打印JVM默认参数</a>
+<a href="https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/">GC日志中的人体工程学(Ergonomics)</a>
 </h1>
 <div class="post-meta">
 <span class="post-date">
@@ -76,10 +76,34 @@
 <div class="post-content">
           
           
-          运行java程序时加入<code>-XX:+PrintFlagsFinal</code>可以打印出JVM启动时所设置的所有的默认flags的值！
+          最近在看GC日志相关的东西，我们知道，当Eden区空间不足时触发minor GC，当老年代空间不足时触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC。
           
           
         </div>
+<div>
+<a class="read-more button" href="/2020/09/21/gc-log-fullgc-ergonomics/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
+<a href="https://zhige.io/2020/09/21/print-jvm-default-flags/">打印JVM默认参数</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-09-21
+          </span>
+<span class="post-author">::Zhige</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://zhige.io/tags/jvm/">JVM</a> 
+            
+          </span>
+<div class="post-content">
+<blockquote>
+<p>运行java程序时加入<code>-XX:+PrintFlagsFinal</code>可以打印出JVM启动时所设置的所有的默认flags的值！</p>
+</blockquote>
+</div>
 <div>
 <a class="read-more button" href="/2020/09/21/print-jvm-default-flags/">Read more →</a>
 </div>

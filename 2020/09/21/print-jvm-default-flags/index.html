@@ -4,7 +4,7 @@
 <title>打印JVM默认参数 :: 志哥笔记 — 记述码农在家的故事！</title>
 <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="运行java程序时加入-XX:+PrintFlagsFinal可以打印出JVM启动时所设置的所有的默认flags的值！
+<meta content=" 运行java程序时加入-XX:+PrintFlagsFinal可以打印出JVM启动时所设置的所有的默认flags的值！
 " name="description"/>
 <meta content="前沿技术,IT博客,技术笔记,IT Share" name="keywords"/>
 <meta content="noodp" name="robots"/>
@@ -18,7 +18,7 @@
 <meta content="en" property="og:locale"/>
 <meta content="article" property="og:type"/>
 <meta content="打印JVM默认参数 :: 志哥笔记" property="og:title"/>
-<meta content="运行java程序时加入-XX:+PrintFlagsFinal可以打印出JVM启动时所设置的所有的默认flags的值！
+<meta content=" 运行java程序时加入-XX:+PrintFlagsFinal可以打印出JVM启动时所设置的所有的默认flags的值！
 " property="og:description"/>
 <meta content="https://zhige.io/2020/09/21/print-jvm-default-flags/" property="og:url"/>
 <meta content="打印JVM默认参数" property="og:site_name"/>
@@ -77,14 +77,16 @@
     
   </span>
 <div class="post-content"><div>
+<blockquote>
 <p>运行java程序时加入<code>-XX:+PrintFlagsFinal</code>可以打印出JVM启动时所设置的所有的默认flags的值！</p>
-<p>JDK的版本情况：</p>
+</blockquote>
+<p>我得JDK的版本情况：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ java -version
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>java version <span style="color:#e6db74">"1.8.0_151"</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>Java<span style="color:#f92672">(</span>TM<span style="color:#f92672">)</span> SE Runtime Environment <span style="color:#f92672">(</span>build 1.8.0_151-b12<span style="color:#f92672">)</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>Java HotSpot<span style="color:#f92672">(</span>TM<span style="color:#f92672">)</span> 64-Bit Server VM <span style="color:#f92672">(</span>build 25.151-b12, mixed mode<span style="color:#f92672">)</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>
-</code></pre></div><p>启动参数：</p>
+</code></pre></div><p>我们假设启动参数：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>java  -XX:+PrintFlagsFinal messageSenderTest.JVMTest2
 </code></pre></div><p>打印得到的所有flags：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  1</span><span style="color:#f92672">[</span>Global flags<span style="color:#f92672">]</span>
@@ -820,6 +822,12 @@
 <hr/>
 </div>
 <div class="pagination__buttons">
+<span class="button previous">
+<a href="https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/">
+<span class="button__icon">←</span>
+<span class="button__text">GC日志中的人体工程学(Ergonomics)</span>
+</a>
+</span>
 <span class="button next">
 <a href="https://zhige.io/2020/09/18/jvm-log-big-object-alloc/">
 <span class="button__text">JVM中晋升到老年代的大对象到底多大</span>

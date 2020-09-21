@@ -12,12 +12,23 @@
     
     
     <item>
+      <title>GC日志中的人体工程学(Ergonomics)</title>
+      <link>https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/</link>
+      <pubDate>Mon, 21 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/</guid>
+      <description>&lt;p&gt;最近在看GC日志相关的东西，我们知道，当Eden区空间不足时触发minor GC，当老年代空间不足时触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>打印JVM默认参数</title>
       <link>https://zhige.io/2020/09/21/print-jvm-default-flags/</link>
       <pubDate>Mon, 21 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>https://zhige.io/2020/09/21/print-jvm-default-flags/</guid>
-      <description>&lt;p&gt;运行java程序时加入&lt;code&gt;-XX:+PrintFlagsFinal&lt;/code&gt;可以打印出JVM启动时所设置的所有的默认flags的值！&lt;/p&gt;</description>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;运行java程序时加入&lt;code&gt;-XX:+PrintFlagsFinal&lt;/code&gt;可以打印出JVM启动时所设置的所有的默认flags的值！&lt;/p&gt;
+&lt;/blockquote&gt;</description>
     </item>
     
     <item>
