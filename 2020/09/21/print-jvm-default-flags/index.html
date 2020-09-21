@@ -80,7 +80,7 @@
 <blockquote>
 <p>运行java程序时加入<code>-XX:+PrintFlagsFinal</code>可以打印出JVM启动时所设置的所有的默认flags的值！</p>
 </blockquote>
-<p>我得JDK的版本情况：</p>
+<p>本人的JDK的版本情况：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>$ java -version
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>java version <span style="color:#e6db74">"1.8.0_151"</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>Java<span style="color:#f92672">(</span>TM<span style="color:#f92672">)</span> SE Runtime Environment <span style="color:#f92672">(</span>build 1.8.0_151-b12<span style="color:#f92672">)</span>
@@ -88,7 +88,7 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span>
 </code></pre></div><p>我们假设启动参数：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>java  -XX:+PrintFlagsFinal messageSenderTest.JVMTest2
-</code></pre></div><p>打印得到的所有flags：</p>
+</code></pre></div><p>这样就可以打印出JVM所有flags的默认值啦！</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  1</span><span style="color:#f92672">[</span>Global flags<span style="color:#f92672">]</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  2</span>    uintx AdaptiveSizeDecrementScaleFactor          <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>                                   <span style="color:#f92672">{</span>product<span style="color:#f92672">}</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  3</span>    uintx AdaptiveSizeMajorGCDecayTimeScale         <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>                                  <span style="color:#f92672">{</span>product<span style="color:#f92672">}</span>

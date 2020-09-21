@@ -4,7 +4,7 @@
 <title>GC日志中的人体工程学(Ergonomics) :: 志哥笔记 — 记述码农在家的故事！</title>
 <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="最近在看GC日志相关的东西，我们知道，当Eden区空间不足时触发minor GC，当老年代空间不足时触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC。
+<meta content="最近在看GC日志相关的东西，众所周知，当Eden区空间不足时会触发minor GC，老年代空间不足时会触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC，什么情况，了解一下！
 " name="description"/>
 <meta content="前沿技术,IT博客,技术笔记,IT Share" name="keywords"/>
 <meta content="noodp" name="robots"/>
@@ -18,7 +18,7 @@
 <meta content="en" property="og:locale"/>
 <meta content="article" property="og:type"/>
 <meta content="GC日志中的人体工程学(Ergonomics) :: 志哥笔记" property="og:title"/>
-<meta content="最近在看GC日志相关的东西，我们知道，当Eden区空间不足时触发minor GC，当老年代空间不足时触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC。
+<meta content="最近在看GC日志相关的东西，众所周知，当Eden区空间不足时会触发minor GC，老年代空间不足时会触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC，什么情况，了解一下！
 " property="og:description"/>
 <meta content="https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/" property="og:url"/>
 <meta content="GC日志中的人体工程学(Ergonomics)" property="og:site_name"/>
@@ -77,7 +77,7 @@
     
   </span>
 <div class="post-content"><div>
-<p>最近在看GC日志相关的东西，我们知道，当Eden区空间不足时触发minor GC，当老年代空间不足时触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC。</p>
+<p>最近在看GC日志相关的东西，众所周知，当Eden区空间不足时会触发minor GC，老年代空间不足时会触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC，什么情况，了解一下！</p>
 <p>例子代码：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">package</span> test<span style="color:#f92672">;</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
@@ -146,7 +146,8 @@
 <li>目前新生代已经使用的大小和之前晋升到老年代的平均大小，如果这2个值中的任意一个值都比当前老年代的剩余空间还大，直接执行full GC，否则执行minor GC。</li>
 <li>在YGC执行后，平均晋升到老年代的大小 &gt; 老年代剩余空间大小 ? 触发Full GC ： 什么都不做。</li>
 </ol>
-<p>针对这3个原因，我查阅了大量资料，也做过了大量的测试模拟，第一条是正确的，但是第二条和第三条经过测试很容易被推翻掉，根据这几天反复的实验大概可以认为，<strong>当Eden区空间不足而触发minor GC时，JVM会去看老年代剩余空间大小，如果小于之前由新生代晋升到老年代的大小，则会先触发一次minor GC，紧跟着一次Full GC(Ergonomics)，如果老年代的剩余空间明显过小时，则直接执行Full GC(Ergonomics)，根本不去执行minor GC了。如果老年代的剩余空间接近满了或已经满了，Full GC的原因不再是Ergonomics，而是Allocation Failure。</strong></p>
+<p>针对这3个原因，我查阅了大量资料，也做过了大量的测试模拟，第一条是正确的，但是第二条和第三条经过测试很容易被推翻掉。</p>
+<p>根据这几天反复的实验大概可以认为，<strong>当Eden区空间不足而触发minor GC时，JVM会去看老年代剩余空间大小，如果小于之前由新生代晋升到老年代的大小，则会先触发一次minor GC，紧跟着一次Full GC(Ergonomics)，如果老年代的剩余空间明显过小时，则直接执行Full GC(Ergonomics)，根本不去执行minor GC了。如果老年代的剩余空间接近满了或已经满了，Full GC的原因不再是Ergonomics，而是Allocation Failure。</strong></p>
 <p>关于GC Ergonomics，就研究到这里，有空再继续琢磨，看能不能得到更精确的结论。</p>
 </div></div>
 <div class="pagination">

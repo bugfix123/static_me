@@ -13,7 +13,7 @@
 <link>https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/</link>
 <pubDate>Mon, 21 Sep 2020 00:00:00 +0000</pubDate>
 <guid>https://zhige.io/2020/09/21/gc-log-fullgc-ergonomics/</guid>
-<description>&lt;p&gt;最近在看GC日志相关的东西，我们知道，当Eden区空间不足时触发minor GC，当老年代空间不足时触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC。&lt;/p&gt;</description>
+<description>&lt;p&gt;最近在看GC日志相关的东西，众所周知，当Eden区空间不足时会触发minor GC，老年代空间不足时会触发full GC，但是下面的例子中，老年代的空间并没有满，也出现了full GC，什么情况，了解一下！&lt;/p&gt;</description>
 </item>
 <item>
 <title>打印JVM默认参数</title>
