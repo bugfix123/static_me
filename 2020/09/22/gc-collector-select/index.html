@@ -22,7 +22,7 @@
 " property="og:description"/>
 <meta content="https://zhige.io/2020/09/22/gc-collector-select/" property="og:url"/>
 <meta content="GC收集器的命令行参数指定总结" property="og:site_name"/>
-<meta content="https://zhige.io/img/favicon/blue.png" property="og:image"/>
+<meta content="https://zhige.io/post/images/2020/09/gc-collector-compose.png" property="og:image"/>
 <meta content="2048" property="og:image:width"/>
 <meta content="1024" property="og:image:height"/>
 <meta content="2020-09-22 00:00:00 +0000 UTC" property="article:published_time"/>
@@ -76,6 +76,7 @@
     #<a href="https://zhige.io/tags/jvm/">JVM</a> 
     
   </span>
+<img alt="GC收集器的命令行参数指定总结" class="post-cover" src="https://zhige.io/post/images/2020/09/gc-collector-compose.png"/>
 <div class="post-content"><div>
 <blockquote>
 <p>通过命令行的参数可以指定JVM的GC收集器，本文总结一下常见GC收集器的指定参数，供参考。</p>
@@ -86,8 +87,8 @@
 <a class="lightbox" href="#_" id="490c76716209bd497fc82841e29e8269-lightbox">
 <img alt="gc-collector-compose.png" src="/post/images/2020/09/gc-collector-compose.png"/>
 </a></p>
-<p>#　-XX:+UseParallelGC
-Server模式下默认开启，GC日志输出如下：</p>
+<h1 id="-xxuseparallelgc">-XX:+UseParallelGC<a arialabel="Anchor" class="hanchor" href="#-xxuseparallelgc">⌗</a> </h1>
+<p>Server模式下默认开启，GC日志输出如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails  messageSenderTest.JVMTest3
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#f92672">[</span>Full GC <span style="color:#f92672">(</span>Ergonomics<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>PSYoungGen: 648K-&gt;0K<span style="color:#f92672">(</span>9216K<span style="color:#f92672">)]</span> <span style="color:#f92672">[</span>ParOldGen: 6152K-&gt;6689K<span style="color:#f92672">(</span>10240K<span style="color:#f92672">)]</span> 6800K-&gt;6689K<span style="color:#f92672">(</span>19456K<span style="color:#f92672">)</span>, <span style="color:#f92672">[</span>Metaspace: 2665K-&gt;2665K<span style="color:#f92672">(</span>1056768K<span style="color:#f92672">)]</span>, 0.0042451 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>Heap
@@ -101,8 +102,8 @@ Server模式下默认开启，GC日志输出如下：</p>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>  class space    used 288K, capacity 386K, committed 512K, reserved 1048576K
 </code></pre></div><p><strong>PSYoungGen</strong>:其中PS是Parallel Scavenge的缩写，表示新生代使用了Parallel Scavenge收集器。
 <strong>ParOldGen</strong>：其中ParOld是Parallel Old的简写，表示老年代使用了Parallel Old收集器。</p>
-<p>#　-XX:+UseSerialGC
-Client模式下默认开启。GC日志输出如下：</p>
+<h1 id="-xxuseserialgc">-XX:+UseSerialGC<a arialabel="Anchor" class="hanchor" href="#-xxuseserialgc">⌗</a> </h1>
+<p>Client模式下默认开启。GC日志输出如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails -XX:+UseSerialGC messageSenderTest.JVMTest3
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>DefNew: 7129K-&gt;546K<span style="color:#f92672">(</span>9216K<span style="color:#f92672">)</span>, 0.0032658 secs<span style="color:#f92672">]</span> 7129K-&gt;6690K<span style="color:#f92672">(</span>19456K<span style="color:#f92672">)</span>, 0.0032931 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>DefNew: 6850K-&gt;6850K<span style="color:#f92672">(</span>9216K<span style="color:#f92672">)</span>, 0.0000074 secs<span style="color:#f92672">][</span>Tenured: 6144K-&gt;8192K<span style="color:#f92672">(</span>10240K<span style="color:#f92672">)</span>, 0.0024199 secs<span style="color:#f92672">]</span> 12994K-&gt;12832K<span style="color:#f92672">(</span>19456K<span style="color:#f92672">)</span>, <span style="color:#f92672">[</span>Metaspace: 2666K-&gt;2666K<span style="color:#f92672">(</span>1056768K<span style="color:#f92672">)]</span>, 0.0024507 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
@@ -115,8 +116,8 @@ Client模式下默认开启。GC日志输出如下：</p>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>   the space 10240K,  80% used <span style="color:#f92672">[</span>0x00000000ff600000, 0x00000000ffe00040, 0x00000000ffe00200, 0x0000000100000000<span style="color:#f92672">)</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span> Metaspace       used 2672K, capacity 4486K, committed 4864K, reserved 1056768K
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  class space    used 288K, capacity 386K, committed 512K, reserved 1048576K
-</code></pre></div><p>DefNew：新生代区域，使用的是Serial收集器，单线程，复制算法
-Tenured: 老年代区域，使用的是Serial Old收集器，单线程，标记整理算法</p>
+</code></pre></div><p><strong>DefNew</strong>：新生代区域，使用的是Serial收集器，单线程，复制算法</p>
+<p><strong>Tenured</strong>: 老年代区域，使用的是Serial Old收集器，单线程，标记整理算法</p>
 <h1 id="-xxuseparnewgc">-XX:+UseParNewGC<a arialabel="Anchor" class="hanchor" href="#-xxuseparnewgc">⌗</a> </h1>
 <p>新生代ParNew，老年代Serial Old，其中ParNew是Serial的多线程版本，算法原理都一样。GC日志如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails -XX:+UseParNewGC messageSenderTest.JVMTest3
@@ -133,8 +134,8 @@ Tenured: 老年代区域，使用的是Serial Old收集器，单线程，标记�
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>  class space    used 288K, capacity 386K, committed 512K, reserved 1048576K
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>Java HotSpot<span style="color:#f92672">(</span>TM<span style="color:#f92672">)</span> 64-Bit Server VM warning: Using the ParNew young collector with the Serial old collector is deprecated and will likely be removed in a future release
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
-</code></pre></div><p>ParNew：新生代区域，使用ParNew收集器
-Tenured: 老年代区域，使用的是Serial Old收集器</p>
+</code></pre></div><p><strong>ParNew</strong>：新生代区域，使用ParNew收集器</p>
+<p><strong>Tenured</strong>: 老年代区域，使用的是Serial Old收集器</p>
 <p>日志中提示信息很明显了，对于Java HotSpot(TM) 64-Bit Server VM，使用<code>ParNew + Serial Old</code>这种组合是不推荐的，可能会在后续的正式版本中移除掉。</p>
 <h1 id="-xxuseparalleloldgc">-XX:+UseParallelOldGC<a arialabel="Anchor" class="hanchor" href="#-xxuseparalleloldgc">⌗</a> </h1>
 <p>与-XX:+UseParallelGC这个参数一样，使用的收集器：Parallel Scavenge + Parallel Old</p>
