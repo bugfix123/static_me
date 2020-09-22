@@ -6,10 +6,21 @@
     <description>Recent content in JVM on 志哥笔记</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 21 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 22 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://zhige.io/tags/jvm/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>GC收集器的命令行参数指定总结</title>
+      <link>https://zhige.io/2020/09/22/gc-collector-select/</link>
+      <pubDate>Tue, 22 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://zhige.io/2020/09/22/gc-collector-select/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;通过命令行的参数可以指定JVM的GC收集器，本文总结一下常见GC收集器的指定参数，供参考。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>GC日志中的人体工程学(Ergonomics)</title>
