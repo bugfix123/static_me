@@ -81,12 +81,6 @@
 <blockquote>
 <p>通过命令行的参数可以指定JVM的GC收集器，本文总结一下常见GC收集器的指定参数，供参考。</p>
 </blockquote>
-<p><a href="#490c76716209bd497fc82841e29e8269-lightbox">
-<img alt="gc-collector-compose.png" src="/post/images/2020/09/gc-collector-compose.png"/>
-</a>
-<a class="lightbox" href="#_" id="490c76716209bd497fc82841e29e8269-lightbox">
-<img alt="gc-collector-compose.png" src="/post/images/2020/09/gc-collector-compose.png"/>
-</a></p>
 <h1 id="-xxuseparallelgc">-XX:+UseParallelGC<a arialabel="Anchor" class="hanchor" href="#-xxuseparallelgc">⌗</a> </h1>
 <p>Server模式下默认开启，GC日志输出如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails  messageSenderTest.JVMTest3
@@ -100,8 +94,8 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>  object space 10240K, 65% used <span style="color:#f92672">[</span>0x00000000fec00000,0x00000000ff288510,0x00000000ff600000<span style="color:#f92672">)</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span> Metaspace       used 2672K, capacity 4486K, committed 4864K, reserved 1056768K
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>  class space    used 288K, capacity 386K, committed 512K, reserved 1048576K
-</code></pre></div><p><strong>PSYoungGen</strong>:其中PS是Parallel Scavenge的缩写，表示新生代使用了Parallel Scavenge收集器。
-<strong>ParOldGen</strong>：其中ParOld是Parallel Old的简写，表示老年代使用了Parallel Old收集器。</p>
+</code></pre></div><p><strong>PSYoungGen</strong>:其中PS是Parallel Scavenge的缩写，表示新生代使用了Parallel Scavenge收集器。</p>
+<p><strong>ParOldGen</strong>：其中ParOld是Parallel Old的简写，表示老年代使用了Parallel Old收集器。</p>
 <h1 id="-xxuseserialgc">-XX:+UseSerialGC<a arialabel="Anchor" class="hanchor" href="#-xxuseserialgc">⌗</a> </h1>
 <p>Client模式下默认开启。GC日志输出如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails -XX:+UseSerialGC messageSenderTest.JVMTest3
@@ -169,7 +163,24 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span> Metaspace       used 2672K, capacity 4486K, committed 4864K, reserved 1056768K
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>  class space    used 288K, capacity 386K, committed 512K, reserved 1048576K
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
-</code></pre></div>
+</code></pre></div><h1 id="-xxuseconcmarksweepgc">-XX:+UseConcMarkSweepGC<a arialabel="Anchor" class="hanchor" href="#-xxuseconcmarksweepgc">⌗</a> </h1>
+<p>表示老年代要使用CMS(concurrent mark-sweep)收集器，相应地年轻代使用ParNew。GC日志如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>$ java -Xms20m -Xmx20m -Xmn10m -verbose:gc -XX:+PrintGCDetails -XX:+UseConcMarkSweepGC -XX:+PrintCommandLineFlags messageSenderTest.JVMTest3
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>-XX:InitialHeapSize<span style="color:#f92672">=</span><span style="color:#ae81ff">20971520</span> -XX:MaxHeapSize<span style="color:#f92672">=</span><span style="color:#ae81ff">20971520</span> -XX:MaxNewSize<span style="color:#f92672">=</span><span style="color:#ae81ff">10485760</span> -XX:MaxTenuringThreshold<span style="color:#f92672">=</span><span style="color:#ae81ff">6</span> -XX:NewSize<span style="color:#f92672">=</span><span style="color:#ae81ff">10485760</span> -XX:OldPLABSize<span style="color:#f92672">=</span><span style="color:#ae81ff">16</span> -XX:+PrintCommandLineFlags -XX:+PrintGC -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:-UseLargePagesIndividualAllocation -XX:+UseParNewGC
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>Allocation Failure<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>ParNew: 7129K-&gt;565K<span style="color:#f92672">(</span>9216K<span style="color:#f92672">)</span>, 0.0021883 secs<span style="color:#f92672">]</span> 7129K-&gt;6711K<span style="color:#f92672">(</span>19456K<span style="color:#f92672">)</span>, 0.0022223 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>Heap
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span> par new generation   total 9216K, used 2695K <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>  eden space 8192K,  26% used <span style="color:#f92672">[</span>0x00000000fec00000, 0x00000000fee14930, 0x00000000ff400000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>  from space 1024K,  55% used <span style="color:#f92672">[</span>0x00000000ff500000, 0x00000000ff58d4f8, 0x00000000ff600000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>  to   space 1024K,   0% used <span style="color:#f92672">[</span>0x00000000ff400000, 0x00000000ff400000, 0x00000000ff500000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span> concurrent mark-sweep generation total 10240K, used 6146K <span style="color:#f92672">[</span>0x00000000ff600000, 0x0000000100000000, 0x0000000100000000<span style="color:#f92672">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span> Metaspace       used 2672K, capacity 4486K, committed 4864K, reserved 1056768K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>  class space    used 288K, capacity 386K, committed 512K, reserved 1048576K
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>
+</code></pre></div><p><strong>par new generation</strong>: 年轻代</p>
+<p><strong>concurrent mark-sweep generation</strong>: 老年代</p>
+<p>从日志中也可以看出，在命令行参数中增加<code>-XX:+PrintCommandLineFlags</code>打印出默认参数发现，当使用<code>-XX:+UseConcMarkSweepGC</code>时会默认带上<code>-XX:+UseParNewGC</code>。</p>
 </div></div>
 <div class="pagination">
 <div class="pagination__title">
