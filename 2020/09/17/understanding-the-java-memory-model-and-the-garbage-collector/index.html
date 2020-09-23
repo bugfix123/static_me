@@ -79,7 +79,7 @@
 <div class="post-content"><div>
 <p>在这篇文章中我们将尝试搞清楚Java内存模型以及垃圾收集器是如何工作的。在这篇文章中我使用的是JDK8 Oracle Hot Spot 64 bit版本的JVM。首先我描述一下Java进程使用的不同内存区域。</p>
 <p><a href="#23b27edc54992c358910ce8ad3d21c4e-lightbox">
-<img alt="garbage-collector-01.png" src="/post/images/2020/09/garbage-collector-01.png"/>
+<img alt="garbage-collector-01.png" src="/post/images/2020/09/garbage-collector-01.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="23b27edc54992c358910ce8ad3d21c4e-lightbox">
 <img alt="garbage-collector-01.png" src="/post/images/2020/09/garbage-collector-01.png"/>
@@ -118,7 +118,7 @@
 <p>现在我们来讨论垃圾收集过程(the garbage collection process)。JVM单独使用一个守护线程来进行垃圾收集。正如上文所述，当应用程序创建对象的时候，JVM将尝试从Eden Space(伊甸区)获取所需要的内存。JVM执行GC比如minor GC和major GC。</p>
 <p>我们来理解一下minor GC。</p>
 <p><a href="#f8d75b996826a1b416c19c18cdb6d0d3-lightbox">
-<img alt="garbage-collector-02.png" src="/post/images/2020/09/garbage-collector-02.png"/>
+<img alt="garbage-collector-02.png" src="/post/images/2020/09/garbage-collector-02.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="f8d75b996826a1b416c19c18cdb6d0d3-lightbox">
 <img alt="garbage-collector-02.png" src="/post/images/2020/09/garbage-collector-02.png"/>
@@ -126,7 +126,7 @@
 <p>初始时<code>Survivor Space(幸存区)</code>和<code>Tenured Space(老年代)</code>是空的。当JVM不能从Eden Space(伊甸区)获得内存时就会启动minor GC。在minor GC过程中，那些<strong>不可达的</strong>对象被标记为<strong>待回收的</strong>。
 JVM选择Survivor Space(幸存区)中的一块作为"<code>To Space</code>”，可能是S0，也可能是S1。JVM将所有可达的对象复制到"<code>To Space</code>”(假设S0)并将对象年龄增加1，那些无法存放在Survivor Space中的对象将被移动到Tenured Space，这个过程称为"premature promotion”(过早提升)。下图中我故意让“<code>To Space</code>” 比已经分配的空间大，但是请记住，Survivor Space大小不会增长。</p>
 <p><a href="#88f4db96e0d7ce609ed81d30e5e8ce3f-lightbox">
-<img alt="garbage-collector-03.png" src="/post/images/2020/09/garbage-collector-03.png"/>
+<img alt="garbage-collector-03.png" src="/post/images/2020/09/garbage-collector-03.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="88f4db96e0d7ce609ed81d30e5e8ce3f-lightbox">
 <img alt="garbage-collector-03.png" src="/post/images/2020/09/garbage-collector-03.png"/>
@@ -134,21 +134,21 @@ JVM选择Survivor Space(幸存区)中的一块作为"<code>To Space</code>”，
 <p>在上图中，被标记为红色的对象表示他们是不可达的。所有可达的对象都是GC roots，垃圾收集器不会移除GC roots，而是移除不可达的对象并清空Eden Space。</p>
 <p>再一次进行minor GC时，垃圾收集器标记Eden Space和To Survivor Space(S0)中不可达的对象，将GC roots复制到另外一块幸存区空间S1，与此同时，可达的对象的年龄将增加1。</p>
 <p><a href="#e12ead4029918e1b495c880104926334-lightbox">
-<img alt="garbage-collector-04.png" src="/post/images/2020/09/garbage-collector-04.png"/>
+<img alt="garbage-collector-04.png" src="/post/images/2020/09/garbage-collector-04.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="e12ead4029918e1b495c880104926334-lightbox">
 <img alt="garbage-collector-04.png" src="/post/images/2020/09/garbage-collector-04.png"/>
 </a></p>
 <p>在上图中，被标记为红色的对象有资格被GC，Eden Space和survivor spaces空间中其他的对象将被复制到另一块幸存区S1，同时对象年龄加1。</p>
 <p><a href="#41b444dc8065088cbafe4dd4d6dd6de1-lightbox">
-<img alt="garbage-collector-05.png" src="/post/images/2020/09/garbage-collector-05.png"/>
+<img alt="garbage-collector-05.png" src="/post/images/2020/09/garbage-collector-05.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="41b444dc8065088cbafe4dd4d6dd6de1-lightbox">
 <img alt="garbage-collector-05.png" src="/post/images/2020/09/garbage-collector-05.png"/>
 </a></p>
 <p>对于每一次minor GC重复上述过程，当对象的年龄到达最大年龄阈值(the max age threshold)就会被复制到Tenured Space。</p>
 <p><a href="#625d2ec6016acc786c37a7683bf636b5-lightbox">
-<img alt="garbage-collector-06.png" src="/post/images/2020/09/garbage-collector-06.png"/>
+<img alt="garbage-collector-06.png" src="/post/images/2020/09/garbage-collector-06.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="625d2ec6016acc786c37a7683bf636b5-lightbox">
 <img alt="garbage-collector-06.png" src="/post/images/2020/09/garbage-collector-06.png"/>

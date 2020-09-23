@@ -77,7 +77,7 @@
     
   </span>
 <div class="post-content"><div>
-<p>CMS收集器的全称是"Mostly Concurrent Mark and Sweep Garbage Collector”，它是老年代的收集器，算法是mark-sweep，它以避免老年代的长时间停顿为设计目标。与之搭配的新生代收集器是ParNew。</p>
+<p>CMS收集器的全称是"Mostly Concurrent Mark and Sweep Garbage Collector”，它是老年代的收集器，算法是<code>mark-sweep</code>，它以避免老年代的长时间停顿为设计目标。与之搭配的新生代收集器是ParNew。</p>
 <p>要启用CMS收集器需要在命令行中添加参数:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-XX:+UseConcMarkSweepGC
 </code></pre></div><p>相应地完整CMS GC日志如下：</p>
@@ -108,37 +108,36 @@
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>
 </code></pre></div><p>CMS一共包括7个阶段，下面逐一分解。</p>
 <h1 id="phase-1-initial-mark">Phase 1: Initial Mark<a arialabel="Anchor" class="hanchor" href="#phase-1-initial-mark">⌗</a> </h1>
-<p>这是CMS中两个"stop-the-world"的其中之一。这个阶段的目标是标记老年代中这2种对象：a.直接被GC Roots引用 b.被新生代中存活的对象引用
-This is one of the two stop-the-world events during CMS. The goal of this phase is to mark all the objects in the Old Generation that are either direct GC roots or are referenced from some live object in the Young Generation. The latter is important since the Old Generation is collected separately.
-<a href="#5f59342fe75020e995b6f2c9c7a109cc-lightbox">
-<img alt="cms_phase_01.png" src="/post/images/2020/09/cms_phase_01.png"/>
+<p>这是CMS中两个"stop-the-world"的其中之一。这个阶段的目标是标记老年代中这2种对象：a.直接被GC Roots引用 b.被新生代中存活的对象引用</p>
+<p><a href="#5f59342fe75020e995b6f2c9c7a109cc-lightbox">
+<img alt="cms_phase_01.png" src="/post/images/2020/09/cms_phase_01.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="5f59342fe75020e995b6f2c9c7a109cc-lightbox">
 <img alt="cms_phase_01.png" src="/post/images/2020/09/cms_phase_01.png"/>
 </a></p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>CMS Initial Mark<span style="color:#f92672">)</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">1</span> CMS-initial-mark: 8192K<span style="color:#f92672">(</span>10240K<span style="color:#f92672">)]</span> 14881K<span style="color:#f92672">(</span>19456K<span style="color:#f92672">)</span>, 0.0002765 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
 </code></pre></div><h1 id="phase-2-concurrent-mark">Phase 2: Concurrent Mark<a arialabel="Anchor" class="hanchor" href="#phase-2-concurrent-mark">⌗</a> </h1>
-<p>在这个阶段中，垃圾收集器遍历老年代，从前一阶段"Initial Mark"中标记的roots开始标记所有活着的对象。在并发标记阶段，GC并发地和应用程序运行着，不会停止应用程序线程。需要注意老年代中并非所有活着的对象会被标记，因为在标记过程中应用程序会不断变更对象的引用。
-<a href="#cb3f018994889998b039f9ea7a3d4631-lightbox">
-<img alt="cms_phase_02.png" src="/post/images/2020/09/cms_phase_02.png"/>
+<p>在这个阶段中，垃圾收集器遍历老年代，从前一阶段"Initial Mark"中标记的roots开始标记所有活着的对象。在并发标记阶段，GC并发地和应用程序运行着，不会停止应用程序线程。需要注意老年代中并非所有活着的对象会被标记，因为在标记过程中应用程序会不断变更对象的引用。</p>
+<p><a href="#cb3f018994889998b039f9ea7a3d4631-lightbox">
+<img alt="cms_phase_02.png" src="/post/images/2020/09/cms_phase_02.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="cb3f018994889998b039f9ea7a3d4631-lightbox">
 <img alt="cms_phase_02.png" src="/post/images/2020/09/cms_phase_02.png"/>
-</a>
-在上面插图中，由"Current object"所指向的引用已经被标记线程移除掉。</p>
+</a></p>
+<p>在上面插图中，由"Current object"所指向的引用已经被标记线程移除掉。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#f92672">[</span>CMS-concurrent-mark-start<span style="color:#f92672">]</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span style="color:#f92672">[</span>CMS-concurrent-mark: 0.000/0.000 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
 </code></pre></div><h1 id="phase-3-concurrent-preclean">Phase 3: Concurrent Preclean<a arialabel="Anchor" class="hanchor" href="#phase-3-concurrent-preclean">⌗</a> </h1>
-<p>这是又一个并发阶段，与应用程序线程并发执行。在前一个"Concurrent Mark"过程中，一些对象引用已发生了改变，这时JVM会标记发生变化的对象所在的堆区域(称为"Card”)。发生变化的对象称为dirty，这个过程称为Card Marking。
-<a href="#73b2519367bf3fb0fd30345b089c2336-lightbox">
-<img alt="cms_phase_03.png" src="/post/images/2020/09/cms_phase_03.png"/>
+<p>这是又一个并发阶段，与应用程序线程并发执行。在前一个"Concurrent Mark"过程中，一些对象引用已发生了改变，这时JVM会标记发生变化的对象所在的堆区域(称为"Card”)。发生变化的对象称为dirty，这个过程称为Card Marking。</p>
+<p><a href="#73b2519367bf3fb0fd30345b089c2336-lightbox">
+<img alt="cms_phase_03.png" src="/post/images/2020/09/cms_phase_03.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="73b2519367bf3fb0fd30345b089c2336-lightbox">
 <img alt="cms_phase_03.png" src="/post/images/2020/09/cms_phase_03.png"/>
 </a></p>
-<p>在pre-cleaning阶段，这些dirty对象会被记录，从这些dirty对象开始的可达的对象也会被标记。标记完成之后Card区域将被清除掉。
-<a href="#b8bc2221154d872295ce87e63b73c8f9-lightbox">
-<img alt="cms_phase_04.png" src="/post/images/2020/09/cms_phase_04.png"/>
+<p>在pre-cleaning阶段，这些dirty对象会被记录，从这些dirty对象开始的可达的对象也会被标记。标记完成之后Card区域将被清除掉。</p>
+<p><a href="#b8bc2221154d872295ce87e63b73c8f9-lightbox">
+<img alt="cms_phase_04.png" src="/post/images/2020/09/cms_phase_04.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="b8bc2221154d872295ce87e63b73c8f9-lightbox">
 <img alt="cms_phase_04.png" src="/post/images/2020/09/cms_phase_04.png"/>
@@ -147,20 +146,20 @@ This is one of the two stop-the-world events during CMS. The goal of this phase 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>[CMS-concurrent-preclean-start]
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>[CMS-concurrent-preclean: 0.000/0.000 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
 </code></pre></div><h1 id="phase-4-concurrent-abortable-preclean">Phase 4: Concurrent Abortable Preclean<a arialabel="Anchor" class="hanchor" href="#phase-4-concurrent-abortable-preclean">⌗</a> </h1>
-<p>又是一个不会让应用线程停下来的并发阶段。这个阶段尝试尽可能多做工作为后面的Final Remark阶段减轻负担，该阶段的时间取决于很多条件，直到其中一个中断条件满足时才会终止。</p>
+<p>又是一个不会让应用线程停下来的并发阶段。这个阶段尝试尽可能多做工作为后面的"Final Remark"阶段减轻负担，该阶段的时间取决于很多条件，直到其中一个中断条件满足时才会终止。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#f92672">[</span>CMS-concurrent-abortable-preclean-start<span style="color:#f92672">]</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span style="color:#f92672">[</span>CMS-concurrent-abortable-preclean: 0.000/0.000 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
 </code></pre></div><h1 id="phase-5-final-remark">Phase 5: Final Remark<a arialabel="Anchor" class="hanchor" href="#phase-5-final-remark">⌗</a> </h1>
-<p>这是第二个stop-the-world阶段，停顿的目标是最终标记老年代中所有活着的对象。前面几个preclean阶段是并发的，无法跟上应用程序的变更速度。这次的stop-the-world停顿要求完成历经煎熬的标记过程。</p>
+<p>这是第二个stop-the-world阶段，停顿的目标是最终标记老年代中所有活着的对象。前面几个预清理(preclean)阶段是并发的，无法跟上应用程序的变更速度。这次的stop-the-world停顿要求完成历经煎熬的标记过程。</p>
 <p>通常CMS在新生代比较空的时候执行Final Remark，这样做的好处是减少连续两次发生stop-the-world的可能性。这个阶段看起来比前面几个阶段都要复杂。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#f92672">[</span>GC <span style="color:#f92672">(</span>CMS Final Remark<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>YG occupancy: <span style="color:#ae81ff">6853</span> K <span style="color:#f92672">(</span><span style="color:#ae81ff">9216</span> K<span style="color:#f92672">)][</span>Rescan <span style="color:#f92672">(</span>parallel<span style="color:#f92672">)</span> , 0.0002730 secs<span style="color:#f92672">][</span>weak refs processing, 0.0000032 secs<span style="color:#f92672">]</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span style="color:#f92672">[</span>class unloading, 0.0001511 secs<span style="color:#f92672">][</span>scrub symbol table, 0.0003031 secs<span style="color:#f92672">][</span>scrub string table, 0.0001097 secs<span style="color:#f92672">][</span><span style="color:#ae81ff">1</span> CMS-remark: 8192K<span style="color:#f92672">(</span>10240K<span style="color:#f92672">)]</span> 15045K<span style="color:#f92672">(</span>19456K<span style="color:#f92672">)</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>, 0.0008706 secs<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>Times: user<span style="color:#f92672">=</span>0.00 sys<span style="color:#f92672">=</span>0.00, real<span style="color:#f92672">=</span>0.00 secs<span style="color:#f92672">]</span>
 </code></pre></div><p>在上面五个标记阶段之后，老年代中所有活着的对象都已经被标记好了，现在GC将清除老年代以回收无用的对象。</p>
 <h1 id="phase-6-concurrent-sweep">Phase 6: Concurrent Sweep<a arialabel="Anchor" class="hanchor" href="#phase-6-concurrent-sweep">⌗</a> </h1>
-<p>该阶段与应用程序并发执行，无需stop the world。这个阶段的目标是移除那些未被使用的对象，回收他们占据的空间。
-<a href="#c1b5513987a864770b0bc0f701ab78e8-lightbox">
-<img alt="cms_phase_05.png" src="/post/images/2020/09/cms_phase_05.png"/>
+<p>该阶段与应用程序并发执行，无需stop the world。这个阶段的目标是移除那些未被使用的对象，回收他们占据的空间。</p>
+<p><a href="#c1b5513987a864770b0bc0f701ab78e8-lightbox">
+<img alt="cms_phase_05.png" src="/post/images/2020/09/cms_phase_05.png" style="margin: auto;"/>
 </a>
 <a class="lightbox" href="#_" id="c1b5513987a864770b0bc0f701ab78e8-lightbox">
 <img alt="cms_phase_05.png" src="/post/images/2020/09/cms_phase_05.png"/>
