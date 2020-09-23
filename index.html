@@ -61,6 +61,32 @@
 <div class="posts">
 <div class="post on-list">
 <h1 class="post-title">
+<a href="https://zhige.io/2020/09/23/cms-collector-process/">CMS收集器概览</a>
+</h1>
+<div class="post-meta">
+<span class="post-date">
+            2020-09-23
+          </span>
+<span class="post-author">::Zhige</span>
+</div>
+<span class="post-tags">
+            
+            #<a href="https://zhige.io/tags/jvm/">JVM</a> 
+            
+          </span>
+<div class="post-content">
+          
+          
+          CMS收集器的全称是"Mostly Concurrent Mark and Sweep Garbage Collector”，它是老年代的收集器，算法是mark-sweep，它以避免老年代的长时间停顿为设计目标。与之搭配的新生代收集器是ParNew。
+          
+          
+        </div>
+<div>
+<a class="read-more button" href="/2020/09/23/cms-collector-process/">Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class="post-title">
 <a href="https://zhige.io/2020/09/22/gc-collector-select/">GC收集器的命令行参数指定总结</a>
 </h1>
 <div class="post-meta">
@@ -160,30 +186,6 @@
 </div>
 <div>
 <a class="read-more button" href="/2020/09/21/print-jvm-default-flags/">Read more →</a>
-</div>
-</div>
-<div class="post on-list">
-<h1 class="post-title">
-<a href="https://zhige.io/2020/09/18/jvm-log-big-object-alloc/">JVM中晋升到老年代的大对象到底多大</a>
-</h1>
-<div class="post-meta">
-<span class="post-date">
-            2020-09-18
-          </span>
-<span class="post-author">::Zhige</span>
-</div>
-<span class="post-tags">
-            
-            #<a href="https://zhige.io/tags/jvm/">JVM</a> 
-            
-          </span>
-<div class="post-content">
-          
-          JVM中新创建的对象在Eden区分配内存，Eden区空间不足时，触发minorGC回收内存，对于一些大对象则直接分配在老年代，那么这里所谓的大对象到底是多大呢？本文将用测试结果回答这个问题！
-          
-        </div>
-<div>
-<a class="read-more button" href="/2020/09/18/jvm-log-big-object-alloc/">Read more →</a>
 </div>
 </div>
 <div class="pagination">

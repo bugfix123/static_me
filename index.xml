@@ -6,8 +6,15 @@
 <description>Recent content on 志哥笔记</description>
 <generator>Hugo -- gohugo.io</generator>
 <language>en-us</language>
-<lastBuildDate>Tue, 22 Sep 2020 00:00:00 +0000</lastBuildDate>
+<lastBuildDate>Wed, 23 Sep 2020 00:00:00 +0000</lastBuildDate>
 <atom:link href="https://zhige.io/index.xml" rel="self" type="application/rss+xml"/>
+<item>
+<title>CMS收集器概览</title>
+<link>https://zhige.io/2020/09/23/cms-collector-process/</link>
+<pubDate>Wed, 23 Sep 2020 00:00:00 +0000</pubDate>
+<guid>https://zhige.io/2020/09/23/cms-collector-process/</guid>
+<description>&lt;p&gt;CMS收集器的全称是&amp;quot;Mostly Concurrent Mark and Sweep Garbage Collector&amp;rdquo;，它是老年代的收集器，算法是mark-sweep，它以避免老年代的长时间停顿为设计目标。与之搭配的新生代收集器是ParNew。&lt;/p&gt;</description>
+</item>
 <item>
 <title>GC收集器的命令行参数指定总结</title>
 <link>https://zhige.io/2020/09/22/gc-collector-select/</link>
