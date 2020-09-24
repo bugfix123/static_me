@@ -75,7 +75,7 @@
     
   </span>
 <div class="post-content"><div>
-<h1 id="主要步骤">主要步骤<a arialabel="Anchor" class="hanchor" href="#主要步骤">⌗</a> </h1>
+<h2 id="主要步骤">主要步骤<a arialabel="Anchor" class="hanchor" href="#主要步骤">⌗</a> </h2>
 <p>以获取最短回收停顿时间为目标，多应用于互联网站或B/S服务端。基于<strong>标记-清除</strong>算法，大体上包括4个步骤：</p>
 <ol>
 <li>初始标记(CMS Initial Mark)</li>
@@ -90,27 +90,27 @@
 <li>并发标记就是进行GC Roots Tracing的过程，从GC Roots出发找到关联的对象，然后从关联的对象找到其他的对象，这是并发过程，并不影响业务线程的执行。</li>
 <li>重新标记则是为了修正并发标记过程中，因用户线程运行导致标记产生变动的那一部分对象的标记记录，这个阶段停顿时间比初始标记阶段稍长，但是远远比并发标记时间短</li>
 </ol>
-<h1 id="优缺点">优缺点<a arialabel="Anchor" class="hanchor" href="#优缺点">⌗</a> </h1>
+<h2 id="优缺点">优缺点<a arialabel="Anchor" class="hanchor" href="#优缺点">⌗</a> </h2>
 <p>在整个过程中耗时最长的并发标记和并发清除阶段都可以和用户线程一起工作，总体上看，CMS的回收工作和用户线程是并发执行的。</p>
-<p>优点： 并发收集、低停顿(停顿的用户线程)
-缺点：</p>
+<p>优点：并发收集、低停顿(停顿的用户线程)</p>
+<p>缺点：</p>
 <ol>
 <li>对CPU资源敏感</li>
 <li>无法处理浮动垃圾(浮动垃圾指的是，一些对象已经被标记了不是垃圾，但是在并发标记过程中，业务线程已经不再使用该对象，该对象实际上是垃圾了，但是GC认为不是垃圾，因此需要等到下次GC才能回收，这部分对象就称为了浮动垃圾。)</li>
 <li>收集结束时会产生大量垃圾碎片</li>
 </ol>
-<h1 id="并发模式失败concurrent-mode-failure">并发模式失败(Concurrent Mode Failure)<a arialabel="Anchor" class="hanchor" href="#并发模式失败concurrent-mode-failure">⌗</a> </h1>
-<p>通常情况下，CMS的绝大部分的追踪和清理工作是和应用线程并发进行的，只需要应用线程很短的停顿。但是如果在老年代填满之前，CMS不能完成回收不可达对象，
-或者是老年代中的剩余空间块不能满足当前的内存分配，那么应用就会被暂停，所有的应用线程会被停下来，知道垃圾收集完成。这种无法并发完成收集的过程叫做<strong>并发模式失败</strong>(concurrent mode failure)</p>
-<h1 id="浮动垃圾floating-garbage">浮动垃圾(Floating Garbage)<a arialabel="Anchor" class="hanchor" href="#浮动垃圾floating-garbage">⌗</a> </h1>
-<p>由于在magor GC中应用线程和GC线程并发进行，已经被GC线程标记过的对象接下来在收集处理快要完成的时候依然可能变成不可达的，这些还没有被回收的不可达的对象称为<strong>浮动垃圾</strong>(floating garbage)。浮动垃圾的数量并发收集周期的长短和引用更新的频率。考虑到老年代的浮动垃圾问题，应将老年代的空间增加20%
-在堆中一次收集快结束时产生的浮动垃圾将会在下一次收集中被处理掉。</p>
-<h1 id="两次停顿">两次停顿<a arialabel="Anchor" class="hanchor" href="#两次停顿">⌗</a> </h1>
-<p>CMS执行周期中会使应用程序停顿2次。第一次是初始标记停顿。也就是标记从roots(比如application thread stacks and registers,static objects等的对象引用)和年轻代出发直接可达的对象。
-第二次停顿是<strong>重新标记停顿</strong>。这次是发生在并发标记结束的时候，查找那些并发追踪错过的已经完成了追踪但是由被应用线程更新了引用的对象。</p>
-<h1 id="cms什么时候开始">CMS什么时候开始<a arialabel="Anchor" class="hanchor" href="#cms什么时候开始">⌗</a> </h1>
-<p>对于串行收集器来说，只要老年代满了，major GC就会发生，所有的应用线程就会停止，直到垃圾收集完成。与之不同的是，CMS并发收集器的启动时间是有时间限制的，就是在老年代占满之前垃圾收集要完成！否则应用程序将会由于并发模式失败而带来长时间的停顿。
-基于历史数据，CMS收集器会评估还有多少时间老年代空间就会耗尽，以及一次并发收集周期花费多少时间。通过这种动态评估，并发收集在以在老年代耗尽之前完成收集工作为目标下启动了。为了安全起见，这种动态评估是有时间预留的，
+<h2 id="并发模式失败concurrent-mode-failure">并发模式失败(Concurrent Mode Failure)<a arialabel="Anchor" class="hanchor" href="#并发模式失败concurrent-mode-failure">⌗</a> </h2>
+<p>通常情况下，CMS的绝大部分的追踪和清理工作是和应用线程并发进行的，只需要应用线程很短的停顿。但是如果在老年代填满之前，CMS不能完成回收不可达对象，或者是老年代中的剩余空间块不能满足当前的内存分配，那么应用就会被暂停，所有的应用线程会被停下来，知道垃圾收集完成。这种无法并发完成收集的过程叫做<strong>并发模式失败</strong>(<code>concurrent mode failure</code>)</p>
+<h2 id="浮动垃圾floating-garbage">浮动垃圾(Floating Garbage)<a arialabel="Anchor" class="hanchor" href="#浮动垃圾floating-garbage">⌗</a> </h2>
+<p>由于在magor GC中应用线程和GC线程并发进行，已经被GC线程标记过的对象接下来在收集处理快要完成的时候依然可能变成不可达的，这些还没有被回收的不可达的对象称为<strong>浮动垃圾</strong>(<code>floating garbage</code>)。</p>
+<p>浮动垃圾的数量并发收集周期的长短和引用更新的频率。考虑到老年代的浮动垃圾问题，应将老年代的空间增加20%。在堆中一次收集快结束时产生的浮动垃圾将会在下一次收集中被处理掉。</p>
+<h2 id="两次停顿">两次停顿<a arialabel="Anchor" class="hanchor" href="#两次停顿">⌗</a> </h2>
+<p>CMS执行周期中会使应用程序停顿2次。</p>
+<p>第一次是<strong>初始标记停顿</strong>。也就是标记从roots(比如application thread stacks and registers,static objects等的对象引用)和年轻代出发直接可达的对象。</p>
+<p>第二次停顿是<strong>重新标记停顿</strong>。这次是发生在并发标记结束的时候，查找那些并发追踪错过的已经完成了追踪但是由被应用线程更新了引用的对象。</p>
+<h2 id="cms什么时候开始">CMS什么时候开始<a arialabel="Anchor" class="hanchor" href="#cms什么时候开始">⌗</a> </h2>
+<p>对于串行收集器来说，只要老年代满了，major GC就会发生，所有的应用线程就会停止，直到垃圾收集完成。与之不同的是，CMS并发收集器的启动时间是有时间限制的，就是在老年代占满之前垃圾收集要完成！否则应用程序将会由于并发模式失败而带来长时间的停顿。</p>
+<p>基于历史数据，CMS收集器会评估还有多少时间老年代空间就会耗尽，以及一次并发收集周期花费多少时间。通过这种动态评估，并发收集在以在老年代耗尽之前完成收集工作为目标下启动了。为了安全起见，这种动态评估是有时间预留的，
 比较并发模式失败的代价是很大的。</p>
 <p>如果老年代的使用率超过初始的占用率，并发收集也会启动，默认的初始占用率大约是92%，但是不同的release版本中这个值可能不一样。这个值可以通过命令行参数设置：<code>-XX:CMSInitiatingOccupancyFraction=&lt;N&gt;</code>，这里<n>是老年代大小百分比的整数。</n></p>
 </div></div>
