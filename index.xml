@@ -6,10 +6,17 @@
 <description>Recent content on 志哥笔记</description>
 <generator>Hugo -- gohugo.io</generator>
 <language>en-us</language>
-<lastBuildDate>Wed, 23 Sep 2020 00:00:00 +0000</lastBuildDate>
+<lastBuildDate>Thu, 24 Sep 2020 00:00:00 +0000</lastBuildDate>
 <atom:link href="https://zhige.io/index.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>CMS收集器概览</title>
+<title>CMS收集器之重要概念</title>
+<link>https://zhige.io/2020/09/24/cms-key-concept/</link>
+<pubDate>Thu, 24 Sep 2020 00:00:00 +0000</pubDate>
+<guid>https://zhige.io/2020/09/24/cms-key-concept/</guid>
+<description/>
+</item>
+<item>
+<title>CMS收集器之概览</title>
 <link>https://zhige.io/2020/09/23/cms-collector-process/</link>
 <pubDate>Wed, 23 Sep 2020 00:00:00 +0000</pubDate>
 <guid>https://zhige.io/2020/09/23/cms-collector-process/</guid>
@@ -23,13 +30,6 @@
 <description>&lt;blockquote&gt;
 &lt;p&gt;通过命令行的参数可以指定JVM的GC收集器，本文总结一下常见GC收集器的指定参数，供参考。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
-</item>
-<item>
-<title>深入理解CMS收集器</title>
-<link>https://zhige.io/2020/09/22/understand-cms-collector/</link>
-<pubDate>Tue, 22 Sep 2020 00:00:00 +0000</pubDate>
-<guid>https://zhige.io/2020/09/22/understand-cms-collector/</guid>
-<description>以获取最短回收停顿时间为目标，多应用于互联网站或B/S服务端。基于标记-清除算法，包括4个步骤： 初始标记(CMS Initial Mark) 并发标记(CMS concurrent mark) 重新标记(CMS Final Remark) 并发清除(CMS concurrent sweep) 各个阶段的含义： 初始标记</description>
 </item>
 <item>
 <title>GC日志中的人体工程学(Ergonomics)</title>

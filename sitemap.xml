@@ -3,37 +3,37 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://zhige.io/2020/09/24/cms-key-concept/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://zhige.io/tags/jvm/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://zhige.io/post/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://zhige.io/tags/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://zhige.io/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://zhige.io/2020/09/23/cms-collector-process/</loc>
     <lastmod>2020-09-23T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://zhige.io/tags/jvm/</loc>
-    <lastmod>2020-09-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://zhige.io/post/</loc>
-    <lastmod>2020-09-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://zhige.io/tags/</loc>
-    <lastmod>2020-09-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://zhige.io/</loc>
-    <lastmod>2020-09-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://zhige.io/2020/09/22/gc-collector-select/</loc>
-    <lastmod>2020-09-22T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://zhige.io/2020/09/22/understand-cms-collector/</loc>
     <lastmod>2020-09-22T00:00:00+00:00</lastmod>
   </url>
   
