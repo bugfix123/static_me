@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>CMS收集器之参数调优 :: 志哥笔记 — 记述码农在家的故事！</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="to do work" name="description"/>
+<meta content="前沿技术,IT博客,技术笔记,IT Share" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://zhige.io/2020/09/23/cms-collector-tuning/" rel="canonical"/>
+<link href="https://zhige.io/assets/style.css" rel="stylesheet"/>
+<link href="https://zhige.io/assets/blue.css" rel="stylesheet"/>
+<link href="/img/favicon/favicon_io/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="/img/favicon/favicon_io/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/img/favicon/favicon_io/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="/img/favicon/favicon_io/site.webmanifest" rel="manifest"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="CMS收集器之参数调优 :: 志哥笔记" property="og:title"/>
+<meta content="to do work" property="og:description"/>
+<meta content="https://zhige.io/2020/09/23/cms-collector-tuning/" property="og:url"/>
+<meta content="CMS收集器之参数调优" property="og:site_name"/>
+<meta content="https://zhige.io/img/favicon/blue.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-09-23 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    Zhige.io
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://zhige.io/2020/09/23/cms-collector-tuning/">CMS收集器之参数调优</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-09-23 
+      </span>
+<span class="post-author">::
+      Zhige
+    </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://zhige.io/tags/jvm/">JVM</a> 
+    
+  </span>
+<div class="post-content"><div>
+<hr/>
+<p>to do work</p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button previous">
+<a href="https://zhige.io/2020/09/24/cms-key-concept/">
+<span class="button__icon">←</span>
+<span class="button__text">CMS收集器之重要概念</span>
+</a>
+</span>
+<span class="button next">
+<a href="https://zhige.io/2020/09/23/cms-collector-process/">
+<span class="button__text">CMS收集器之概览</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<section data-isso-id="/2020/09/23/cms-collector-tuning/" data-title="CMS收集器之参数调优" id="isso-thread"></section>
+<script async="" data-isso="https://isso.dongzhi.me" data-isso-avatar="true" data-isso-avatar-bg="#f0f0f0" data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..." data-isso-css="false" data-isso-feed="false" data-isso-id="thread-id" data-isso-lang="zh" data-isso-max-comments-nested="5" data-isso-max-comments-top="10" data-isso-reply-notifications="true" data-isso-reply-to-self="true" data-isso-require-author="true" data-isso-require-email="true" data-isso-reveal-on-click="5" data-isso-vote="false" data-isso-vote-levels="" onload="setAutoCompleteProperty()" src="https://isso.dongzhi.me/js/embed.min.js"></script>
+<script>
+	function setAutoCompleteProperty() {
+		var authors = document.getElementsByName('author');
+		if (authors != null && authors.length > 0) {
+			authors[0].setAttribute('autocomplete', 'off');
+		}
+		var emails = document.getElementsByName('email');
+		if (emails != null && emails.length > 0) {
+			emails[0].setAttribute('autocomplete', 'off');
+		}
+		var sites = document.getElementsByName('website');
+		if (sites != null && sites.length > 0) {
+			sites[0].setAttribute('autocomplete', 'off');
+		}
+	}
+	</script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 <a href="https://zhige.io/">志哥笔记</a></span>
+<span>:: <a href="https://themes.gohugo.io/hugo-theme-terminal/">Terminal</a></span>
+<span>:: <a href="https://my.laoxuehost.com/aff.php?aff=10457">老薛主机</a></span>
+</div>
+</div>
+</footer>
+<script src="https://zhige.io/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>
