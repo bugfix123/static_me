@@ -75,26 +75,36 @@
     
   </span>
 <div class="post-content"><div>
-<h1 id="-xxcmsinitiatingoccupancyfractionn">-XX:CMSInitiatingOccupancyFraction=N<a arialabel="Anchor" class="hanchor" href="#-xxcmsinitiatingoccupancyfractionn">⌗</a> </h1>
-<p>N表示老年代的占比，比如：</p>
+<h1 id="cmsinitiatingoccupancyfractionn">CMSInitiatingOccupancyFraction=N<a arialabel="Anchor" class="hanchor" href="#cmsinitiatingoccupancyfractionn">⌗</a> </h1>
+<p>触发CMS老年代占比阈值，比如：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-XX:CMSInitiatingOccupancyFraction=80
 </code></pre></div><p>表示当老年代的空间占比达到80%时触发CMS收集器。这个参数的默认值：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>intx CMSInitiatingOccupancyFraction            <span style="color:#f92672">=</span> -1                                  <span style="color:#f92672">{</span>product<span style="color:#f92672">}</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>intx CMSInitiatingOccupancyFraction    <span style="color:#f92672">=</span> -1               <span style="color:#f92672">{</span>product<span style="color:#f92672">}</span>
 </code></pre></div><p>当CMSInitiatingOccupancyFraction &gt; 0，直接取设定的值。
 当 CMSInitiatingOccupancyFraction &lt; 0时，它的默认值是由下面的计算公式得到的：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>CMSInitiatingOccupancyFraction = (100 - MinHeapFreeRatio) + (CMSTriggerRatio * MinHeapFreeRatio / 100)
 </code></pre></div><p>而MinHeapFreeRatio和CMSTriggerRatio的默认值：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>uintx MinHeapFreeRatio                          = 0                                   {manageable}
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>uintx CMSTriggerRatio                           = 80                                  {product}
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>uintx MinHeapFreeRatio                = 0                  {manageable}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>uintx CMSTriggerRatio                 = 80                 {product}
 </code></pre></div><p>从而计算得到CMSInitiatingOccupancyFraction = 100</p>
-<h1 id="-xxusecmsinitiatingoccupancyonly">-XX:+UseCMSInitiatingOccupancyOnly<a arialabel="Anchor" class="hanchor" href="#-xxusecmsinitiatingoccupancyonly">⌗</a> </h1>
-<p>这个参数的默认值是false，也就是不启用。默认情况下老年代CMS触发的空间占比阈值，第一次取的是CMSInitiatingOccupancyFraction设定的值，后续由JVM根据历史运行数据自动调整。如果UseCMSInitiatingOccupancyOnly设置为true，
-那么导致触发CMS的老年代空间占比阈值就一直固定取自CMSInitiatingOccupancyFraction参数设置的值。</p>
-<h1 id="-xxusecmscompactatfullcollection">-XX:+UseCMSCompactAtFullCollection<a arialabel="Anchor" class="hanchor" href="#-xxusecmscompactatfullcollection">⌗</a> </h1>
+<h1 id="usecmsinitiatingoccupancyonly">UseCMSInitiatingOccupancyOnly<a arialabel="Anchor" class="hanchor" href="#usecmsinitiatingoccupancyonly">⌗</a> </h1>
+<p>这个参数的默认值是false，也就是不开启。</p>
+<p><strong>开启</strong>：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-XX:+UseCMSInitiatingOccupancyOnly
+</code></pre></div><p><strong>关闭</strong>：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-XX:-UseCMSInitiatingOccupancyOnly
+</code></pre></div><p>默认情况下老年代触发CMS的空间占比阈值，第一次取的是CMSInitiatingOccupancyFraction设定的值，后续由JVM根据历史运行数据自动调整。如果UseCMSInitiatingOccupancyOnly设置为true，那么导致触发CMS的老年代空间占比阈值就一直固定取自CMSInitiatingOccupancyFraction参数设置的值。</p>
+<h1 id="usecmscompactatfullcollection">UseCMSCompactAtFullCollection<a arialabel="Anchor" class="hanchor" href="#usecmscompactatfullcollection">⌗</a> </h1>
 <p>默认值是true，执行Full GC时对老年代进行压缩。与CMSFullGCsBeforeCompaction搭配使用。</p>
-<h1 id="-xxcmsfullgcsbeforecompaction">-XX:+CMSFullGCsBeforeCompaction<a arialabel="Anchor" class="hanchor" href="#-xxcmsfullgcsbeforecompaction">⌗</a> </h1>
+<p><strong>开启</strong>：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-XX:+UseCMSCompactAtFullCollection
+</code></pre></div><p><strong>关闭</strong>：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-XX:-UseCMSCompactAtFullCollection
+</code></pre></div><h1 id="cmsfullgcsbeforecompaction">CMSFullGCsBeforeCompaction<a arialabel="Anchor" class="hanchor" href="#cmsfullgcsbeforecompaction">⌗</a> </h1>
 <p>默认值是0。含义是"Number of CMS full collection done before compaction if &gt; 0”(CMS扛不住了，进而执行Full GC，当执行了CMSFullGCsBeforeCompaction设定的次数Full GC之后，才进行老年代空间压缩)</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>*should_compact =
+<p>用法：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-XX:CMSFullGCsBeforeCompaction=0
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>*should_compact =
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>    UseCMSCompactAtFullCollection &amp;&amp;
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span>    ((_full_gcs_since_conc_gc &gt;= CMSFullGCsBeforeCompaction) ||
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>     GCCause::is_user_requested_gc(gch-&gt;gc_cause()) ||
