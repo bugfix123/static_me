@@ -118,11 +118,11 @@
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms2048m -Xmx4096m -Xmn2048m -Xss512k -XX:MetaspaceSize=512m -XX:MaxMetaspaceSize=512m -XX:+DisableExx plicitGC -XX:MaxTenuringThreshold=5 -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseCMSCompactAtFullCollection
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>-XX:+PrintGCDetails -Xloggc:/data/logs/gc.log
 </code></pre></div><p>总共4个G的堆，年轻代单独给了2个G，按照比率算，JVM 内存各个区的分配情况如下：</p>
-<p><a href="#2d15097321846b076412c8b285aadb55-lightbox">
-<img alt="jvm_problem_06.png" src="post/images/2020/08/jvm_problem_06.png" style="margin: auto;"/>
+<p><a href="#d8def968d512534601e3d22b323c32a2-lightbox">
+<img alt="jvm_problem_06.png" src="/post/images/2020/08/jvm_problem_06.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="2d15097321846b076412c8b285aadb55-lightbox">
-<img alt="jvm_problem_06.png" src="post/images/2020/08/jvm_problem_06.png"/>
+<a class="lightbox" href="#_" id="d8def968d512534601e3d22b323c32a2-lightbox">
+<img alt="jvm_problem_06.png" src="/post/images/2020/08/jvm_problem_06.png"/>
 </a></p>
 <p>所以开始怀疑是JVM参数设置的有问题导致的老年代被快速的占满。</p>
 <p>但是其实这参数已经是之前优化后的结果了，Eden区设置的挺大，大部分我们的方法产生的对象都是朝生夕死的对象，应该大部分都在年轻代会清理了，存活的对象才会进入survivor区，到达年龄或者触发了进入老年代的条件后才会进入老年代。基本上老年代里的对象大部分应该是一直存活的对象，比如static修饰的对象啊，一直被引用的缓存啊，Spring容器中的bean等等。</p>
