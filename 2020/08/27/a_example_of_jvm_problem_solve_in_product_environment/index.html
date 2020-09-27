@@ -20,7 +20,7 @@
 <meta content="公司线上有个tomcat服务，里面合并部署了大概8个微服务，线上一共部署了2个tomcat进行负载均衡。这个tomcat刚上生产线，运行挺平稳。大概过了大概1天后，运维同事反映2个tomcat节点均挂了，无法接受新的请求了，CPU 飙升到 100%！" property="og:description"/>
 <meta content="https://zhige.io/2020/08/27/a_example_of_jvm_problem_solve_in_product_environment/" property="og:url"/>
 <meta content="记一次公司JVM堆溢出抽丝剥茧定位的过程" property="og:site_name"/>
-<meta content="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png" property="og:image"/>
+<meta content="https://zhige.io/post/images/2020/08/jvm_problem_01.png" property="og:image"/>
 <meta content="2048" property="og:image:width"/>
 <meta content="1024" property="og:image:height"/>
 <meta content="2020-08-27 20:09:50 +0800 +0800" property="article:published_time"/>
@@ -71,106 +71,105 @@
     #<a href="https://zhige.io/tags/jvm/">jvm</a> 
     
   </span>
-<img alt="记一次公司JVM堆溢出抽丝剥茧定位的过程" class="post-cover" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png"/>
+<img alt="记一次公司JVM堆溢出抽丝剥茧定位的过程" class="post-cover" src="https://zhige.io/post/images/2020/08/jvm_problem_01.png"/>
 <div class="post-content"><div>
 <h1 id="背景">背景<a arialabel="Anchor" class="hanchor" href="#背景">⌗</a> </h1>
 <p>公司线上有个tomcat服务，里面合并部署了大概8个微服务，之所以没有像其他微服务那样单独部署，其目的是为了节约服务器资源，况且这8个服务是属于边缘服务，并发不高，就算宕机也不会影响核心业务。因为并发不高，所以线上一共部署了2个tomcat进行负载均衡。这个tomcat刚上生产线，运行挺平稳。大概过了大概1天后，运维同事反映2个tomcat节点均挂了，无法接受新的请求了，CPU 飙升到 100%！</p>
 <h1 id="排查过程一">排查过程一<a arialabel="Anchor" class="hanchor" href="#排查过程一">⌗</a> </h1>
 <p>接手这个问题后，首先大致看了下当时的JVM监控，CPU的确居高不下:</p>
-<p><a href="#5afe48689bb924d569aea81d3eaca7d5-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png" style="margin: auto;"/>
+<p><a href="#f11038abce68e37e4645d9f367bea5f7-lightbox">
+<img alt="jvm_problem_01.png" src="/post/images/2020/08/jvm_problem_01.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="5afe48689bb924d569aea81d3eaca7d5-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_01.png"/>
+<a class="lightbox" href="#_" id="f11038abce68e37e4645d9f367bea5f7-lightbox">
+<img alt="jvm_problem_01.png" src="/post/images/2020/08/jvm_problem_01.png"/>
 </a></p>
 <p>FULL GC从大概这个小时的22分开始，就开始频繁的进行FULL GC，一分钟最高能进行10次FULL GC:</p>
-<p><a href="#538f6c04d5981491bf8bd402ba5cce29-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_02.png" style="margin: auto;"/>
+<p><a href="#abfbc811933ced0068434c2027f53a92-lightbox">
+<img alt="jvm_problem_02.png" src="/post/images/2020/08/jvm_problem_02.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="538f6c04d5981491bf8bd402ba5cce29-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_02.png"/>
+<a class="lightbox" href="#_" id="abfbc811933ced0068434c2027f53a92-lightbox">
+<img alt="jvm_problem_02.png" src="/post/images/2020/08/jvm_problem_02.png"/>
 </a></p>
 <p>minor GC每分钟竟然接近60次，相当于每秒钟都有minor GC。如图：</p>
-<p><a href="#64dcbbf45dda1dad1a13b1a8fa2788e2-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_03.png" style="margin: auto;"/>
+<p><a href="#fbf3f0daf191476f124ca98f39c3f6dd-lightbox">
+<img alt="jvm_problem_03.png" src="/post/images/2020/08/jvm_problem_03.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="64dcbbf45dda1dad1a13b1a8fa2788e2-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_03.png"/>
+<a class="lightbox" href="#_" id="fbf3f0daf191476f124ca98f39c3f6dd-lightbox">
+<img alt="jvm_problem_03.png" src="/post/images/2020/08/jvm_problem_03.png"/>
 </a></p>
 <p>同时，从老年代的使用情况也反映了这一点:</p>
-<p><a href="#deaa17a1b5277ca71c7f48e275210b17-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_04.png" style="margin: auto;"/>
+<p><a href="#bdeedd85a21ef11ec3ae8d19e44f3364-lightbox">
+<img alt="jvm_problem_04.png" src="/post/images/2020/08/jvm_problem_04.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="deaa17a1b5277ca71c7f48e275210b17-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_04.png"/>
+<a class="lightbox" href="#_" id="bdeedd85a21ef11ec3ae8d19e44f3364-lightbox">
+<img alt="jvm_problem_04.png" src="/post/images/2020/08/jvm_problem_04.png"/>
 </a></p>
 <p>接着，随机对线上应用分析了线程的cpu占用情况，用<code>top -H -p pid</code> 命令:</p>
-<p><a href="#6275e11d50ef54b58cc405e3819b0fe8-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_05.png" style="margin: auto;"/>
+<p><a href="#a42f8cfa747cf87fb1f8abea28204a76-lightbox">
+<img alt="jvm_problem_05.png" src="/post/images/2020/08/jvm_problem_05.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="6275e11d50ef54b58cc405e3819b0fe8-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_05.png"/>
+<a class="lightbox" href="#_" id="a42f8cfa747cf87fb1f8abea28204a76-lightbox">
+<img alt="jvm_problem_05.png" src="/post/images/2020/08/jvm_problem_05.png"/>
 </a></p>
-<p>可以看到前面4条线程，都占用了大量的 CPU 资源。随即进行了<code>jstack</code>，把线程栈信息拉下来，用前面4条线程的ID转换16进制后进行搜索发现并没有找到相应的线程。所以判断为不是应用线程导致的。</p>
+<p>可以看到前面4条线程都占用了大量的CPU资源。随即进行了<code>jstack</code>，把线程栈信息拉下来，用前面4条线程的ID转换16进制后进行搜索发现并没有找到相应的线程。所以判断为不是应用线程导致的。</p>
 <h1 id="第一个结论">第一个结论<a arialabel="Anchor" class="hanchor" href="#第一个结论">⌗</a> </h1>
-<p>通过对当时JVM的的监控情况可以发现：这个小时的22分之前，系统一直保持着一个比较稳定的运行状态，堆的使用率不高，但是在22分钟时年轻代大量的minor gc后，老年代在几分钟之内被快速的填满，导致了FULL GC。同时FULL GC不停的发生，导致了大量的STW，CPU被FULL GC线程占据，出现CPU飙高，应用线程由于STW再加上CPU过高，大量线程被阻塞。同时新的请求又不停的进来，最终tomcat的线程池被占满，再也无法响应新的请求了。这个雪球终于还是滚大了。</p>
-<p>分析完了案发现场。要解决的问题变成了：<strong>是什么原因导致老年代被快速的填满？</strong> 拉了下当时的JVM参数:</p>
+<p>通过对当时JVM的的监控情况可以发现：这个小时的22分之前，系统一直保持着一个比较稳定的运行状态，堆的使用率不高，但是在22分钟时年轻代大量的minor gc后，老年代在几分钟之内被快速的填满，导致了FULL GC。同时FULL GC不停的发生导致了大量的STW，CPU被FULL GC线程占据，出现CPU飙高，应用线程由于STW再加上CPU过高，大量线程被阻塞。同时新的请求又不停的进来，最终tomcat的线程池被占满，再也无法响应新的请求了。这个雪球终于还是滚大了。</p>
+<p>分析完了案发现场，要解决的问题变成了：<strong>是什么原因导致老年代被快速的填满？</strong> 拉了下当时的JVM参数:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span>-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms2048m -Xmx4096m -Xmn2048m -Xss512k -XX:MetaspaceSize=512m -XX:MaxMetaspaceSize=512m -XX:+DisableExx plicitGC -XX:MaxTenuringThreshold=5 -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseCMSCompactAtFullCollection
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>-XX:+PrintGCDetails -Xloggc:/data/logs/gc.log
 </code></pre></div><p>总共4个G的堆，年轻代单独给了2个G，按照比率算，JVM 内存各个区的分配情况如下：</p>
-<p><a href="#2200fea659afc9165b0e4372da9ad9f9-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_06.png" style="margin: auto;"/>
+<p><a href="#2d15097321846b076412c8b285aadb55-lightbox">
+<img alt="jvm_problem_06.png" src="post/images/2020/08/jvm_problem_06.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="2200fea659afc9165b0e4372da9ad9f9-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_06.png"/>
+<a class="lightbox" href="#_" id="2d15097321846b076412c8b285aadb55-lightbox">
+<img alt="jvm_problem_06.png" src="post/images/2020/08/jvm_problem_06.png"/>
 </a></p>
 <p>所以开始怀疑是JVM参数设置的有问题导致的老年代被快速的占满。</p>
 <p>但是其实这参数已经是之前优化后的结果了，Eden区设置的挺大，大部分我们的方法产生的对象都是朝生夕死的对象，应该大部分都在年轻代会清理了，存活的对象才会进入survivor区，到达年龄或者触发了进入老年代的条件后才会进入老年代。基本上老年代里的对象大部分应该是一直存活的对象，比如static修饰的对象啊，一直被引用的缓存啊，Spring容器中的bean等等。</p>
 <p>我看了下垃圾回收进入老年代的触发条件后，发现这个场景应该是属于大对象直接进老年代的这种，也就是说年轻代进行minor GC后，存活的对象足够大，不足以在survivor区域放下了，就直接进入老年代了。</p>
 <p>但是一次minor GC应该超过90%的对象都是无引用对象，只有少部分的对象才是存活的。而且这些个服务的并发一直不高，为什么一次minor GC后有那么大量的数据会存活呢？</p>
 <p>随即看了下当时的<code>jmap -histo</code>命令产生的文件:</p>
-<p><a href="#18363812a4b167bc45ec6cec231c71ae-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_07.png" style="margin: auto;"/>
+<p><a href="#bf042497d479ba4047fb11042804f1e7-lightbox">
+<img alt="jvm_problem_07.png" src="/post/images/2020/08/jvm_problem_07.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="18363812a4b167bc45ec6cec231c71ae-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_07.png"/>
+<a class="lightbox" href="#_" id="bf042497d479ba4047fb11042804f1e7-lightbox">
+<img alt="jvm_problem_07.png" src="/post/images/2020/08/jvm_problem_07.png"/>
 </a></p>
 <p>发现String这个这个对象的示例竟然有9000多w个，占用堆超过2G，这肯定有问题！但是tomcat里有8个应用，不可能通过分析代码来定位到。还是要从JVM入手来反推。</p>
 <h1 id="第二次结论">第二次结论<a arialabel="Anchor" class="hanchor" href="#第二次结论">⌗</a> </h1>
 <p>程序并发不高，但是在几分钟之内，在Eden区产生了大量的对象，并且这些对象无法被minor GC回收 ，由于太大，触发了大对象直接进老年代机制，老年代会迅速填满，导致FULL GC和后面CPU的飙升，从而导致tomcat的宕机。</p>
 <p>基本判断是，JVM参数应该没有问题，很可能问题出在应用本身不断产生无法被回收的对象上面。但是我暂时定位不到具体的代码位置。</p>
 <h1 id="排查过程二">排查过程二<a arialabel="Anchor" class="hanchor" href="#排查过程二">⌗</a> </h1>
-<p>第二天，又看了下当时的JVM监控，发现有这么一个监控数据当时漏看了:</p>
-<p><a href="#d9202a7c020ac87b2ecddb2092513a79-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_08.png" style="margin: auto;"/>
+<p>第二天又看了下当时的JVM监控，发现有这么一个监控数据当时漏看了:</p>
+<p><a href="#e49d987b65e0c5d55919b69f8f1cdb25-lightbox">
+<img alt="jvm_problem_08.png" src="/post/images/2020/08/jvm_problem_08.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="d9202a7c020ac87b2ecddb2092513a79-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_08.png"/>
+<a class="lightbox" href="#_" id="e49d987b65e0c5d55919b69f8f1cdb25-lightbox">
+<img alt="jvm_problem_08.png" src="/post/images/2020/08/jvm_problem_08.png"/>
 </a></p>
 <p>这是FULL GC之后老年代的使用率。可以看到,FULL GC之后老年代依然占据80%多的空间，FULL GC就根本清理不掉老年代的对象。这说明，老年代里的这些对象都是被程序引用着的，所以清理不掉。但是平稳的时候，老年代一直维持着大概300M的堆，从这个小时的22分开始，之后就狂飙到接近2G，这肯定不正常。更加印证了我前面一个观点：<strong>这是因为应用程序产生的无法回收的对象导致的</strong>。</p>
 <p>但是，当时我并没有dump下来jvm的堆，所以只能等再次重现问题。</p>
 <p>终于，在晚上9点多，这个问题又重现了，熟悉的配方熟悉的味道。</p>
-<p>直接<code>jmap -dump</code>，经过漫长的等待，产生了4.2G的一个堆快照文件dump.hprof，经过压缩，得到一个466M的tar.gz文件，然后download到本地，解压。</p>
-<p>运行堆分析工具<code>JProfile</code>，装载这个dump.hprof文件。然后查看堆当时的所有类占比大小的信息：</p>
-<p><a href="#466fc74e8d77169778d7182c126c4466-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_09.png" style="margin: auto;"/>
+<p>直接<code>jmap -dump</code>，经过漫长的等待，产生了4.2G的一个堆快照文件dump.hprof，经过压缩，得到一个466M的tar.gz文件，然后download到本地，解压。运行堆分析工具<code>JProfile</code>，装载这个dump.hprof文件。然后查看堆当时的所有类占比大小的信息：</p>
+<p><a href="#e3ac039f054ed00fb40961947e215a9c-lightbox">
+<img alt="jvm_problem_09.png" src="/post/images/2020/08/jvm_problem_09.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="466fc74e8d77169778d7182c126c4466-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_09.png"/>
+<a class="lightbox" href="#_" id="e3ac039f054ed00fb40961947e215a9c-lightbox">
+<img alt="jvm_problem_09.png" src="/post/images/2020/08/jvm_problem_09.png"/>
 </a></p>
 <p>发现导致堆溢出，就是这个String对象，和之前Jmap 得出的结果一样，超过了2个G，并且无法被回收。随即看大对象视图，发现这些个String对象都是被<strong>java.util.ArrayList</strong>引用着的，也就是有一个ArrayList里，引用了超过2G的对象：</p>
-<p><a href="#a14338349de3bce44b1bd48915b03a62-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_10.png" style="margin: auto;"/>
+<p><a href="#cf2357390f3e1abf3e4c85042deef413-lightbox">
+<img alt="jvm_problem_10.png" src="/post/images/2020/08/jvm_problem_10.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="a14338349de3bce44b1bd48915b03a62-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_10.png"/>
+<a class="lightbox" href="#_" id="cf2357390f3e1abf3e4c85042deef413-lightbox">
+<img alt="jvm_problem_10.png" src="/post/images/2020/08/jvm_problem_10.png"/>
 </a></p>
 <p>然后查看引用的关系图，往上溯源，源头终于显形：</p>
-<p><a href="#868010db355db337eb5e341acebaf670-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_11.png" style="margin: auto;"/>
+<p><a href="#b0821d17d0f9cd458c598868c894b2e2-lightbox">
+<img alt="jvm_problem_11.png" src="/post/images/2020/08/jvm_problem_11.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="868010db355db337eb5e341acebaf670-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_11.png"/>
+<a class="lightbox" href="#_" id="b0821d17d0f9cd458c598868c894b2e2-lightbox">
+<img alt="jvm_problem_11.png" src="/post/images/2020/08/jvm_problem_11.png"/>
 </a></p>
 <p>这个ArrayList是被一个线程栈引用着，而这个线程栈信息里面，可以直接定位到相应的服务和相应的类。具体服务是Media这个微服务。</p>
 <p>看来已经要逼近真相了！</p>
@@ -180,11 +179,11 @@
 <p>得知了具体的代码位置，直接进去看。经过小伙伴提醒，发现这个代码有一个问题:</p>
 <p>这段代码为一个拆词方法，具体代码就不贴了，里面有一个循环，每一次循环会往一个ArrayList里加一个String对象，在循环的某一个阶段，会重置循环计数器 i，在普通的参数下并没有问题。但是某些特定的条件下。就会不停的重置循环计数器 i，导致一个死循环。</p>
 <p>以下是模拟出来的结果，可以看到，才运行了一会，这个ArrayList就产生了322w个对象，且大部分Stirng对象都是空值。</p>
-<p><a href="#235e836673d95a6dcdf93932d20cdad7-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_12.png" style="margin: auto;"/>
+<p><a href="#5000f344d175c0abbb77840ab11015eb-lightbox">
+<img alt="jvm_problem_12.png" src="/post/images/2020/08/jvm_problem_12.png" style="margin: auto;"/>
 </a>
-<a class="lightbox" href="#_" id="235e836673d95a6dcdf93932d20cdad7-lightbox">
-<img alt="" src="https://cdn.jsdelivr.net/gh/bugfix123/CDN/9527/post/images/2020/jvm_problem_12.png"/>
+<a class="lightbox" href="#_" id="5000f344d175c0abbb77840ab11015eb-lightbox">
+<img alt="jvm_problem_12.png" src="/post/images/2020/08/jvm_problem_12.png"/>
 </a></p>
 <p>至此，水落石出。</p>
 <h1 id="最终结论">最终结论<a arialabel="Anchor" class="hanchor" href="#最终结论">⌗</a> </h1>
