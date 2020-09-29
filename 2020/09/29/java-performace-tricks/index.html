@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>衡量Java性能的两个重要指标 :: 志哥笔记 — 记述码农在家的故事！</title>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="当我们关注Java应用的性能时，通常会聚焦两个因素：响应能力(responsiveness)和吞吐量(throughput)。 响应能力 响应能力(Responsiveness)，指的是应用或系统对请求的" name="description"/>
+<meta content="前沿技术,IT博客,技术笔记,IT Share" name="keywords"/>
+<meta content="noodp" name="robots"/>
+<link href="https://zhige.io/2020/09/29/java-performace-tricks/" rel="canonical"/>
+<link href="https://zhige.io/assets/style.css" rel="stylesheet"/>
+<link href="https://zhige.io/assets/blue.css" rel="stylesheet"/>
+<link href="/img/favicon/favicon_io/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="/img/favicon/favicon_io/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/img/favicon/favicon_io/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="/img/favicon/favicon_io/site.webmanifest" rel="manifest"/>
+<meta content="en" property="og:locale"/>
+<meta content="article" property="og:type"/>
+<meta content="衡量Java性能的两个重要指标 :: 志哥笔记" property="og:title"/>
+<meta content="当我们关注Java应用的性能时，通常会聚焦两个因素：响应能力(responsiveness)和吞吐量(throughput)。" property="og:description"/>
+<meta content="https://zhige.io/2020/09/29/java-performace-tricks/" property="og:url"/>
+<meta content="衡量Java性能的两个重要指标" property="og:site_name"/>
+<meta content="https://zhige.io/img/favicon/blue.png" property="og:image"/>
+<meta content="2048" property="og:image:width"/>
+<meta content="1024" property="og:image:height"/>
+<meta content="2020-09-29 00:00:00 +0000 UTC" property="article:published_time"/>
+<link href="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body class="">
+<div class="container center headings--one-size">
+<header class="header">
+<div class="header__inner">
+<div class="header__logo">
+<a href="/">
+<div class="logo">
+    Zhige.io
+  </div>
+</a>
+</div>
+<div class="menu-trigger">menu</div>
+</div>
+<nav class="menu">
+<ul class="menu__inner menu__inner--desktop">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href="/">Home</a></li>
+<li><a href="/archives">Archives</a></li>
+<li><a href="/tags">Tags</a></li>
+<li><a href="/search">Search</a></li>
+<li><a href="/about">About</a></li>
+</ul>
+</nav>
+</header>
+<div class="content">
+<div class="post">
+<h1 class="post-title">
+<a href="https://zhige.io/2020/09/29/java-performace-tricks/">衡量Java性能的两个重要指标</a></h1>
+<div class="post-meta">
+<span class="post-date">
+        2020-09-29 
+      </span>
+<span class="post-author">::
+      Zhige
+    </span>
+</div>
+<span class="post-tags">
+    
+    #<a href="https://zhige.io/tags/jvm/">JVM</a> 
+    
+  </span>
+<div class="post-content"><div>
+<p>当我们关注Java应用的性能时，通常会聚焦两个因素：响应能力(responsiveness)和吞吐量(throughput)。</p>
+<h1 id="响应能力">响应能力<a arialabel="Anchor" class="hanchor" href="#响应能力">⌗</a> </h1>
+<p><strong>响应能力</strong><code>(Responsiveness)</code>，指的是应用或系统对请求的数据响应有多快。例如：</p>
+<ul>
+<li>桌面UI对触发事件响应有多快</li>
+<li>网站返回请求的页面有多快</li>
+<li>数据库查询返回结果有多快</li>
+</ul>
+<p>对于强调响应能力的应用来说，长时间的暂停是不可接受的，关注的焦点 是响应时间的长短。</p>
+<h1 id="吞吐量">吞吐量<a arialabel="Anchor" class="hanchor" href="#吞吐量">⌗</a> </h1>
+<p><strong>吞吐量</strong><code>(Throughput)</code>，指的是在指定的时间内，应用作业的最大数量。吞吐量的衡量指标比如：</p>
+<ul>
+<li>在指定时间内完成了多少个事务</li>
+<li>在一个小时内批处理任务完成了多少任务</li>
+<li>在一个小时内数据库查询了多少次</li>
+</ul>
+<p>对于聚焦于吞吐量的应用来说，较高的暂停是可以接受的。由于吞吐量的衡量基准是基于很长一段时间，所以快速响应不是考虑在内的因素。</p>
+</div></div>
+<div class="pagination">
+<div class="pagination__title">
+<span class="pagination__title-h">Read other posts</span>
+<hr/>
+</div>
+<div class="pagination__buttons">
+<span class="button next">
+<a href="https://zhige.io/2020/09/24/cms-key-concept/">
+<span class="button__text">CMS收集器之重要概念</span>
+<span class="button__icon">→</span>
+</a>
+</span>
+</div>
+</div>
+<aside id="comments" style="
+/* background: rgb(183 168 154 / 26%);
+border: 1px dashed var(--accent); 
+padding: 5px auto;margin: 10px auto;*/
+">
+<section data-isso-id="/2020/09/29/java-performace-tricks/" data-title="衡量Java性能的两个重要指标" id="isso-thread"></section>
+<script async="" data-isso="https://isso.dongzhi.me" data-isso-avatar="true" data-isso-avatar-bg="#f0f0f0" data-isso-avatar-fg="#9abf88 #5698c4 #e279a3 #9163b6 ..." data-isso-css="false" data-isso-feed="false" data-isso-id="thread-id" data-isso-lang="zh" data-isso-max-comments-nested="5" data-isso-max-comments-top="10" data-isso-reply-notifications="true" data-isso-reply-to-self="true" data-isso-require-author="true" data-isso-require-email="true" data-isso-reveal-on-click="5" data-isso-vote="false" data-isso-vote-levels="" onload="setAutoCompleteProperty()" src="https://isso.dongzhi.me/js/embed.min.js"></script>
+<script>
+	function setAutoCompleteProperty() {
+		var authors = document.getElementsByName('author');
+		if (authors != null && authors.length > 0) {
+			authors[0].setAttribute('autocomplete', 'off');
+		}
+		var emails = document.getElementsByName('email');
+		if (emails != null && emails.length > 0) {
+			emails[0].setAttribute('autocomplete', 'off');
+		}
+		var sites = document.getElementsByName('website');
+		if (sites != null && sites.length > 0) {
+			sites[0].setAttribute('autocomplete', 'off');
+		}
+	}
+	</script>
+</aside>
+</div>
+</div>
+<footer class="footer">
+<div class="footer__inner">
+<div class="copyright">
+<span>© 2020 <a href="https://zhige.io/">志哥笔记</a></span>
+<span>:: <a href="https://themes.gohugo.io/hugo-theme-terminal/">Terminal</a></span>
+<span>:: <a href="https://my.laoxuehost.com/aff.php?aff=10457">老薛主机</a></span>
+</div>
+</div>
+</footer>
+<script src="https://zhige.io/assets/main.js"></script>
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bugfix123/CDN@master/modules/plyr/3.6.2/plyr.polyfilled.min.js"></script>
+<script>
+    const players = Plyr.setup('.js-player', {
+        iconUrl: '/modules/plyr/3.6.2/plyr.svg'
+    });
+    </script>
+</div>
+</body>
+</html>
